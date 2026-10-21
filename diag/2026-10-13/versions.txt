@@ -1,0 +1,12 @@
+kernel: 7.2.9-1-cachyos
+dmi: MacBook9,1 bios 522.0.0.0.0
+mem_sleep: s2idle [deep]
+linux-firmware 1:20260916-1
+linux-firmware-broadcom 1:20260916-1
+networkmanager 1.58.1-2
+wpa_supplicant 2:2.12-1.1
+iwd 3.12-2.1
+brcm 4350 files: brcmfmac4350c2-pcie.bin.zst brcmfmac4350-pcie.bin.zst 
+modprobe.d brcm: 
+NM conf powersave/backend: 
+cmdline: quiet loglevel=3 systemd.show_status=auto nowatchdog rw rootflags=subvol=/@ rd.luks.uuid=<redacted> root=<redacted> cpuidle.governor=teo pcie_aspm=force

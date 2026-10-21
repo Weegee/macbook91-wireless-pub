@@ -1,0 +1,153 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Weegee <748975+Weegee@users.noreply.github.com>
+Date: Tue, 13 Oct 2026 15:44:05 +0200
+Subject: [PATCH] Bluetooth: hci_bcm: set up the ROM firmware of Mac UART
+ controllers
+
+The UART controllers of Intel Macs (BCM2E7C, e.g. BCM4350C0 in the
+MacBook9,1) run on their ROM firmware: neither macOS nor Boot Camp ship
+a patch for them. Setup searched for one anyway and logged an error,
+then returned early, so it never finalized the controller. Before that,
+the serdev core sent a speed change to the ACPI 'baud' of 3 Mbit/s, the
+speed the controller already runs at, which it refused with Command
+Disallowed.
+
+On Macs, skip the patch search and finalize the controller as after a
+patch, do not set the speed before setup, and leave out the speed
+change when the operational speed equals the initial one. The module
+parameter apple_patchram restores the search. The ACPI and reset
+warnings, which describe the normal Mac layout (power through ACPI
+methods, no GPIOs), become silent there.
+---
+ drivers/bluetooth/hci_bcm.c | 52 ++++++++++++++++++++++++++++++++-----
+ 1 file changed, 45 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 9bbc8ec..0b7301d 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -148,6 +148,7 @@ struct bcm_device {
+ 	bool			no_uart_clock_set;
+ 	bool			use_autobaud_mode;
+ 	bool			le_adv_type_fixup;
++	bool			no_patchram;
+ 	u8			pcm_int_params[5];
+ 	u32			max_autobaud_speed;
+ };
+@@ -169,6 +170,10 @@ static int irq_polarity = -1;
+ module_param(irq_polarity, int, 0444);
+ MODULE_PARM_DESC(irq_polarity, "IRQ polarity 0: active-high 1: active-low");
+ 
++static bool apple_patchram;
++module_param(apple_patchram, bool, 0644);
++MODULE_PARM_DESC(apple_patchram, "Look for a firmware patch on Macs, which run their UART controllers on ROM firmware");
++
+ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ {
+ 	if (hu->serdev)
+@@ -590,7 +595,8 @@ static int bcm_setup(struct hci_uart *hu)
+ 	struct bcm_data *bcm = hu->priv;
+ 	bool fw_load_done = false;
+ 	bool use_autobaud_mode = (bcm->dev ? bcm->dev->use_autobaud_mode : 0);
+-	unsigned int speed;
++	unsigned int speed, init_speed;
++	bool apple, rom_only;
+ 	int err;
+ 
+ 	bt_dev_dbg(hu->hdev, "hu %p", hu);
+@@ -598,6 +604,16 @@ static int bcm_setup(struct hci_uart *hu)
+ 	hu->hdev->set_diag = bcm_set_diag;
+ 	hu->hdev->set_bdaddr = btbcm_set_bdaddr;
+ 
++	/* The UART controllers of Intel Macs run on ROM firmware; macOS and
++	 * Boot Camp load no patch for them, so there is none to look for.
++	 * Set up the controller as after a patch, without re-initializing.
++	 * no_patchram is set for Macs only (bcm_apple_get_resources()).
++	 */
++	apple = bcm->dev && bcm->dev->no_patchram;
++	rom_only = apple && !apple_patchram;
++	if (rom_only)
++		fw_load_done = true;
++
+ 	err = btbcm_initialize(hu->hdev, &fw_load_done, use_autobaud_mode);
+ 	if (err)
+ 		return err;
+@@ -615,6 +631,7 @@ static int bcm_setup(struct hci_uart *hu)
+ 
+ 	if (speed)
+ 		host_set_baudrate(hu, speed);
++	init_speed = speed;
+ 
+ 	/* Operational speed if any */
+ 	if (hu->oper_speed)
+@@ -626,7 +643,11 @@ static int bcm_setup(struct hci_uart *hu)
+ 	else
+ 		speed = 0;
+ 
+-	if (speed) {
++	/* On Macs, nothing to change when the controller already runs at
++	 * the operational speed (both are the ACPI 'baud' of 3 Mbit/s); the
++	 * controller may refuse the command then (Command Disallowed).
++	 */
++	if (speed && !(apple && speed == init_speed)) {
+ 		err = bcm_set_baudrate(hu, speed);
+ 		if (!err)
+ 			host_set_baudrate(hu, speed);
+@@ -642,6 +663,10 @@ static int bcm_setup(struct hci_uart *hu)
+ 		btbcm_write_pcm_int_params(hu->hdev, &params);
+ 	}
+ 
++	/* Without a patch there is nothing to re-initialize. */
++	if (rom_only)
++		fw_load_done = false;
++
+ 	err = btbcm_finalize(hu->hdev, &fw_load_done, use_autobaud_mode);
+ 	if (err)
+ 		return err;
+@@ -1077,6 +1102,12 @@ static int bcm_apple_get_resources(struct bcm_device *dev)
+ 	dev->set_device_wakeup = bcm_apple_set_device_wakeup;
+ 	dev->set_shutdown = bcm_apple_set_shutdown;
+ 	dev->le_adv_type_fixup = true;
++	dev->no_patchram = true;
++	/* The controller starts at the ACPI 'baud' (3 Mbit/s, also the
++	 * maximum of the LPSS UART) and refuses a speed change before its
++	 * reset (Command Disallowed).
++	 */
++	dev->no_early_set_baudrate = true;
+ 
+ 	return 0;
+ }
+@@ -1243,12 +1274,14 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+ 		gpio_mapping = acpi_bcm_int_first_gpios;
+ 	else if (dev->gpio_int_idx == 2)
+ 		gpio_mapping = acpi_bcm_int_last_gpios;
+-	else
++	else if (!x86_apple_machine)
+ 		dev_warn(dev->dev, "Unexpected ACPI gpio_int_idx: %d\n",
+ 			 dev->gpio_int_idx);
+ 
+-	/* Warn if our expectations are not met. */
+-	if (dev->gpio_count != (dev->irq ? 2 : 3))
++	/* Warn if our expectations are not met. Macs have no GPIO resources:
++	 * power and wake are ACPI methods (bcm_apple_get_resources()).
++	 */
++	if (dev->gpio_count != (dev->irq ? 2 : 3) && !x86_apple_machine)
+ 		dev_warn(dev->dev, "Unexpected number of ACPI GPIOs: %d\n",
+ 			 dev->gpio_count);
+ 
+@@ -1584,8 +1617,13 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
+ 		return err;
+ 
+ 	if (!bcmdev->shutdown) {
+-		dev_warn(&serdev->dev,
+-			 "No reset resource, using default baud rate\n");
++		/* Macs power the controller through ACPI methods instead. */
++		if (bcmdev->btpu)
++			dev_dbg(&serdev->dev,
++				"No reset GPIO, using default baud rate\n");
++		else
++			dev_warn(&serdev->dev,
++				 "No reset resource, using default baud rate\n");
+ 		bcmdev->oper_speed = bcmdev->init_speed;
+ 	}
+ 

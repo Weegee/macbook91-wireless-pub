@@ -1,0 +1,13 @@
+# Suspend tests of the camera project on 2026-10-13 (rtcwake, driver facetimehd with patch 0008)
+s3-closed-1: rtcwake_rc=0 wall_ms=10547
+s3-closed-2: rtcwake_rc=0 wall_ms=10043
+s2i-closed-1: rtcwake_rc=0 wall_ms=9594
+s3-open-1: rtcwake_rc=0 wall_ms=10424
+s2i-open-1: rtcwake_rc=0 wall_ms=9512
+L-mem-open-1: rtcwake_rc=0 wall_ms=4880 | ok
+L-mem-closed-1: rtcwake_rc=1 wall_ms=11246 | Schreibfehler
+L-mem-open-2: rtcwake_rc=1 wall_ms=10176 | Schreibfehler
+L-mem-closed-2: rtcwake_rc=1 wall_ms=4743 | Schreibfehler
+L-mem-open-3: rtcwake_rc=1 wall_ms=4642 | Schreibfehler
+L-mem-closed-3: rtcwake_rc=1 wall_ms=4679 | Schreibfehler
+L-mem-open-4: rtcwake_rc=1 wall_ms=4692 | Schreibfehler

@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Maintainer: Weegee <748975+Weegee@users.noreply.github.com>
+#
+# Patched brcmfmac and hci_uart (DKMS) making WLAN (BCM4350) and Bluetooth
+# (BCM4350C0, UART) of the Apple MacBook9,1 survive suspend and recover from
+# firmware hangs without a reboot. See README.md and docs/ in the project.
+
+pkgname=macbook91-wireless-dkms
+_pkgname="${pkgname%-dkms}"
+pkgver=20261021.01
+pkgrel=1
+pkgdesc="Patched brcmfmac and hci_uart for WLAN and Bluetooth of the Apple MacBook9,1 (DKMS)"
+arch=('x86_64')
+url='https://github.com/Weegee/macbook91-wireless-pub'
+# This project's own files are GPL-3.0-or-later, except those that build the
+# modules (Makefile, dkms.conf and Kbuild files in /usr/src):
+# GPL-2.0-or-later, the Kbuild file for hci_uart GPL-2.0-only. Kernel files
+# keep their licenses: brcmfmac is ISC; hci_uart is GPL-2.0-or-later except
+# hci_ll.c, hci_qca.c and btqca.h (GPL-2.0-only) and hci_aml.c
+# (GPL-2.0-only OR MIT). README.md maps every path.
+license=('GPL-3.0-or-later' 'GPL-2.0-or-later' 'GPL-2.0-only' 'ISC' 'MIT')
+install="$_pkgname.install"
+
+# linux-firmware-broadcom carries brcm/brcmfmac4350c2-pcie.bin, the only
+# FullMAC firmware for this chip; the Bluetooth controller runs on its ROM and
+# needs no file (docs/FINDINGS.md).
+depends=('dkms' 'linux-firmware-broadcom')
+# DKMS builds per installed kernel and needs that kernel's headers. Only the
+# kernel series listed in KERNEL-SERIES (6.18 and 7.2) are built; other kernels
+# keep their drivers.
+optdepends=('linux-cachyos-headers: build against the CachyOS kernel'
+            'linux-cachyos-lts-headers: build against the CachyOS LTS kernel'
+            'linux-headers: build against the Arch kernel'
+            'clang: required by kernels built with clang, e.g. linux-cachyos'
+            'lld: required by kernels built with clang'
+            'llvm: required by kernels built with clang'
+            'bluez-utils: lets macbook91-wireless-verify read the Bluetooth state')
+makedepends=('make')
+
+# One source: the reproducible tarball `make dist` writes to dist/. Its kernel
+# half is fetched by packaging/fetch-upstream.sh from git.kernel.org and checked
+# against packaging/upstream.lock before it enters the tarball; makepkg
+# downloads nothing, and DKMS rebuilds during kernel upgrades run offline.
+source=("$pkgname-$pkgver.tar")
+sha256sums=('65d735b8e5ecd1e312113e1334de74045ef9f23a9bfebe8fa40f3cb50a3997c3')
+
+package() {
+    cd "$pkgname-$pkgver" || exit 1
+    make PREFIX=/usr DESTDIR="$pkgdir" install
+}

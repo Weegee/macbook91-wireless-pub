@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Weegee <748975+Weegee@users.noreply.github.com>
+Date: Wed, 14 Oct 2026 10:52:59 +0200
+Subject: [PATCH] brcmfmac: pcie: lock the parent bridge's config space for the
+ reset on resume
+
+With pm_reset the device is reset on resume by pci_reset_function_locked(),
+since the PM core already holds the device lock. The chip has no FLR, so
+this is a secondary bus reset of the parent bridge, and unlike
+pci_reset_function() this path does not lock the bridge. The PCI core
+warns once per boot, on the first resume:
+
+  pcieport 0000:00:1d.0: unlocked secondary bus reset via: __pci_reset_function_locked+0x60/0x110
+
+Lock the bridge's config space around the reset, as pci_dev_lock() does
+for pci_reset_function(), so that no config access to the bridge races
+the reset. The bridge's device lock is not taken: the PM core holds the
+device's own lock, and taking the parent's after it would invert the lock
+order.
+---
+ .../net/wireless/broadcom/brcm80211/brcmfmac/pcie.c    | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+index 928a1be..6c7ef22 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+@@ -2752,12 +2752,22 @@ MODULE_PARM_DESC(pm_reset, "Remove the device for system sleep, reset and probe
+ 
+ static int brcmf_pcie_pm_reprobe(struct pci_dev *pdev)
+ {
++	struct pci_dev *bridge = pci_upstream_bridge(pdev);
+ 	int err;
+ 
+ 	/* The PM core holds the device lock across the resume callbacks.
+ 	 * The reset_done handler probes the device after a reset.
++	 *
++	 * The reset is a secondary bus reset of the parent bridge. Its config
++	 * space is locked for it, as pci_reset_function() does through
++	 * pci_dev_lock(); only the config space, since taking the bridge's
++	 * device lock after the device's own would invert the lock order.
+ 	 */
++	if (bridge)
++		pci_cfg_access_lock(bridge);
+ 	err = pci_reset_function_locked(pdev);
++	if (bridge)
++		pci_cfg_access_unlock(bridge);
+ 	if (dev_get_drvdata(&pdev->dev))
+ 		return 0;
+ 	if (err)

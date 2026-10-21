@@ -1,0 +1,82 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Weegee <748975+Weegee@users.noreply.github.com>
+Date: Tue, 13 Oct 2026 15:32:26 +0200
+Subject: [PATCH] brcmfmac: pcie: remove before and probe after a function
+ reset
+
+A reset of the bound device (sysfs reset, or the reset before probe on
+resume) returns the chip to its power-on state with the firmware gone,
+while the driver still holds rings, interrupts and the firmware's shared
+memory. The PCI core then also warns 'resetting' and 'reset done' on
+every reset of a bound device without error handlers, so each resume
+with pm_reset logged two warnings.
+
+reset_prepare removes the device, reset_done probes it again. The reset
+before probe on resume now leaves the probe to reset_done and probes
+itself only when no reset was possible.
+---
+ .../broadcom/brcm80211/brcmfmac/pcie.c        | 38 ++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+index cd8bf9e..9342fc6 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+@@ -2753,8 +2753,12 @@ static int brcmf_pcie_pm_reprobe(struct pci_dev *pdev)
+ {
+ 	int err;
+ 
+-	/* The PM core holds the device lock across the resume callbacks. */
++	/* The PM core holds the device lock across the resume callbacks.
++	 * The reset_done handler probes the device after a reset.
++	 */
+ 	err = pci_reset_function_locked(pdev);
++	if (dev_get_drvdata(&pdev->dev))
++		return 0;
+ 	if (err)
+ 		pci_info(pdev, "reset before probe failed (%d), probing anyway\n",
+ 			 err);
+@@ -2914,11 +2918,43 @@ static const struct pci_device_id brcmf_pcie_devid_table[] = {
+ MODULE_DEVICE_TABLE(pci, brcmf_pcie_devid_table);
+ 
+ 
++/* A function reset (sysfs reset, or the reset before probe on resume)
++ * takes the chip back to its power-on state, which the bound driver cannot
++ * survive: remove before, probe again after. Without these handlers the
++ * PCI core also warns 'resetting' and 'reset done' on every reset of a
++ * bound device.
++ */
++static void brcmf_pcie_reset_prepare(struct pci_dev *pdev)
++{
++	if (dev_get_drvdata(&pdev->dev)) {
++		brcmf_dbg(PCIE, "function reset, removing device\n");
++		brcmf_pcie_remove(pdev);
++	}
++}
++
++static void brcmf_pcie_reset_done(struct pci_dev *pdev)
++{
++	int err;
++
++	if (dev_get_drvdata(&pdev->dev))
++		return;
++	err = brcmf_pcie_probe(pdev, NULL);
++	if (err)
++		__brcmf_err(NULL, __func__, "probe after reset failed, err=%d\n",
++			    err);
++}
++
++static const struct pci_error_handlers brcmf_pcie_err_handler = {
++	.reset_prepare = brcmf_pcie_reset_prepare,
++	.reset_done = brcmf_pcie_reset_done,
++};
++
+ static struct pci_driver brcmf_pciedrvr = {
+ 	.name = KBUILD_MODNAME,
+ 	.id_table = brcmf_pcie_devid_table,
+ 	.probe = brcmf_pcie_probe,
+ 	.remove = brcmf_pcie_remove,
++	.err_handler = &brcmf_pcie_err_handler,
+ #ifdef CONFIG_PM
+ 	.driver.pm = &brcmf_pciedrvr_pm,
+ #endif

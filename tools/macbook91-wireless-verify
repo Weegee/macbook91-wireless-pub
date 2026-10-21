@@ -1,0 +1,210 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# macbook91-wireless-verify: is the patched WLAN/Bluetooth stack of
+# macbook91-wireless what is actually running on this MacBook9,1?
+#
+#   macbook91-wireless-verify            check, print PASS/WARN/FAIL lines,
+#                                        exit 1 on any FAIL
+#   sudo macbook91-wireless-verify --reload
+#                                        load the installed modules now (WLAN
+#                                        and Bluetooth drop for a few seconds),
+#                                        then check
+#
+# Prints no MAC or Bluetooth addresses, SSIDs or device names.
+set -uo pipefail
+
+PCI=0000:02:00.0
+fails=0
+warns=0
+pass() { printf 'PASS  %s\n' "$*"; }
+warn() { printf 'WARN  %s\n' "$*"; warns=$((warns + 1)); }
+fail() { printf 'FAIL  %s\n' "$*"; fails=$((fails + 1)); }
+info() { printf 'INFO  %s\n' "$*"; }
+has_netdev() { [ -n "$(ls -A /sys/bus/pci/devices/$PCI/net 2>/dev/null)" ]; }
+
+usage() { sed -n '4,12s/^# \{0,1\}//p' "$0"; }
+
+reload() {
+	[ "$(id -u)" = 0 ] || { echo "--reload needs root" >&2; exit 2; }
+	local m
+	for m in brcmfmac_wcc brcmfmac_cyw brcmfmac_bca brcmfmac; do
+		grep -q "^$m " /proc/modules && { modprobe -r "$m" || { echo "cannot unload $m" >&2; exit 1; }; }
+	done
+	modprobe brcmfmac || { echo "cannot load brcmfmac" >&2; exit 1; }
+	if grep -q '^hci_uart ' /proc/modules; then
+		modprobe -r hci_uart || { echo "cannot unload hci_uart (in use?)" >&2; exit 1; }
+	fi
+	modprobe hci_uart || { echo "cannot load hci_uart" >&2; exit 1; }
+	# Give the firmware and NetworkManager time to come up before checking.
+	for _ in $(seq 1 30); do
+		has_netdev && [ -e /sys/class/bluetooth/hci0 ] && break
+		sleep 1
+	done
+	sleep 2
+}
+
+case "${1:-}" in
+'') ;;
+--reload) reload ;;
+-h|--help) usage; exit 0 ;;
+*) usage >&2; exit 2 ;;
+esac
+
+running=$(uname -r)
+series=${running%%.*}.$(echo "$running" | cut -d. -f2)
+srcdir=$(ls -d /usr/src/macbook91-wireless-* 2>/dev/null | sort -V | tail -n1)
+
+# Package and build ---------------------------------------------------------
+if [ -z "$srcdir" ]; then
+	fail "macbook91-wireless is not installed (/usr/src/macbook91-wireless-*)"
+	exit 1
+fi
+# The package carries one source tree per kernel series (KERNEL-SERIES lists
+# them); the module identity of the running kernel is the hash of the manifest
+# of its series.
+pkgsers=$(paste -sd, "$srcdir/KERNEL-SERIES" 2>/dev/null | sed 's/,/, /g')
+pkgver=${srcdir##*/macbook91-wireless-}
+want_id="$pkgver+$(sha256sum "$srcdir/series/$series/UPSTREAM.sha256" 2>/dev/null | cut -c1-16)"
+shipped=0
+while IFS= read -r s; do
+	[ "$s" = "$series" ] && shipped=1
+done <"$srcdir/KERNEL-SERIES"
+info "package $pkgver for Linux ${pkgsers:-none}, running kernel $running"
+if [ "$shipped" = 0 ]; then
+	warn "the running kernel is not one of Linux ${pkgsers:-none}: it uses its stock drivers"
+fi
+
+# Modules: the file depmod resolves and the loaded copy -----------------------
+check_module() { # name sysfs-name
+	local file tag loaded_src file_src taint
+	file=$(modinfo -n "$1" 2>/dev/null)
+	tag=$(modinfo -F macbook91_wireless "$1" 2>/dev/null)
+	if [ -z "$tag" ]; then
+		[ "$shipped" = 1 ] && fail "$1: modprobe resolves to the stock module ($file); DKMS build missing?"
+		return
+	fi
+	[ "$tag" = "$want_id" ] || warn "$1: installed module is $tag, the package sources are $want_id"
+	if [ ! -d /sys/module/"$2" ]; then
+		warn "$1: not loaded"
+		return
+	fi
+	loaded_src=$(cat /sys/module/"$2"/srcversion 2>/dev/null)
+	file_src=$(modinfo -F srcversion "$1" 2>/dev/null)
+	taint=$(cat /sys/module/"$2"/taint 2>/dev/null)
+	if [ -n "$loaded_src" ] && [ "$loaded_src" = "$file_src" ] && [[ "$taint" == *O* ]]; then
+		pass "$1: patched module $tag loaded"
+	else
+		fail "$1: the loaded module is not the installed patched one (reboot, or sudo $0 --reload)"
+	fi
+}
+if [ "$shipped" = 1 ]; then
+	if command -v dkms >/dev/null; then
+		st=$(dkms status -m macbook91-wireless -v "$pkgver" -k "$running" 2>/dev/null)
+		case "$st" in
+		*installed*) pass "dkms: built and installed for $running" ;;
+		*) fail "dkms: not installed for $running (${st:-no status}); check headers and clang" ;;
+		esac
+	fi
+	check_module brcmfmac brcmfmac
+	check_module brcmfmac-wcc brcmfmac_wcc
+	check_module hci_uart hci_uart
+fi
+
+param() { cat /sys/module/"$1"/parameters/"$2" 2>/dev/null; }
+if [ -d /sys/module/brcmfmac/parameters ] && [ -e /sys/module/brcmfmac/parameters/pm_reset ]; then
+	[ "$(param brcmfmac pm_reset)" = Y ] && pass "brcmfmac: chip reset across system sleep on" ||
+		warn "brcmfmac: pm_reset is off; suspend uses the firmware's own D3 path"
+	[ "$(param brcmfmac reset_rebind)" = Y ] && pass "brcmfmac: hang recovery by rebind on" ||
+		warn "brcmfmac: reset_rebind is off; a firmware hang needs a manual reload"
+fi
+# modprobe joins the options of all modprobe.d files in lexical order and the
+# last feature_disable wins; bit 0x10 is Wi-Fi P2P.
+fd=$(modprobe -c 2>/dev/null | awk '$1 == "options" && $2 == "brcmfmac" {
+	for (i = 3; i <= NF; i++) if ($i ~ /^feature_disable=/) v = substr($i, 17) } END {print v}')
+if [[ $fd =~ ^(0[xX][0-9a-fA-F]+|[0-9]+)$ ]] && (( fd & 0x10 )); then
+	pass "brcmfmac: Wi-Fi P2P off (modprobe.d)"
+else
+	info "brcmfmac: Wi-Fi P2P on (feature_disable=${fd:-unset} in modprobe.d)"
+fi
+
+# Firmware ------------------------------------------------------------------
+# brcmfmac loads brcmfmac4350c2-pcie for BCM4350 revisions 0-7 (the
+# MacBook9,1 has revision 5) and brcmfmac4350-pcie for later ones.
+if ls /usr/lib/firmware/brcm/brcmfmac4350c2-pcie.bin* >/dev/null 2>&1; then
+	pass "firmware: brcm/brcmfmac4350c2-pcie.bin present"
+else
+	fail "firmware: brcm/brcmfmac4350c2-pcie.bin missing (linux-firmware-broadcom)"
+fi
+
+# Sleep hooks that fight the driver -----------------------------------------
+hooks=$(grep -lsE 'brcmfmac|hci_uart|rfkill' /usr/lib/systemd/system-sleep/* /etc/systemd/system-sleep/* \
+	/etc/pm/sleep.d/* /usr/lib/pm-utils/sleep.d/* 2>/dev/null)
+units=$(grep -lsE '(modprobe|rmmod).*(brcmfmac|hci_uart)' /etc/systemd/system/*.service \
+	/usr/lib/systemd/system/*.service 2>/dev/null)
+if [ -n "$hooks$units" ]; then
+	for h in $hooks $units; do
+		warn "sleep hook touches WLAN/Bluetooth, likely obsolete now: $h"
+	done
+else
+	pass "no sleep hook unloads brcmfmac or hci_uart"
+fi
+
+# Devices -------------------------------------------------------------------
+if [ -e /sys/bus/pci/devices/$PCI/driver ]; then
+	drv=$(basename "$(readlink /sys/bus/pci/devices/$PCI/driver)")
+	if [ "$drv" = brcmfmac ] && has_netdev; then
+		pass "WLAN: BCM4350 bound to brcmfmac, interface up"
+	else
+		fail "WLAN: BCM4350 bound to '$drv' but no interface"
+	fi
+else
+	fail "WLAN: BCM4350 ($PCI) has no driver"
+fi
+if [ -e /sys/class/bluetooth/hci0 ]; then
+	soft=$(cat /sys/class/bluetooth/hci0/rfkill*/soft 2>/dev/null | head -n1)
+	if [ "$soft" = 1 ]; then
+		info "Bluetooth: hci0 present, blocked by rfkill (user setting)"
+	else
+		pass "Bluetooth: hci0 present"
+	fi
+else
+	fail "Bluetooth: no hci0"
+fi
+
+# Journal since the modules were loaded ---------------------------------------
+# A module's load time is the last line it logs while loading in this boot:
+# brcmfmac registers its USB driver, hci_uart prints its version. Without such
+# a line the whole boot counts. (The mtime of /sys/module/<name> is not the
+# load time: sysfs stamps a directory when its inode is first looked up.)
+since() { # since REGEX: "@<epoch>" of the last kernel line of this boot matching it, or ""
+	journalctl -k -b 0 -o short-unix --no-pager 2>/dev/null | grep -E "$1" | tail -n1 |
+		awk '{print "@" $1}'
+}
+kern() { # kern SINCE [journalctl options]: kernel lines of this boot since SINCE ("" = whole boot)
+	local args=(-k -b 0 -o cat --no-pager)
+	[ -n "$1" ] && args+=(--since "$1")
+	journalctl "${args[@]}" "${@:2}" 2>/dev/null
+}
+if journalctl -k -b 0 -n 1 >/dev/null 2>&1; then
+	sw=$(since 'usbcore: registered new interface driver brcmfmac$')
+	sb=$(since 'Bluetooth: HCI UART driver ver ')
+	when() { [ -z "$1" ] && echo "this boot" || echo "since $(date -d "$1" '+%F %H:%M')"; }
+	n_rec=$(kern "$sw" | grep -c 'brcmfmac.*recovering')
+	n_giveup=$(kern "$sw" | grep -c 'brcmfmac.*giving up')
+	n_werr=$(kern "$sw" -p err | grep -ciE 'brcmf|brcmfmac')
+	n_berr=$(kern "$sb" -p err | grep -ciE 'hci0|Bluetooth')
+	n_adv=$(kern "$sb" | grep -c 'unknown advertising packet type')
+	[ "$n_rec" -gt 0 ] && info "journal: brcmfmac recovered the firmware $n_rec time(s) $(when "$sw")"
+	[ "$n_giveup" -gt 0 ] && fail "journal: brcmfmac gave up recovering $(when "$sw")"
+	[ "$n_werr" -gt 0 ] && warn "journal: $n_werr WLAN error line(s) $(when "$sw") (journalctl -k -b -p err)"
+	[ "$n_berr" -gt 0 ] && warn "journal: $n_berr Bluetooth error line(s) $(when "$sb") (journalctl -k -b -p err)"
+	[ "$n_adv" -gt 0 ] && warn "journal: $n_adv 'unknown advertising packet type' $(when "$sb")"
+	[ "$n_giveup$n_werr$n_berr$n_adv" = 0000 ] &&
+		pass "journal: no WLAN/Bluetooth errors $(when "$sw")"
+else
+	info "journal: not readable (run as root or in group systemd-journal)"
+fi
+
+printf '%s: %d FAIL, %d WARN\n' "$([ $fails = 0 ] && echo PASS || echo FAIL)" "$fails" "$warns"
+[ "$fails" = 0 ]

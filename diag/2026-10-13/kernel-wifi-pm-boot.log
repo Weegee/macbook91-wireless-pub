@@ -1,0 +1,713 @@
+[    1.466818] cachyos kernel: pci 0000:00:1d.0: [8086:9d18] type 01 class 0x060400 PCIe Root Port
+[    1.467240] cachyos kernel: pci 0000:00:1d.0: PCI bridge to [bus 02]
+[    1.467679] cachyos kernel: pci 0000:00:1d.0:   bridge window [mem 0x92000000-0x924fffff]
+[    1.468131] cachyos kernel: pci 0000:00:1d.0: PME# supported from D0 D3hot D3cold
+[    1.477097] cachyos kernel: pci 0000:02:00.0: [14e4:43a3] type 00 class 0x028000 PCIe Endpoint
+[    1.477499] cachyos kernel: pci 0000:02:00.0: BAR 0 [mem 0x92400000-0x92407fff 64bit]
+[    1.477898] cachyos kernel: pci 0000:02:00.0: BAR 2 [mem 0x92000000-0x923fffff 64bit]
+[    1.478305] cachyos kernel: pci 0000:02:00.0: supports D1 D2
+[    1.478699] cachyos kernel: pci 0000:02:00.0: PME# supported from D0 D1 D2 D3hot D3cold
+[    1.479089] cachyos kernel: pci 0000:00:1d.0: PCI bridge to [bus 02]
+[    1.504112] cachyos kernel: pci 0000:00:1d.0: PCI bridge to [bus 02]
+[    1.504595] cachyos kernel: pci 0000:00:1d.0:   bridge window [mem 0x92000000-0x924fffff]
+[   14.711038] testhost kernel: usbcore: registered new interface driver brcmfmac
+[   14.818070] testhost kernel: brcmfmac: brcmf_fw_alloc_request: using brcm/brcmfmac4350c2-pcie for chip BCM4350/5
+[   15.234649] testhost kernel: brcmfmac: brcmf_c_process_clm_blob: no clm_blob available (err=-2), device may have limited channels available
+[   15.246874] testhost kernel: brcmfmac: brcmf_c_process_txcap_blob: no txcap_blob available (err=-2)
+[   15.247111] testhost kernel: brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4350/5 wl0: Nov 26 2015 03:48:57 version 7.35.180.133 (r602372) FWID 01-c45b39d6
+[38025.721046] testhost kernel: PM: suspend entry (deep)
+[38027.955799] testhost kernel: ieee80211 phy0: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[38027.958488] testhost kernel: ieee80211 phy0: brcmf_cfg80211_reg_notifier: Country code iovar returned err = -5
+[38027.961361] testhost kernel: ACPI: PM: Preparing to enter system sleep state S3
+[38027.973321] testhost kernel: ACPI: PM: Waking up from system sleep state S3
+[38028.052324] testhost kernel: ieee80211 phy0: brcmf_netdev_start_xmit: xmit rejected state=0
+[38028.145909] testhost kernel: brcmfmac: brcmf_fw_alloc_request: using brcm/brcmfmac4350c2-pcie for chip BCM4350/5
+[38028.347086] testhost kernel: brcmfmac: brcmf_c_process_clm_blob: no clm_blob available (err=-2), device may have limited channels available
+[38028.347209] testhost kernel: brcmfmac: brcmf_c_process_txcap_blob: no txcap_blob available (err=-2)
+[38028.347276] testhost kernel: brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4350/5 wl0: Nov 26 2015 03:48:57 version 7.35.180.133 (r602372) FWID 01-c45b39d6
+[38028.475759] testhost kernel: PM: suspend exit
+[38039.180063] testhost kernel: PM: suspend entry (deep)
+[38041.372511] testhost kernel: ieee80211 phy1: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[38041.372860] testhost kernel: ieee80211 phy1: brcmf_cfg80211_reg_notifier: Country code iovar returned err = -5
+[38041.375189] testhost kernel: ieee80211 phy1: brcmf_netdev_start_xmit: xmit rejected state=0
+[38041.375497] testhost kernel: ACPI: PM: Preparing to enter system sleep state S3
+[38041.380074] testhost kernel: ACPI: PM: Waking up from system sleep state S3
+[38041.452953] testhost kernel: brcmfmac: brcmf_fw_alloc_request: using brcm/brcmfmac4350c2-pcie for chip BCM4350/5
+[38041.884794] testhost kernel: PM: suspend exit
+[38041.923053] testhost kernel: brcmfmac: brcmf_c_process_clm_blob: no clm_blob available (err=-2), device may have limited channels available
+[38041.923179] testhost kernel: brcmfmac: brcmf_c_process_txcap_blob: no txcap_blob available (err=-2)
+[38041.923226] testhost kernel: brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4350/5 wl0: Nov 26 2015 03:48:57 version 7.35.180.133 (r602372) FWID 01-c45b39d6
+[38052.605029] testhost kernel: PM: suspend entry (s2idle)
+[38055.103171] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[38055.103999] testhost kernel: ieee80211 phy2: brcmf_cfg80211_reg_notifier: Country code iovar returned err = -5
+[38055.457284] testhost kernel: PM: suspend exit
+[38069.141025] testhost kernel: PM: suspend entry (deep)
+[38069.264890] testhost kernel: facetimehd 0000:03:00.0: PM: dpm_run_callback(): pci_pm_suspend returns -16
+[38069.267073] testhost kernel: facetimehd 0000:03:00.0: PM: failed to suspend async: error -16
+[38069.268958] testhost kernel: PM: Some devices failed to suspend, or early wake event detected
+[38069.572579] testhost kernel: PM: suspend exit
+[40753.812044] testhost kernel: PM: suspend entry (deep)
+[40754.939998] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[40754.941707] testhost kernel: ieee80211 phy2: brcmf_cfg80211_reg_notifier: Country code iovar returned err = -5
+[40754.950436] testhost kernel: ieee80211 phy2: brcmf_netdev_start_xmit: xmit rejected state=0
+[40754.950893] testhost kernel: ACPI: PM: Preparing to enter system sleep state S3
+[40754.952686] testhost kernel: ACPI: PM: Waking up from system sleep state S3
+[40755.340713] testhost kernel: PM: suspend exit
+[40837.553173] testhost kernel: PM: suspend entry (deep)
+[40839.555538] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[40839.557153] testhost kernel: ieee80211 phy2: brcmf_cfg80211_reg_notifier: Country code iovar returned err = -5
+[40839.557704] testhost kernel: ieee80211 phy2: brcmf_netdev_start_xmit: xmit rejected state=0
+[40839.559587] testhost kernel: ACPI: PM: Preparing to enter system sleep state S3
+[40839.560645] testhost kernel: ACPI: PM: Waking up from system sleep state S3
+[40839.896817] testhost kernel: PM: suspend exit
+[40853.496173] testhost kernel: PM: suspend entry (s2idle)
+[40855.921212] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[40855.921938] testhost kernel: ieee80211 phy2: brcmf_cfg80211_reg_notifier: Country code iovar returned err = -5
+[40855.923692] testhost kernel: ieee80211 phy2: brcmf_netdev_start_xmit: xmit rejected state=0
+[40856.262892] testhost kernel: PM: suspend exit
+[40872.842033] testhost kernel: PM: suspend entry (deep)
+[40874.080549] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[40874.082433] testhost kernel: ieee80211 phy2: brcmf_cfg80211_reg_notifier: Country code iovar returned err = -5
+[40874.089096] testhost kernel: ACPI: PM: Preparing to enter system sleep state S3
+[40874.089292] testhost kernel: ieee80211 phy2: brcmf_netdev_start_xmit: xmit rejected state=0
+[40874.091378] testhost kernel: ACPI: PM: Waking up from system sleep state S3
+[40874.405424] testhost kernel: PM: suspend exit
+[40915.062029] testhost kernel: PM: suspend entry (s2idle)
+[40917.508429] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[40917.512144] testhost kernel: ieee80211 phy2: brcmf_cfg80211_reg_notifier: Country code iovar returned err = -5
+[40917.512987] testhost kernel: ieee80211 phy2: brcmf_netdev_start_xmit: xmit rejected state=0
+[40917.829768] testhost kernel: PM: suspend exit
+[40967.893039] testhost kernel: PM: suspend entry (deep)
+[40969.018466] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[40969.021097] testhost kernel: ieee80211 phy2: brcmf_cfg80211_reg_notifier: Country code iovar returned err = -5
+[40969.021773] testhost kernel: ACPI: PM: Preparing to enter system sleep state S3
+[40969.027607] testhost kernel: ACPI: PM: Waking up from system sleep state S3
+[40969.432664] testhost kernel: PM: suspend exit
+[40971.073102] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40971.073636] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-5)
+[40973.121024] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40973.121490] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-5)
+[40975.172784] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40975.174174] testhost kernel: ieee80211 phy2: brcmf_cfg80211_dump_station: BRCMF_C_GET_ASSOCLIST failed, err=-5
+[40977.217073] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40977.217613] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -5
+[40979.264132] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40979.264775] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-5)
+[40979.265944] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-5)
+[40981.313024] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40981.313549] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -5
+[40983.361339] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40983.362116] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-5)
+[40983.363289] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-5)
+[40985.409135] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40985.409714] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-5
+[40987.457021] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40989.504185] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40989.504804] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-5)
+[40989.505976] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-5)
+[40991.553025] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40993.607267] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40993.607677] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-5)
+[40993.608015] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-5)
+[40996.608256] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40996.608836] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-5)
+[40996.609292] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-5)
+[40998.657026] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[40998.657613] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -5
+[41000.705020] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41000.705549] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -5
+[41002.752072] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41002.752704] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-5)
+[41004.801021] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41006.848152] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41006.848777] testhost kernel: ieee80211 phy2: brcmf_c_set_cur_etheraddr: Setting cur_etheraddr failed, -5
+[41008.897072] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41008.897571] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-5
+[41010.945066] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41012.992162] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41015.041031] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41017.088082] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41017.088753] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -5
+[41019.136274] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41019.136772] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: error (-5)
+[41021.185069] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41021.185604] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -5
+[41023.232074] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41023.232583] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: Unable to set pm timeout, (-5)
+[41025.281115] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41025.281730] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-5
+[41027.329022] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41029.377114] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41031.424165] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41031.424766] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-5)
+[41033.472281] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41033.473178] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-5)
+[41035.521069] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41037.569017] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41039.616072] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41039.616669] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-5)
+[41039.617099] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-5)
+[41041.665018] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41041.665505] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -5
+[41043.713034] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41043.713553] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -5
+[41045.760173] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41045.892030] testhost kernel: PM: suspend entry (deep)
+[41056.580664] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41056.582557] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-5
+[41056.584292] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41056.586809] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41056.588913] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-5)
+[41056.590528] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-5)
+[41056.592984] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41056.601344] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41056.601950] testhost kernel: ieee80211 phy2: brcmf_set_mpc: fail to set mpc
+[41056.603535] testhost kernel: PM: Some devices failed to suspend, or early wake event detected
+[41057.034528] testhost kernel: PM: suspend exit
+[41058.625057] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41058.625576] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -5
+[41060.672328] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41060.672936] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -5
+[41062.721216] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41062.721740] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-5)
+[41062.722189] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-5)
+[41072.491557] testhost kernel: PM: suspend entry (deep)
+[41072.514324] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41072.520832] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-5
+[41072.528845] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41072.535619] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41072.539290] testhost kernel: ieee80211 phy2: brcmf_set_mpc: fail to set mpc
+[41072.542588] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41072.545177] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[41072.545641] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -5
+[41072.547315] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[41072.554456] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -5
+[41072.561833] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[41072.571447] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-5
+[41072.575336] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[41072.575810] testhost kernel: ieee80211 phy2: brcmf_fil_cmd_data: bus is down. we have nothing to do.
+[41072.578353] testhost kernel: brcmfmac 0000:02:00.0: brcmf_pcie_pm_enter_D3: Timeout on response for entering D3 substate
+[41072.578915] testhost kernel: brcmfmac 0000:02:00.0: PM: pci_pm_suspend(): brcmf_pcie_pm_enter_D3 [brcmfmac] returns -5
+[41072.580544] testhost kernel: brcmfmac 0000:02:00.0: PM: dpm_run_callback(): pci_pm_suspend returns -5
+[41072.582114] testhost kernel: brcmfmac 0000:02:00.0: PM: failed to suspend async: error -5
+[41072.582649] testhost kernel: PM: Some devices failed to suspend, or early wake event detected
+[41072.925768] testhost kernel: PM: suspend exit
+[41075.393187] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41075.393676] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-5)
+[41075.394099] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-5)
+[41078.401046] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41078.401514] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-5)
+[41078.401921] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-5)
+[41081.409072] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41081.409488] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-5)
+[41081.409833] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-5)
+[41084.033023] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41084.033566] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -5
+[41086.080808] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41086.081485] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -5
+[41088.129031] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41088.129570] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-5)
+[41090.177551] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41090.178010] testhost kernel: ieee80211 phy2: brcmf_c_set_cur_etheraddr: Setting cur_etheraddr failed, -5
+[41092.225032] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41094.273092] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41094.273621] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-5
+[41096.321020] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41098.368276] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41098.368818] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: error (-5)
+[41100.417173] testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+[41100.418745] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.420354] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41100.421823] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.422469] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: Unable to set pm timeout, (-12)
+[41100.422924] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.423352] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41100.423756] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.424134] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41100.424467] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.424796] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.425133] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.425478] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41100.425811] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.426162] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41100.426493] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.426825] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41100.427275] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.427717] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41100.432026] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.432688] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41100.433791] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41100.938035] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.938662] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41100.939235] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.939814] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41100.940388] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.941035] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41100.941665] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.942353] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.942952] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.943548] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41100.945508] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.946198] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41100.946842] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.947340] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41100.947931] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.948422] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.948913] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.949411] testhost kernel: ieee80211 phy2: brcmf_vif_set_mgmt_ie: vndr ie set error : -12
+[41100.949892] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41100.957024] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41100.957670] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41100.958191] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41101.138162] testhost kernel: PM: suspend entry (deep)
+[41105.344196] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41105.344740] testhost kernel: ieee80211 phy2: brcmf_set_mpc: fail to set mpc
+[41105.345394] testhost kernel: brcmfmac 0000:02:00.0: brcmf_pcie_pm_enter_D3: Timeout on response for entering D3 substate
+[41105.345943] testhost kernel: brcmfmac 0000:02:00.0: PM: pci_pm_suspend(): brcmf_pcie_pm_enter_D3 [brcmfmac] returns -5
+[41105.346782] testhost kernel: brcmfmac 0000:02:00.0: PM: dpm_run_callback(): pci_pm_suspend returns -5
+[41105.347373] testhost kernel: brcmfmac 0000:02:00.0: PM: failed to suspend async: error -5
+[41105.347906] testhost kernel: PM: Some devices failed to suspend, or early wake event detected
+[41105.742758] testhost kernel: PM: suspend exit
+[41106.139178] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41106.139580] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41106.139933] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41107.140094] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41107.141245] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41107.141653] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41108.141732] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41108.142201] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41108.142608] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41109.143009] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41109.143967] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41109.144345] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41110.144211] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41110.144626] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41110.144970] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41111.145018] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41111.145437] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41111.145772] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41111.599024] testhost kernel: PM: suspend entry (deep)
+[41115.764952] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41115.767685] testhost kernel: ieee80211 phy2: brcmf_set_mpc: fail to set mpc
+[41115.773733] testhost kernel: brcmfmac 0000:02:00.0: brcmf_pcie_pm_enter_D3: Timeout on response for entering D3 substate
+[41115.777988] testhost kernel: brcmfmac 0000:02:00.0: PM: pci_pm_suspend(): brcmf_pcie_pm_enter_D3 [brcmfmac] returns -5
+[41115.788861] testhost kernel: brcmfmac 0000:02:00.0: PM: dpm_run_callback(): pci_pm_suspend returns -5
+[41115.791043] testhost kernel: brcmfmac 0000:02:00.0: PM: failed to suspend async: error -5
+[41115.793349] testhost kernel: PM: Some devices failed to suspend, or early wake event detected
+[41116.170607] testhost kernel: PM: suspend exit
+[41116.306081] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41116.306484] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41116.306849] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41117.307014] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41117.307419] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41117.307764] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41118.308673] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41118.309104] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41118.309452] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41119.310080] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41119.310504] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41119.310851] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41120.311738] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41120.312219] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41120.312648] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41121.313045] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41121.313467] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41121.313813] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41122.314497] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41122.314910] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41122.315288] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41123.315170] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41123.315614] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41123.315957] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41124.316678] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41124.317158] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41124.317564] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41125.318425] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41125.318856] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41125.319227] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41126.005022] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.005584] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41126.006072] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.006484] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41126.006910] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.007327] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41126.007763] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.008182] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41126.008583] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.008983] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41126.009403] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.009819] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.513017] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.513485] testhost kernel: ieee80211 phy2: brcmf_c_set_cur_etheraddr: Setting cur_etheraddr failed, -12
+[41126.513848] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.514259] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.514648] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: error (-12)
+[41126.515078] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.515469] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: Unable to set pm timeout, (-12)
+[41126.515906] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.516451] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41126.516861] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.517934] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41126.518353] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.518753] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41126.519157] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.519554] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.519951] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.520353] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41126.520747] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.521137] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41126.521505] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41126.521839] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41126.522296] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41127.023017] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41127.023554] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41127.023978] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41127.024498] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41127.025030] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41127.025519] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41127.026020] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41127.026520] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41127.029091] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41127.029715] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41127.030269] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41127.030782] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41127.031263] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41127.031701] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41127.032132] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41127.032544] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41127.040025] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41127.040541] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41127.040979] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41128.046375] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41128.046862] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41128.047266] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41129.043438] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41129.043818] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41129.044162] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41130.045321] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41130.045734] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41130.046091] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41131.046369] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41131.046858] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41131.047328] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41132.047025] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41132.047561] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41132.048336] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41133.048240] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41133.049169] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41133.049520] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41134.050132] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41134.050599] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41134.050955] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41135.051041] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41135.052386] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41135.052772] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41136.053481] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41136.053952] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41136.054384] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41137.054307] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41137.055244] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41137.055582] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41138.056083] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41138.056472] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41138.056786] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41139.057477] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41139.057919] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41139.058319] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41140.058181] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41140.059021] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41140.059388] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41141.060021] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41141.060495] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41141.060903] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41142.061589] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41142.062086] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41142.062439] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41143.063220] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41143.063647] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41143.063969] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41144.064015] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41144.064419] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41144.064731] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41144.462027] testhost kernel: PM: suspend entry (deep)
+[41148.753702] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41148.756562] testhost kernel: ieee80211 phy2: brcmf_set_mpc: fail to set mpc
+[41148.758352] testhost kernel: brcmfmac 0000:02:00.0: brcmf_pcie_pm_enter_D3: Timeout on response for entering D3 substate
+[41148.761133] testhost kernel: brcmfmac 0000:02:00.0: PM: pci_pm_suspend(): brcmf_pcie_pm_enter_D3 [brcmfmac] returns -5
+[41148.768158] testhost kernel: brcmfmac 0000:02:00.0: PM: dpm_run_callback(): pci_pm_suspend returns -5
+[41148.768767] testhost kernel: brcmfmac 0000:02:00.0: PM: failed to suspend async: error -5
+[41148.771666] testhost kernel: PM: Some devices failed to suspend, or early wake event detected
+[41149.070229] testhost kernel: PM: suspend exit
+[41149.334598] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41149.335019] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41149.335383] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41150.336196] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41150.336653] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41150.337028] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41151.337560] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41151.338063] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41151.338456] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41152.004791] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.006648] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41152.007103] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.007457] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41152.007796] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.008143] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41152.008502] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.008921] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41152.009463] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.010089] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41152.010556] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.010911] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.513973] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.515813] testhost kernel: ieee80211 phy2: brcmf_c_set_cur_etheraddr: Setting cur_etheraddr failed, -12
+[41152.516244] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.516599] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.516906] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: error (-12)
+[41152.517277] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.517579] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: Unable to set pm timeout, (-12)
+[41152.517877] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.518250] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41152.518566] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.518864] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41152.521947] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.522556] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41152.523053] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.523469] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.523879] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.524285] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41152.524698] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.525114] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41152.525511] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41152.525905] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41152.526415] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41153.231022] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41153.231534] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41153.231947] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41154.856026] testhost kernel: PM: suspend entry (deep)
+[41159.106297] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41159.113536] testhost kernel: ieee80211 phy2: brcmf_set_mpc: fail to set mpc
+[41159.117565] testhost kernel: brcmfmac 0000:02:00.0: brcmf_pcie_pm_enter_D3: Timeout on response for entering D3 substate
+[41159.121271] testhost kernel: brcmfmac 0000:02:00.0: PM: pci_pm_suspend(): brcmf_pcie_pm_enter_D3 [brcmfmac] returns -5
+[41159.121908] testhost kernel: brcmfmac 0000:02:00.0: PM: dpm_run_callback(): pci_pm_suspend returns -5
+[41159.130613] testhost kernel: brcmfmac 0000:02:00.0: PM: failed to suspend async: error -5
+[41159.132965] testhost kernel: PM: Some devices failed to suspend, or early wake event detected
+[41159.453750] testhost kernel: PM: suspend exit
+[41161.245458] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41161.245888] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41161.246444] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41166.017669] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41166.018149] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41166.018561] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41173.008014] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41173.008489] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41173.008856] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41183.004173] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41183.004658] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41183.005108] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41197.058220] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41197.058622] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41197.058968] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41217.012604] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41217.013121] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41217.013538] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41246.076015] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41246.076495] testhost kernel: ieee80211 phy2: brcmf_vif_set_mgmt_ie: vndr ie set error : -12
+[41246.076895] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41289.041493] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41289.041981] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41289.042450] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41323.612131] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41323.612819] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41323.613427] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41334.521316] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41334.521779] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41334.522207] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41338.265186] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41338.265980] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41338.266417] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41338.266763] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41338.281025] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41338.281640] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41338.282187] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41339.841180] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41339.841642] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41339.853012] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41339.853463] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41342.015340] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.015935] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.016425] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: error (-12)
+[41342.016861] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.017302] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: Unable to set pm timeout, (-12)
+[41342.017727] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.018161] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41342.018585] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.019050] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41342.019579] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.020398] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41342.021888] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.023966] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.024514] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.025089] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41342.025681] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.026392] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41342.026954] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.027568] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41342.028076] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.028610] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41342.029222] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.029707] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41342.030217] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.030632] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41342.031072] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.031489] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41342.031911] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.032319] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41342.032725] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.033141] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41342.033544] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.033951] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41342.034509] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.034907] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41342.035456] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.035994] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41342.036589] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.037259] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41342.037770] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.038343] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41342.038779] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.039244] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.039900] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.040482] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.041055] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.041524] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.041933] testhost kernel: ieee80211 phy2: brcmf_p2p_set_firmware: failed to update device address ret -12
+[41342.042358] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.042761] testhost kernel: ieee80211 phy2: brcmf_p2p_create_p2pdev: set p2p_disc error
+[41342.043286] testhost kernel: ieee80211 phy2: brcmf_cfg80211_add_iface: add iface p2p-dev-wlan0 type 10 failed: err=-12
+[41342.054146] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41342.054729] testhost kernel: ieee80211 phy2: brcmf_vif_set_mgmt_ie: vndr ie set error : -12
+[41342.055285] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41346.002587] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41346.003100] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41346.003567] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41351.015387] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41351.015795] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41351.016172] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41358.010550] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41358.011049] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41358.011422] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41365.186067] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41365.186709] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41365.187580] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41365.188121] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41365.188696] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41365.189292] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41365.189834] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41365.190422] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41365.689344] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41365.689833] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41365.696343] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41365.696957] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41365.704043] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41365.704621] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41366.014189] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.014756] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41366.016096] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.016764] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.017389] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: error (-12)
+[41366.017934] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.018410] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: Unable to set pm timeout, (-12)
+[41366.018821] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.019387] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41366.019874] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.020397] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41366.020953] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.021394] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41366.021905] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.022451] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41366.023022] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.023482] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41366.023943] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.024417] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.521097] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.521576] testhost kernel: ieee80211 phy2: brcmf_c_set_cur_etheraddr: Setting cur_etheraddr failed, -12
+[41366.521927] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.522275] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.522657] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: error (-12)
+[41366.523042] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.523387] testhost kernel: ieee80211 phy2: brcmf_cfg80211_set_power_mgmt: Unable to set pm timeout, (-12)
+[41366.523781] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.524177] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting mcast_list failed, -12
+[41366.524479] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.524790] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting allmulti failed, -12
+[41366.525139] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.525469] testhost kernel: ieee80211 phy2: _brcmf_set_multicast_list: Setting BRCMF_C_SET_PROMISC failed, err=-12
+[41366.525797] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.526224] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.535107] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.535668] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41366.536301] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.536855] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41366.537396] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.537922] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41366.538448] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.538974] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41366.539548] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.542405] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41366.543141] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.543813] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41366.544486] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.545066] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41366.545611] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.546203] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41366.546691] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.547245] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41366.547786] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.548307] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41366.548859] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.551555] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41366.552240] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.552796] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41366.553329] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.553811] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_channel: chanspec failed (-12)
+[41366.554417] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.555125] testhost kernel: ieee80211 phy2: brcmf_cfg80211_get_tx_power: error (-12)
+[41366.555804] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.556493] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.560590] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.561260] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.561814] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.562996] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.563550] testhost kernel: ieee80211 phy2: brcmf_p2p_set_firmware: failed to update device address ret -12
+[41366.564189] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.564772] testhost kernel: ieee80211 phy2: brcmf_p2p_create_p2pdev: set p2p_disc error
+[41366.565319] testhost kernel: ieee80211 phy2: brcmf_cfg80211_add_iface: add iface p2p-dev-wlan0 type 10 failed: err=-12
+[41366.608507] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41366.609110] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41366.609619] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41370.008368] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41370.008825] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41370.009219] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41375.013598] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41375.014121] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41375.014557] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41382.008833] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41382.009290] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41382.009670] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41392.043418] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41392.043957] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41392.044482] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41393.547368] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41393.547883] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41393.548329] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41406.006724] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41406.011388] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41406.011817] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41426.010021] testhost kernel: ieee80211 phy2: brcmf_msgbuf_tx_ioctl: Failed to reserve space in commonring
+[41426.010447] testhost kernel: ieee80211 phy2: brcmf_run_escan: error (-12)
+[41426.010804] testhost kernel: ieee80211 phy2: brcmf_cfg80211_scan: scan error (-12)
+[41435.593430] testhost kernel: usbcore: deregistering interface driver brcmfmac
+[41444.102028] testhost kernel: usbcore: registered new interface driver brcmfmac
+[41444.102125] testhost kernel: brcmfmac: brcmf_chip_recognition: MMIO read failed: 0xffffffff
+[41444.102178] testhost kernel: brcmfmac: brcmf_pcie_probe: failed 14e4:43a3

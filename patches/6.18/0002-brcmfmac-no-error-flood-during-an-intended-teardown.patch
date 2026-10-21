@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Weegee <748975+Weegee@users.noreply.github.com>
+Date: Tue, 13 Oct 2026 15:17:46 +0200
+Subject: [PATCH] brcmfmac: no error flood during an intended teardown
+
+Removing the device (unbind, module unload, the chip reset across
+system sleep, recovery from a hung firmware) takes the bus down before
+cfg80211 and the network stack let go of the interface. Everything
+they still ask the firmware then fails with -EIO, and each caller logs
+its own error: 'bus is down', get_tx_power, wsec_key, xmit rejected,
+country code. On the MacBook9,1 that was a burst of errors per suspend
+for nothing that had actually gone wrong.
+
+struct brcmf_bus gets a quiet flag, set where the PCIe bus is removed;
+while it is set, bphy_err() logs at debug level. A new probe allocates a
+new bus, so the flag never outlives the teardown it describes.
+---
+ .../wireless/broadcom/brcm80211/brcmfmac/bus.h  |  1 +
+ .../wireless/broadcom/brcm80211/brcmfmac/core.c |  6 ++++++
+ .../broadcom/brcm80211/brcmfmac/debug.h         | 17 ++++++++++++++---
+ .../wireless/broadcom/brcm80211/brcmfmac/pcie.c |  3 +++
+ 4 files changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bus.h b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bus.h
+index 9371c14..b15a0ca 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bus.h
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bus.h
+@@ -181,6 +181,7 @@ struct brcmf_bus {
+ 	bool always_use_fws_queue;
+ 	bool wowl_supported;
+ 	bool removing;		/* device removal in progress; quiesce async work */
++	bool quiet;		/* intended teardown: errors are expected */
+ 	struct mutex bus_reset_lock;
+ 
+ 	const struct brcmf_bus_ops *ops;
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
+index 048b5d5..9320158 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
+@@ -1445,6 +1445,12 @@ void brcmf_dev_coredump(struct device *dev)
+ 		brcmf_dbg(TRACE, "failed to create coredump\n");
+ }
+ 
++bool brcmf_err_quiet(struct brcmf_pub *drvr)
++{
++	return drvr && drvr->bus_if && READ_ONCE(drvr->bus_if->quiet);
++}
++BRCMF_EXPORT_SYMBOL_GPL(brcmf_err_quiet);
++
+ void brcmf_fw_crashed(struct device *dev)
+ {
+ 	struct brcmf_bus *bus_if = dev_get_drvdata(dev);
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.h b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.h
+index 9bb5f70..e4f5b98 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.h
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.h
+@@ -35,6 +35,7 @@
+ #define pr_fmt(fmt)		KBUILD_MODNAME ": " fmt
+ 
+ struct brcmf_bus;
++struct brcmf_pub;
+ 
+ __printf(3, 4)
+ void __brcmf_err(struct brcmf_bus *bus, const char *func, const char *fmt, ...);
+@@ -51,11 +52,21 @@ void __brcmf_err(struct brcmf_bus *bus, const char *func, const char *fmt, ...);
+ 	} while (0)
+ #endif
+ 
++bool brcmf_err_quiet(struct brcmf_pub *drvr);
++
++/* Errors during an intended teardown of the bus (device removal, the
++ * chip reset across system sleep, recovery from a hung firmware) are
++ * the expected result of the bus being down; they are logged at debug
++ * level only.
++ */
+ #define bphy_err(drvr, fmt, ...)					\
+ 	do {								\
+-		if (IS_ENABLED(CONFIG_BRCMDBG) ||			\
+-		    IS_ENABLED(CONFIG_BRCM_TRACING) ||			\
+-		    net_ratelimit())					\
++		if (brcmf_err_quiet(drvr))				\
++			wiphy_dbg((drvr)->wiphy, "%s: " fmt, __func__,	\
++				  ##__VA_ARGS__);			\
++		else if (IS_ENABLED(CONFIG_BRCMDBG) ||			\
++			 IS_ENABLED(CONFIG_BRCM_TRACING) ||		\
++			 net_ratelimit())				\
+ 			wiphy_err((drvr)->wiphy, "%s: " fmt, __func__,	\
+ 				  ##__VA_ARGS__);			\
+ 	} while (0)
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+index d2a1770..dbe2ceb 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+@@ -2592,6 +2592,9 @@ brcmf_pcie_remove(struct pci_dev *pdev)
+ 	if (bus == NULL)
+ 		return;
+ 
++	/* Everything the firmware is asked from here on fails by design. */
++	WRITE_ONCE(bus->quiet, true);
++
+ 	devinfo = bus->bus_priv.pcie->devinfo;
+ 	brcmf_pcie_bus_console_read(devinfo, false);
+ 	brcmf_pcie_fwcon_timer(devinfo, false);

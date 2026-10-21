@@ -1,0 +1,35 @@
+# PCI state on 2026-10-13 after the failed reload (collected read-only)
+path: /sys/devices/pci0000:00/0000:00:1d.0/0000:02:00.0
+acpi: \_SB_.PCI0.RP09.ARPT / RP: \_SB_.PCI0.RP09
+power_state=D0
+current_link_speed=2.5 GT/s PCIe
+current_link_width=1
+d3cold_allowed=1
+reset_method=bus
+power/control=auto
+power/runtime_status=suspended
+enable=0
+02:00.0 ID=43a314e4 CMD=0000 STA=0010 PMCSR=4008 LNKCTL=0000 LNKSTA=1011
+00:1d.0 ID=9d188086 CMD=0007 STA=0010 PMCSR=0103 LNKCTL=0042 LNKSTA=7011
+00:1d.1 ID=9d198086 CMD=0407 STA=0010 PMCSR=0000 LNKCTL=0c42 LNKSTA=3012
+03:00.0 ID=157014e4 CMD=0406 STA=0010 PMCSR=4008 LNKCTL=0040 LNKSTA=1012
+
+02:00.0 Network controller [0280]: Broadcom Inc. and subsidiaries BCM4350 802.11ac Wireless Network Adapter [14e4:43a3] (rev 05)
+	Subsystem: Apple Inc. Device [106b:0158]
+	Kernel modules: brcmfmac
+-[0000:00]-+-00.0  Intel Corporation Xeon E3-1200 v5/E3-1500 v5/6th Gen Core Processor Host Bridge/DRAM Registers
+           +-02.0  Intel Corporation Skylake-Y GT2 [HD Graphics 515]
+           +-14.0  Intel Corporation Sunrise Point-LP USB 3.0 xHCI Controller
+           +-15.0  Intel Corporation Sunrise Point-LP Serial IO I2C Controller #0
+           +-15.2  Intel Corporation Sunrise Point-LP Serial IO I2C Controller #2
+           +-16.0  Intel Corporation Sunrise Point-LP CSME HECI #1
+           +-19.0  Intel Corporation Sunrise Point-LP Serial IO UART Controller #2
+           +-1c.0-[01]----00.0  Apple Inc. S3X NVMe Controller
+           +-1d.0-[02]----00.0  Broadcom Inc. and subsidiaries BCM4350 802.11ac Wireless Network Adapter
+           +-1d.1-[03]----00.0  Broadcom Inc. and subsidiaries 720p FaceTime HD Camera
+           +-1e.0  Intel Corporation Sunrise Point-LP Serial IO UART Controller #0
+           +-1e.3  Intel Corporation Sunrise Point-LP Serial IO SPI Controller #1
+           +-1f.0  Intel Corporation LPC/eSPI Controller
+           +-1f.2  Intel Corporation Sunrise Point-LP PMC
+           +-1f.3  Intel Corporation Sunrise Point-LP HD Audio
+           \-1f.4  Intel Corporation Sunrise Point-LP SMBus

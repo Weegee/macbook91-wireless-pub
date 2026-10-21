@@ -1,0 +1,186 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Weegee <748975+Weegee@users.noreply.github.com>
+Date: Tue, 13 Oct 2026 15:19:50 +0200
+Subject: [PATCH] brcmfmac: pcie: recover by unbind, secondary bus reset and
+ probe
+
+brcmf_fw_crashed() and the debugfs reset recover through
+brcmf_pcie_reset(): detach, watchdog reset through the chip's own
+backplane, firmware download. On the MacBook9,1 the hung BCM4350 no
+longer answered on its backplane (every MMIO read 0xffffffff), so a
+watchdog reset written through it cannot work, and a later reload of the
+module failed in brcmf_chip_recognition(). A secondary bus reset through
+the parent bridge followed by unbind and bind brought the chip back on
+the same machine (tested by hand through sysfs on a healthy chip).
+
+New module parameter reset_rebind (default on): brcmf_pcie_reset() logs
+the firmware console and hands the device to an ordered, freezable work
+queue that unbinds it, resets it with pci_reset_function() and binds it
+again. The work runs outside the driver's bus_reset work, which remove
+cancels. At most three recoveries within ten minutes; after that it
+gives up with an error instead of looping. Module exit drains the queue
+before unregistering the driver.
+
+brcmf_pcie_bus_console_read() looped forever on a dead chip: the write
+index read as 0xffffffff never equals the read index, which wraps at the
+buffer size. An index outside the buffer now ends the read.
+---
+ .../broadcom/brcm80211/brcmfmac/pcie.c        | 118 +++++++++++++++++-
+ 1 file changed, 117 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+index a50d9c3..cd8bf9e 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+@@ -876,6 +876,9 @@ static void brcmf_pcie_bus_console_read(struct brcmf_pciedev_info *devinfo,
+ 		return;
+ 	addr = console->base_addr + BRCMF_CONSOLE_WRITEIDX_OFFSET;
+ 	newidx = brcmf_pcie_read_tcm32(devinfo, addr);
++	/* A dead chip reads as all ones; the loop below would never end. */
++	if (newidx >= console->bufsize)
++		return;
+ 	while (newidx != console->read_idx) {
+ 		addr = console->buf_addr + console->read_idx;
+ 		ch = brcmf_pcie_read_tcm8(devinfo, addr);
+@@ -1547,6 +1550,100 @@ static int brcmf_pcie_get_blob(struct device *dev, const struct firmware **fw,
+ 	return 0;
+ }
+ 
++/* Recovery from a crashed or hung firmware. The in-place reset below
++ * relies on the chip's own watchdog, which a chip whose backplane no
++ * longer answers (MMIO reads 0xffffffff, as seen on the MacBook9,1) does
++ * not get. With reset_rebind the device is instead unbound, reset through
++ * its parent bridge (secondary bus reset) and bound again, from a work
++ * item outside the driver's own work so that remove can cancel that.
++ */
++static bool brcmf_pcie_reset_rebind = true;
++module_param_named(reset_rebind, brcmf_pcie_reset_rebind, bool, 0644);
++MODULE_PARM_DESC(reset_rebind, "Recover a crashed or hung firmware by unbinding, resetting (secondary bus reset) and binding the device again [PCIe]");
++
++#define BRCMF_PCIE_REBIND_WINDOW	(10 * 60 * HZ)
++#define BRCMF_PCIE_REBIND_MAX		3
++
++struct brcmf_pcie_rebind {
++	struct work_struct work;
++	struct pci_dev *pdev;
++};
++
++static struct workqueue_struct *brcmf_pcie_wq;
++static DEFINE_SPINLOCK(brcmf_pcie_rebind_lock);
++static bool brcmf_pcie_rebind_pending;
++static unsigned long brcmf_pcie_rebind_start;
++static unsigned int brcmf_pcie_rebind_count;
++
++static void brcmf_pcie_rebind_work(struct work_struct *work)
++{
++	struct brcmf_pcie_rebind *rb = container_of(work, struct brcmf_pcie_rebind, work);
++	struct pci_dev *pdev = rb->pdev;
++	int err;
++
++	pci_info(pdev, "recovering: unbind, secondary bus reset, probe\n");
++	device_release_driver(&pdev->dev);
++
++	err = pci_reset_function(pdev);
++	if (err)
++		pci_warn(pdev, "reset failed (%d), probing anyway\n", err);
++
++	err = device_attach(&pdev->dev);
++	if (err <= 0)
++		pci_err(pdev, "no driver bound after recovery (%d)\n", err);
++
++	spin_lock(&brcmf_pcie_rebind_lock);
++	brcmf_pcie_rebind_pending = false;
++	spin_unlock(&brcmf_pcie_rebind_lock);
++
++	pci_dev_put(pdev);
++	kfree(rb);
++}
++
++static int brcmf_pcie_schedule_rebind(struct pci_dev *pdev)
++{
++	struct brcmf_bus *bus = dev_get_drvdata(&pdev->dev);
++	struct brcmf_pcie_rebind *rb;
++	bool give_up = false;
++
++	spin_lock(&brcmf_pcie_rebind_lock);
++	if (brcmf_pcie_rebind_pending) {
++		spin_unlock(&brcmf_pcie_rebind_lock);
++		return 0;
++	}
++	if (!brcmf_pcie_rebind_count ||
++	    time_after(jiffies, brcmf_pcie_rebind_start + BRCMF_PCIE_REBIND_WINDOW)) {
++		brcmf_pcie_rebind_start = jiffies;
++		brcmf_pcie_rebind_count = 0;
++	}
++	if (brcmf_pcie_rebind_count >= BRCMF_PCIE_REBIND_MAX)
++		give_up = true;
++	else
++		brcmf_pcie_rebind_count++;
++	brcmf_pcie_rebind_pending = !give_up;
++	spin_unlock(&brcmf_pcie_rebind_lock);
++
++	if (give_up) {
++		pci_err(pdev, "%u recoveries within %u minutes, giving up; reload brcmfmac or reboot\n",
++			BRCMF_PCIE_REBIND_MAX, BRCMF_PCIE_REBIND_WINDOW / (60 * HZ));
++		return -EBUSY;
++	}
++
++	rb = kzalloc(sizeof(*rb), GFP_KERNEL);
++	if (!rb) {
++		spin_lock(&brcmf_pcie_rebind_lock);
++		brcmf_pcie_rebind_pending = false;
++		spin_unlock(&brcmf_pcie_rebind_lock);
++		return -ENOMEM;
++	}
++	INIT_WORK(&rb->work, brcmf_pcie_rebind_work);
++	rb->pdev = pci_dev_get(pdev);
++	if (bus)
++		WRITE_ONCE(bus->quiet, true);
++	queue_work(brcmf_pcie_wq, &rb->work);
++	return 0;
++}
++
+ static int brcmf_pcie_reset(struct device *dev)
+ {
+ 	struct brcmf_bus *bus_if = dev_get_drvdata(dev);
+@@ -1555,6 +1652,11 @@ static int brcmf_pcie_reset(struct device *dev)
+ 	struct brcmf_fw_request *fwreq;
+ 	int err;
+ 
++	if (brcmf_pcie_reset_rebind && brcmf_pcie_wq) {
++		brcmf_pcie_bus_console_read(devinfo, true);
++		return brcmf_pcie_schedule_rebind(devinfo->pdev);
++	}
++
+ 	brcmf_pcie_intr_disable(devinfo);
+ 
+ 	brcmf_pcie_bus_console_read(devinfo, true);
+@@ -2826,13 +2928,27 @@ static struct pci_driver brcmf_pciedrvr = {
+ 
+ int brcmf_pcie_register(void)
+ {
++	int err;
++
+ 	brcmf_dbg(PCIE, "Enter\n");
+-	return pci_register_driver(&brcmf_pciedrvr);
++	/* Freezable: a recovery never runs into system sleep. */
++	brcmf_pcie_wq = alloc_ordered_workqueue("brcmf_pcie_recover", WQ_FREEZABLE);
++	err = pci_register_driver(&brcmf_pciedrvr);
++	if (err && brcmf_pcie_wq) {
++		destroy_workqueue(brcmf_pcie_wq);
++		brcmf_pcie_wq = NULL;
++	}
++	return err;
+ }
+ 
+ 
+ void brcmf_pcie_exit(void)
+ {
+ 	brcmf_dbg(PCIE, "Enter\n");
++	/* Drain pending recoveries while the driver can still bind. */
++	if (brcmf_pcie_wq) {
++		destroy_workqueue(brcmf_pcie_wq);
++		brcmf_pcie_wq = NULL;
++	}
+ 	pci_unregister_driver(&brcmf_pciedrvr);
+ }

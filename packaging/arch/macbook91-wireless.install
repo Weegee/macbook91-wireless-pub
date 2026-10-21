@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# The dkms package's alpm hooks build, install and remove the modules; this
+# scriptlet only says what is needed to use them.
+
+# The kernel series the installed sources carry, one per line.
+_series() {
+    cat /usr/src/macbook91-wireless-"${1%-*}"/KERNEL-SERIES 2>/dev/null
+}
+
+_note() {
+    local series running s shipped=no list
+    series=$(_series "$1")
+    running=$(uname -r)
+    list=$(printf '%s\n' "$series" | paste -sd, | sed 's/,/, /g')
+    if ! command -v clang >/dev/null 2>&1 &&
+        grep -qsx 'CONFIG_CC_IS_CLANG=y' /usr/lib/modules/"$running"/build/.config; then
+        cat <<'MSG'
+  MISSING COMPILER: the running kernel is built with clang; DKMS needs
+      sudo pacman -S clang lld llvm
+MSG
+    fi
+    for s in $series; do
+        case "$running" in
+        "$s".*) shipped=yes ;;
+        esac
+    done
+    if [ "$shipped" = no ]; then
+        cat <<MSG
+  The running kernel ($running) is not one of Linux $list: it keeps its stock
+  brcmfmac and hci_uart. The patched drivers are built for Linux $list
+  kernels only.
+MSG
+    fi
+    cat <<'MSG'
+  To use the patched drivers now, without a reboot (WLAN and Bluetooth drop
+  for a few seconds):
+      sudo macbook91-wireless-verify --reload
+  Then check, or check after the next reboot:
+      macbook91-wireless-verify
+MSG
+}
+
+post_install() {
+    cat <<'MSG'
+  macbook91-wireless installed.
+MSG
+    _note "$1"
+}
+
+post_upgrade() {
+    _note "$1"
+}

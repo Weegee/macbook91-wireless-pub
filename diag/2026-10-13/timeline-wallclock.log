@@ -1,0 +1,106 @@
+2026-10-12T22:47:24.887040+02:00 testhost kernel: usbcore: registered new interface driver brcmfmac
+2026-10-12T22:47:25.423113+02:00 testhost kernel: brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4350/5 wl0: Nov 26 2015 03:48:57 version 7.35.180.133 (r602372) FWID 01-c45b39d6
+2026-10-13T09:20:58.741746+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T09:21:21.125849+02:00 testhost kernel: brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4350/5 wl0: Nov 26 2015 03:48:57 version 7.35.180.133 (r602372) FWID 01-c45b39d6
+2026-10-13T09:21:21.254331+02:00 testhost kernel: PM: suspend exit
+2026-10-13T09:21:31.958635+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T09:21:54.261545+02:00 testhost kernel: PM: suspend exit
+2026-10-13T09:21:54.299977+02:00 testhost kernel: brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4350/5 wl0: Nov 26 2015 03:48:57 version 7.35.180.133 (r602372) FWID 01-c45b39d6
+2026-10-13T09:22:04.981780+02:00 testhost kernel: PM: suspend entry (s2idle)
+2026-10-13T09:22:27.122909+02:00 testhost kernel: PM: suspend exit
+2026-10-13T09:22:40.806650+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T09:22:41.238204+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:07:25.477669+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T10:07:35.958428+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:08:58.170888+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T10:09:07.970312+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:09:21.569667+02:00 testhost kernel: PM: suspend entry (s2idle)
+2026-10-13T10:09:31.082395+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:09:47.661536+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T10:09:57.990236+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:10:38.646841+02:00 testhost kernel: PM: suspend entry (s2idle)
+2026-10-13T10:10:48.077352+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:11:38.140624+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T10:11:42.952691+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:11:44.593129+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:11:46.641051+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:11:48.692811+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:11:50.737100+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:11:52.784159+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:11:54.833051+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:11:56.881366+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:11:58.929162+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:00.977048+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:03.024212+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:05.073051+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:07.127294+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:10.128283+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:12.177053+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:14.225047+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:16.272099+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:18.321048+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:20.368178+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:22.417099+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:24.465093+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:26.512189+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:28.561058+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:30.608109+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:32.656300+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:34.705096+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:36.752101+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:38.801142+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:40.849049+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:42.897141+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:44.944192+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:46.992308+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:49.041095+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:51.089044+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:53.136099+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:55.185045+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:57.233061+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:59.280199+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:12:59.412057+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T10:13:10.100691+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:10.104319+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:10.106836+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:10.113011+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:10.121371+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:10.554555+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:13:12.145084+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:14.192355+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:16.241243+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:26.011584+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T10:13:26.034351+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:26.048872+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:26.055646+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:26.062615+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:26.098380+02:00 testhost kernel: brcmfmac 0000:02:00.0: brcmf_pcie_pm_enter_D3: Timeout on response for entering D3 substate
+2026-10-13T10:13:26.445795+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:13:28.913214+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:31.921073+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:34.929099+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:37.553050+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:39.600835+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:41.649057+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:43.697578+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:45.745059+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:47.793119+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:49.841047+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:51.888303+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:53.937200+02:00 testhost kernel: ieee80211 phy2: brcmf_msgbuf_query_dcmd: Timeout on response for query command
+2026-10-13T10:13:54.658189+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T10:13:58.865421+02:00 testhost kernel: brcmfmac 0000:02:00.0: brcmf_pcie_pm_enter_D3: Timeout on response for entering D3 substate
+2026-10-13T10:13:59.262785+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:14:05.119051+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T10:14:09.293760+02:00 testhost kernel: brcmfmac 0000:02:00.0: brcmf_pcie_pm_enter_D3: Timeout on response for entering D3 substate
+2026-10-13T10:14:09.690634+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:14:37.982054+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T10:14:42.278379+02:00 testhost kernel: brcmfmac 0000:02:00.0: brcmf_pcie_pm_enter_D3: Timeout on response for entering D3 substate
+2026-10-13T10:14:42.590256+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:14:48.376052+02:00 testhost kernel: PM: suspend entry (deep)
+2026-10-13T10:14:52.637592+02:00 testhost kernel: brcmfmac 0000:02:00.0: brcmf_pcie_pm_enter_D3: Timeout on response for entering D3 substate
+2026-10-13T10:14:52.973777+02:00 testhost kernel: PM: suspend exit
+2026-10-13T10:19:29.113456+02:00 testhost kernel: usbcore: deregistering interface driver brcmfmac
+2026-10-13T10:19:37.622055+02:00 testhost kernel: usbcore: registered new interface driver brcmfmac
+2026-10-13T10:19:37.622152+02:00 testhost kernel: brcmfmac: brcmf_chip_recognition: MMIO read failed: 0xffffffff
+2026-10-13T10:19:37.622205+02:00 testhost kernel: brcmfmac: brcmf_pcie_probe: failed 14e4:43a3

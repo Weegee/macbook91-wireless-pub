@@ -1,0 +1,110 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Weegee <748975+Weegee@users.noreply.github.com>
+Date: Tue, 13 Oct 2026 15:17:01 +0200
+Subject: [PATCH] macbook91: identify the out-of-tree build
+
+When built by the macbook91-wireless package, MACBOOK91_WIRELESS_ID is
+defined on the compiler command line. brcmfmac then carries it as
+MODULE_VERSION and both brcmfmac and hci_uart as the modinfo tag
+macbook91_wireless, so macbook91-wireless-verify can tell the loaded
+modules from the in-tree ones. Without the define nothing changes.
+---
+ drivers/bluetooth/hci_ldisc.c                            | 9 +++++++++
+ .../wireless/broadcom/brcm80211/brcmfmac/bca/module.c    | 7 +++++++
+ .../net/wireless/broadcom/brcm80211/brcmfmac/common.c    | 7 +++++++
+ .../wireless/broadcom/brcm80211/brcmfmac/cyw/module.c    | 7 +++++++
+ .../wireless/broadcom/brcm80211/brcmfmac/wcc/module.c    | 7 +++++++
+ 5 files changed, 37 insertions(+)
+
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 55e0dce..b056d3b 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -972,6 +972,15 @@ module_exit(hci_uart_exit);
+ 
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth HCI UART driver ver " VERSION);
++#ifdef MACBOOK91_WIRELESS_ID
++/* Out-of-tree build of the macbook91-wireless package, see
++ * macbook91-wireless-verify. The version stays above the in-tree one, so
++ * DKMS replaces it.
++ */
++MODULE_VERSION(VERSION "+" MACBOOK91_WIRELESS_ID);
++MODULE_INFO(macbook91_wireless, MACBOOK91_WIRELESS_ID);
++#else
+ MODULE_VERSION(VERSION);
++#endif
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_LDISC(N_HCI);
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/module.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/module.c
+index 1e1c79b..7d39e47 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/module.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/module.c
+@@ -22,6 +22,13 @@ static void __exit brcmf_bca_exit(void)
+ 
+ MODULE_DESCRIPTION("Broadcom FullMAC WLAN driver plugin for Broadcom AP chipsets");
+ MODULE_LICENSE("Dual BSD/GPL");
++#ifdef MACBOOK91_WIRELESS_ID
++/* Out-of-tree build of the macbook91-wireless package. DKMS needs a version
++ * to replace the unversioned in-tree module.
++ */
++MODULE_VERSION(MACBOOK91_WIRELESS_ID);
++MODULE_INFO(macbook91_wireless, MACBOOK91_WIRELESS_ID);
++#endif
+ MODULE_IMPORT_NS("BRCMFMAC");
+ 
+ module_init(brcmf_bca_init);
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
+index 688f16c..32a5084 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
+@@ -24,6 +24,13 @@
+ MODULE_AUTHOR("Broadcom Corporation");
+ MODULE_DESCRIPTION("Broadcom 802.11 wireless LAN fullmac driver.");
+ MODULE_LICENSE("Dual BSD/GPL");
++#ifdef MACBOOK91_WIRELESS_ID
++/* Out-of-tree build of the macbook91-wireless package: lets
++ * macbook91-wireless-verify tell this module from the in-tree one.
++ */
++MODULE_VERSION(MACBOOK91_WIRELESS_ID);
++MODULE_INFO(macbook91_wireless, MACBOOK91_WIRELESS_ID);
++#endif
+ 
+ #define BRCMF_DEFAULT_SCAN_CHANNEL_TIME	40
+ #define BRCMF_DEFAULT_SCAN_UNASSOC_TIME	40
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/module.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/module.c
+index ce5fcfd..6f583c6 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/module.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/module.c
+@@ -22,6 +22,13 @@ static void __exit brcmf_cyw_exit(void)
+ 
+ MODULE_DESCRIPTION("Broadcom FullMAC WLAN driver plugin for Cypress/Infineon chipsets");
+ MODULE_LICENSE("Dual BSD/GPL");
++#ifdef MACBOOK91_WIRELESS_ID
++/* Out-of-tree build of the macbook91-wireless package. DKMS needs a version
++ * to replace the unversioned in-tree module.
++ */
++MODULE_VERSION(MACBOOK91_WIRELESS_ID);
++MODULE_INFO(macbook91_wireless, MACBOOK91_WIRELESS_ID);
++#endif
+ MODULE_IMPORT_NS("BRCMFMAC");
+ 
+ module_init(brcmf_cyw_init);
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/module.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/module.c
+index cfe01ca..7ebbb63 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/module.c
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/module.c
+@@ -22,6 +22,13 @@ static void __exit brcmf_wcc_exit(void)
+ 
+ MODULE_DESCRIPTION("Broadcom FullMAC WLAN driver plugin for Broadcom mobility chipsets");
+ MODULE_LICENSE("Dual BSD/GPL");
++#ifdef MACBOOK91_WIRELESS_ID
++/* Out-of-tree build of the macbook91-wireless package. DKMS needs a version
++ * to replace the unversioned in-tree module.
++ */
++MODULE_VERSION(MACBOOK91_WIRELESS_ID);
++MODULE_INFO(macbook91_wireless, MACBOOK91_WIRELESS_ID);
++#endif
+ MODULE_IMPORT_NS("BRCMFMAC");
+ 
+ module_init(brcmf_wcc_init);

@@ -1,0 +1,217 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Hashes of every file the build takes from outside this repository, and of
+# the tree derived from them.
+#
+#   <tag>  <sha256>  <path in the kernel tree | derived:tree>
+#
+# packaging/fetch-upstream.sh refuses to build from a (tag, path) pair it does
+# not find here and fails hard, with no override, when a pair it does find has
+# different bytes. derived:tree is the hash of UPSTREAM.sha256, the manifest of
+# the assembled tree (fetched files with patches/<series>/ applied, the Kbuild
+# overlays, the patches themselves and KERNEL-SERIES/KERNEL-TAG), so any change
+# to a patch or an overlay changes it too and has to be recorded here.
+#
+# A new tag is added by running the fetcher with --accept-new and committing
+# the new lines after review.
+#
+# v7.2.9 seeded 2026-10-13 from git.kernel.org stable; the fetched files are
+# byte-identical to the sparse checkout the patches were developed on.
+#
+# v6.18.55 added 2026-10-20 (LTS series, fetched from git.kernel.org stable);
+# patches/6.18 is the 7.2 series rebased with offsets only.
+
+v7.2.9     32ebf65e5aa69162f8bc1f2f1d5793e8a337fcd47cc4d0c8bee23f0ba4f2d87d  drivers/net/wireless/broadcom/brcm80211/include/brcm_hw_ids.h
+v7.2.9     1ed2dcc37d792957f2f722b38f6ac1688d210f83316ddacc53a107b7cc3cfe0d  drivers/net/wireless/broadcom/brcm80211/include/brcmu_d11.h
+v7.2.9     b033458f10401bde6e2ef1c14f64f137f15c0858c8df934f22718e248201d478  drivers/net/wireless/broadcom/brcm80211/include/brcmu_utils.h
+v7.2.9     e768af55936c75aa9e8cc679b9c6c0bd199b3b0e08dad8bd15792f9596517423  drivers/net/wireless/broadcom/brcm80211/include/brcmu_wifi.h
+v7.2.9     1e7e449c3e54b725c6b7dc8ef1dfd8a4b8a5027941b496a1f211b36b4cfe1ddf  drivers/net/wireless/broadcom/brcm80211/include/chipcommon.h
+v7.2.9     80568f1354dd96c0dbd49f64939e652d9d25d12a2d54c890068bf64eda23466a  drivers/net/wireless/broadcom/brcm80211/include/defs.h
+v7.2.9     7b74ceaf8afce6ec9c79f9f3053c5120d6e68a61c41f19a8cb6084a65046fbfa  drivers/net/wireless/broadcom/brcm80211/include/soc.h
+v7.2.9     af412ce1d3272d28dc971639a8f831d64118d11db43878dadf70ce6167cf6dfa  drivers/net/wireless/broadcom/brcm80211/brcmfmac/acpi.c
+v7.2.9     458cd390000adcf2a9139ea5942d0e465bc46f2a2e214664150ec06ee21b3394  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/core.c
+v7.2.9     b6df241efded8bc5f04f7fae146bc4cffbebf68956d4154557af8797b35de874  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/module.c
+v7.2.9     4c8bc4a10d463cd4f9494745da61706044e7b30b782af0b8d0338a4cab08f60a  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/vops.h
+v7.2.9     57a06f51624f3128f38df82223cc0501ec11594a7d0428a855e156854ce7959b  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcdc.c
+v7.2.9     98aca9e796804b6cd0f15c490370c674bbdb2b1be84e3210c0a657a14afc6fea  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcdc.h
+v7.2.9     9cf9ce0e27981ec399957c4e098de9bd9924332c6a36c4330cf61ff165f6b7d0  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c
+v7.2.9     bce337ad63ef4cccc5ec2bba0b64fe58f122e6b3e79111160c6d4877697028b0  drivers/net/wireless/broadcom/brcm80211/brcmfmac/btcoex.c
+v7.2.9     2be4914926e397f223564af45b31cf350bd5d9f67c1494752f9148ae41607bee  drivers/net/wireless/broadcom/brcm80211/brcmfmac/btcoex.h
+v7.2.9     5c99cbafa3c881ea96ccdf8fd9f693e070da39a953c6e658d6c6f4634f73eab4  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bus.h
+v7.2.9     00320e75ef2bb75a8a21bce70375bd92be160116c584c41fcd61cd0e8d478718  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c
+v7.2.9     89031854e21941889ca07315f693c53ef0b61b94c022bce5743cc204e003735e  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.h
+v7.2.9     932e25c75f9ea5247194dfdb78c6b41a457af68d7a558935a7b5489bf548aa9d  drivers/net/wireless/broadcom/brcm80211/brcmfmac/chip.c
+v7.2.9     cb6ffbc01bfd35629acfaf87daa8f5a6ef4f9ce4f4f393c19b05c2bd18ff791e  drivers/net/wireless/broadcom/brcm80211/brcmfmac/chip.h
+v7.2.9     8b16af808a17e3a141f34e14b76d7c83090fbc04a9b98428744b98008b65bfc7  drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
+v7.2.9     b319771764b2ff2f32ee7e57718ff350b3ecfc093c07066dcbaa4a480a63c590  drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.h
+v7.2.9     4a5a5ac64da90251b1a6a24262d421f47c3ab365d58a95633bdf7380a3472473  drivers/net/wireless/broadcom/brcm80211/brcmfmac/commonring.c
+v7.2.9     b2899336d680ca868536b25d1601ae99325ab66aaf1c565b4e638c71827b7369  drivers/net/wireless/broadcom/brcm80211/brcmfmac/commonring.h
+v7.2.9     8aca12c8be3f038c6b28437e35fbecbb838ab890bcf7e8e0600aec9e5a06bc30  drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
+v7.2.9     e3134845f2f7fd0eb90e2631b63cde479957b44bda8904ddab74b274718069cf  drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.h
+v7.2.9     ad8f9ed772d3b452a3c6c69df9eb43e2c951f9cbd6d921ae9f633a2229b2b6ad  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/core.c
+v7.2.9     e700b02a130f543f12a238928f84ec9b70b238750ca15d3dfb7570b73bf4973c  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/fwil_types.h
+v7.2.9     bf88ed5ceb44279951199d9cd8e9dd0538f5352876425ab8492d27be6b62e96d  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/module.c
+v7.2.9     003495b3c00879aa9e0f32085d2eeb42f318cffbe202c8ed6b2c94848aad99ac  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/vops.h
+v7.2.9     bbc97b72f2bcfa04757184daddab1de03d57da1d9eb3f3f8374722f5351dfa39  drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.c
+v7.2.9     05baaf3bf1d6d3364482b5f139555d4fb9b1b4c0379ad91853696ee3b05063bb  drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.h
+v7.2.9     73f343d970db13e8f354a3b4d7acb22ee5b2f72059d9b2719726e75e133c5d17  drivers/net/wireless/broadcom/brcm80211/brcmfmac/dmi.c
+v7.2.9     6afeeeab48e2907b8f9b2f7cb6c9999fdf25c565b09847a1e6d9385d80b59b8d  drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.c
+v7.2.9     809332a24eb3135eab24a17c9e54057284b5f5809148dcbe940bc13c157ca719  drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.h
+v7.2.9     f2b6fe570981bf69a81fd5965712f18840df9b97dabcdbd4aa4cf260b4e9760b  drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c
+v7.2.9     166e4115f3d25e27526d94e04322286228e33ae2b6c983985c1d6d2a56c40123  drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h
+v7.2.9     07ac7edee8411d2b12b06451628bc10d848c23a08831ff308545e4659054b76e  drivers/net/wireless/broadcom/brcm80211/brcmfmac/flowring.c
+v7.2.9     c68134161b6f2b30fa8f620224ab148d9e3bfba13985b6dacc91c5fe849487e5  drivers/net/wireless/broadcom/brcm80211/brcmfmac/flowring.h
+v7.2.9     4a4c090a81e7c2a954834e98db41633f1cc5dd0a6b739edc5dbfc9b0bcd9f51c  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fweh.c
+v7.2.9     d36dbcf93b7aa789d1988463915880c20405d8fa09733e021b69675d7bb7ca2c  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fweh.h
+v7.2.9     1ba05bb9a089f6da2e7cdc863473c6168e2443e5c97d9e4906a94bde8bb202a9  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwil.c
+v7.2.9     770964dcbe004e1df7e7c5faecda90358e44cbd2fd56f25ceb73aaaf6a296f79  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwil.h
+v7.2.9     fa2f1b88f6b33c92a39a86bf4cfda9f368cf025347e03cf4614de9d7be46456d  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwil_types.h
+v7.2.9     1cf8308959ad6ae2651f97c94bb391b88f0e6b39edf6712889a37fe1366dc266  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwsignal.c
+v7.2.9     51f14e634a8bf96de8d31a4861064038f9755daa1df6be80ef4e391b5e0c1966  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwsignal.h
+v7.2.9     0b495cc8e5287c1f24b1ae411f0d74c6c0bbe491a866c1982f6a0d0eb616a7c1  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwvid.c
+v7.2.9     6d9150aaa8257c87eb7a093819c115ad197fe1c1a9850fd9ba80df747a5952fc  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwvid.h
+v7.2.9     e05ca59da6de5b465b6358855da8036ea23e79b682e23d621bbccf4b224995ee  drivers/net/wireless/broadcom/brcm80211/brcmfmac/msgbuf.c
+v7.2.9     982683ed0fe0d984acbac405e1e5a9fe84fe0b1c54a9ab793c5961df8c3c9519  drivers/net/wireless/broadcom/brcm80211/brcmfmac/msgbuf.h
+v7.2.9     a3005c3984c5473277ad67a8da4d718084675b061f0863fc6614d3b33992acf8  drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
+v7.2.9     d27052440389dbc249e7435fccef43c18f8d07bf641563327ef0cf2bfab3cd7b  drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.h
+v7.2.9     05324b4c92a694eb5f9009676b8fcbdf93ad819e03862685e9335bf906f2bc4d  drivers/net/wireless/broadcom/brcm80211/brcmfmac/p2p.c
+v7.2.9     f0d89a7f6136140179c0297b7b10c7e9209a844164ae54c82f713f7968d5d3b3  drivers/net/wireless/broadcom/brcm80211/brcmfmac/p2p.h
+v7.2.9     2bc4ff2f06eb515b404e08973a39c029ec975155a17a7baaf6f62e76ca181b4c  drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+v7.2.9     5d48671dc3226f929b813a0f48038d51a9a1b7de29711f41954fc4b6ce48680b  drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.h
+v7.2.9     114a8750a6c223afd9085dd2ecfc190c020e5cbd22efba6924e30caa322e4b4c  drivers/net/wireless/broadcom/brcm80211/brcmfmac/pno.c
+v7.2.9     190211270b7ab6f92dc63acde26c2cb87aedc1774f98eafe6953e4f583f94512  drivers/net/wireless/broadcom/brcm80211/brcmfmac/pno.h
+v7.2.9     e22e27641979e939f44657fc1e74495bb8cacb80e593cc5b100d9c957a6e8c23  drivers/net/wireless/broadcom/brcm80211/brcmfmac/proto.c
+v7.2.9     1c815ae635b0aa6434861be03d44eb715a4c6c359f4c9b834566c4de8944e081  drivers/net/wireless/broadcom/brcm80211/brcmfmac/proto.h
+v7.2.9     6889d448c8e7fab5cf28c3189675deda19a5d7c6e523895bf280441909fa8b9b  drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
+v7.2.9     245881dce2fc3a9765a547ed29a56c0761ccfbaf6d7406ad43081e0d509a2d1b  drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.h
+v7.2.9     ef90882e078eee963a8ae2dcbbd0ef2608af38654d48a16de9c904a55467001c  drivers/net/wireless/broadcom/brcm80211/brcmfmac/tracepoint.c
+v7.2.9     1e76ac445913a9a77bf1d2fb501144048394125b638f831fb12ba4e406799932  drivers/net/wireless/broadcom/brcm80211/brcmfmac/tracepoint.h
+v7.2.9     596d2635d32f549db77e5c4bde7cf8873033b82cc9310b5f962523147e57cc91  drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
+v7.2.9     0c9675eb3c21dd861fadf220190ce8ee5cb90f797e15a5f0f237fe773cfd774f  drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.h
+v7.2.9     3ddfd4441d70028324e92e91d2c2dd78d708bf5ed7f26194fb150c5189fe6414  drivers/net/wireless/broadcom/brcm80211/brcmfmac/vendor.c
+v7.2.9     24b201a75470706ceb47d4526db2b246aef7b89c17ec864eb7dfd7042841928f  drivers/net/wireless/broadcom/brcm80211/brcmfmac/vendor.h
+v7.2.9     a9ce6bb39905dcbf13e4276adc7563c8e20a57768070646abcab48f6c2199885  drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/core.c
+v7.2.9     5a2b30fa87576b3411c6399bd10539d1a05e74549f0af952d6adef78f2ecaaa1  drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/module.c
+v7.2.9     1197bea9205d535c10fbd63dd498e92c2eae882e1392aa5a0e9a66c555d11788  drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/vops.h
+v7.2.9     ff938acbe02c36881a51f83ca93e0265122edbb346fc8ca958946768e5dbb994  drivers/net/wireless/broadcom/brcm80211/brcmfmac/xtlv.c
+v7.2.9     6e2d62dda30960e008bd29c2cd9b5f9b9a20884014f65f6b32d3b9f32f912983  drivers/net/wireless/broadcom/brcm80211/brcmfmac/xtlv.h
+v7.2.9     fba4e66e491186c5fdd295d81602a83abc5f8b827a104f9910fe6aa9214f815f  drivers/net/wireless/broadcom/brcm80211/brcmfmac/Makefile
+v7.2.9     c5d3e784b7629c9af24ee00bb133047baa6439e47893252e6514b64c38713e37  drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/Makefile
+v7.2.9     4778fece953ca85f9d9e46a5f8edc1fa23139e09afcb043929ac1778dde4e6ca  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/Makefile
+v7.2.9     6c39522eb3de877fcd9970e5931f89118f75d0894d2dc049ca7be602725e52d2  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/Makefile
+v7.2.9     35b8f713bf33b035956d6f94ac1f258388dabab9eafb3a17939307a0294ad391  drivers/bluetooth/hci_ldisc.c
+v7.2.9     7ea43973798689b060eb9d7ca4359e87dcd8aa2b49f835cab4d5eb194c10b206  drivers/bluetooth/hci_serdev.c
+v7.2.9     841d77149606f61f36e6a9f1acf9035ec8c4add724da2878e48a417ff37374a2  drivers/bluetooth/hci_h4.c
+v7.2.9     526ee2e0105646ed1f2704c7cf7b619d2218f1534eaf7951e113578c483e75a2  drivers/bluetooth/hci_bcsp.c
+v7.2.9     4b8502514b39dc4b4d8272656d2807474c7e5f0c07892d989c9ba32cf6ca684b  drivers/bluetooth/hci_ll.c
+v7.2.9     1ce55b03087744a74cb4953e0fb172cf3017e5c62641da1c435ce90d99e982bf  drivers/bluetooth/hci_ath.c
+v7.2.9     30ff3b7daaa8570bad0c8619557dc81904109a955e94b9415b3ef34ddc8c2f2b  drivers/bluetooth/hci_h5.c
+v7.2.9     cf0eea80560ca43a11a177fda29615bf5d8cb7cccaffe7e1eaaae883c6eb2d41  drivers/bluetooth/hci_intel.c
+v7.2.9     8d4756102a0d92eb58c9c252338ee50f91be22a0e38dc53491bf110ef8a6e034  drivers/bluetooth/hci_bcm.c
+v7.2.9     ef9ec1ceaacf168c18f6e35b358a00b3cdfb0a084bbf9d19180a1c505a5bf527  drivers/bluetooth/hci_qca.c
+v7.2.9     99646fccd958db6aa091af2e96fc47d083fdb902b107cd0b490c287170a1063f  drivers/bluetooth/hci_ag6xx.c
+v7.2.9     cb20a704d7f494c5e08ee5677514c1f214fa65e2575e7398646fd65675146417  drivers/bluetooth/hci_mrvl.c
+v7.2.9     406a8d7b7c441e5592e06c63fdf20f5bf3e1c7c9763d63b4fb0b695386e0793a  drivers/bluetooth/hci_aml.c
+v7.2.9     3dcfe554f41987e667b227f0ecda93f3eb426e46f6bc1fea576363e51b37cb62  drivers/bluetooth/hci_uart.h
+v7.2.9     43ab94feac41161ff6adca55002b5494117da72b968a41c972144d92b51d574e  drivers/bluetooth/btbcm.h
+v7.2.9     73d31fe011939ee9901a032e4ae2d16929f4acf2bffba65528ff81d9e42f8917  drivers/bluetooth/btintel.h
+v7.2.9     075eeaf78e4a9288ae228c0f99edbd137fcbd87c2645872cf748a9a33752205e  drivers/bluetooth/btqca.h
+v7.2.9     452d4467259f1da92f0f71bb566499f1fa0e1c89ec4f5bf7412ba8c5489daaa1  drivers/bluetooth/btrtl.h
+v7.2.9     494451d9a8ce5f255032730574293d961a419567e9daaf727fcc15c251fe2a50  derived:tree
+v6.18.55   32ebf65e5aa69162f8bc1f2f1d5793e8a337fcd47cc4d0c8bee23f0ba4f2d87d  drivers/net/wireless/broadcom/brcm80211/include/brcm_hw_ids.h
+v6.18.55   1ed2dcc37d792957f2f722b38f6ac1688d210f83316ddacc53a107b7cc3cfe0d  drivers/net/wireless/broadcom/brcm80211/include/brcmu_d11.h
+v6.18.55   b033458f10401bde6e2ef1c14f64f137f15c0858c8df934f22718e248201d478  drivers/net/wireless/broadcom/brcm80211/include/brcmu_utils.h
+v6.18.55   e768af55936c75aa9e8cc679b9c6c0bd199b3b0e08dad8bd15792f9596517423  drivers/net/wireless/broadcom/brcm80211/include/brcmu_wifi.h
+v6.18.55   1e7e449c3e54b725c6b7dc8ef1dfd8a4b8a5027941b496a1f211b36b4cfe1ddf  drivers/net/wireless/broadcom/brcm80211/include/chipcommon.h
+v6.18.55   80568f1354dd96c0dbd49f64939e652d9d25d12a2d54c890068bf64eda23466a  drivers/net/wireless/broadcom/brcm80211/include/defs.h
+v6.18.55   7b74ceaf8afce6ec9c79f9f3053c5120d6e68a61c41f19a8cb6084a65046fbfa  drivers/net/wireless/broadcom/brcm80211/include/soc.h
+v6.18.55   af412ce1d3272d28dc971639a8f831d64118d11db43878dadf70ce6167cf6dfa  drivers/net/wireless/broadcom/brcm80211/brcmfmac/acpi.c
+v6.18.55   525a8d8c27b5980241966e93e7ee252d1e4ad1d2be2ce8b257a761707dcc6d21  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/core.c
+v6.18.55   b6df241efded8bc5f04f7fae146bc4cffbebf68956d4154557af8797b35de874  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/module.c
+v6.18.55   4c8bc4a10d463cd4f9494745da61706044e7b30b782af0b8d0338a4cab08f60a  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/vops.h
+v6.18.55   f6d78bda641ab2bc945ed1c0fe62800b522b4f1d3a1d5cee3af0a8b396414393  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcdc.c
+v6.18.55   98aca9e796804b6cd0f15c490370c674bbdb2b1be84e3210c0a657a14afc6fea  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcdc.h
+v6.18.55   c426bf7e8e18cdd763fb7e6b2c346254ff2d48f2d11d2d965a1733704e96e82c  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c
+v6.18.55   052235603f6c4f8da7789c546459ef94e4e09c8dff405fa8d4680ef865290e6b  drivers/net/wireless/broadcom/brcm80211/brcmfmac/btcoex.c
+v6.18.55   2be4914926e397f223564af45b31cf350bd5d9f67c1494752f9148ae41607bee  drivers/net/wireless/broadcom/brcm80211/brcmfmac/btcoex.h
+v6.18.55   5c99cbafa3c881ea96ccdf8fd9f693e070da39a953c6e658d6c6f4634f73eab4  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bus.h
+v6.18.55   ad2ce32d63cdb5f6902249c0690e7f01c48a099c5266ab525c4ecffc6cc35e29  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c
+v6.18.55   cb4093d41593732e2a027866a096b3e1de2e272fb6a3d4880574fd344fdd6e42  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.h
+v6.18.55   a94f05f303fc6ccc69c7f7fe57a65e46d5ed03ee8709b424f2339c9906bc4f60  drivers/net/wireless/broadcom/brcm80211/brcmfmac/chip.c
+v6.18.55   cb6ffbc01bfd35629acfaf87daa8f5a6ef4f9ce4f4f393c19b05c2bd18ff791e  drivers/net/wireless/broadcom/brcm80211/brcmfmac/chip.h
+v6.18.55   065f0e741ee73bf1d74425fefe6bebbb4f65bad00df98bbff7f77e9f577950b5  drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
+v6.18.55   b319771764b2ff2f32ee7e57718ff350b3ecfc093c07066dcbaa4a480a63c590  drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.h
+v6.18.55   4a5a5ac64da90251b1a6a24262d421f47c3ab365d58a95633bdf7380a3472473  drivers/net/wireless/broadcom/brcm80211/brcmfmac/commonring.c
+v6.18.55   b2899336d680ca868536b25d1601ae99325ab66aaf1c565b4e638c71827b7369  drivers/net/wireless/broadcom/brcm80211/brcmfmac/commonring.h
+v6.18.55   80b1c7ce93aa9f33bf18e836ee5e7b43ee2e8a8613efd5a4f96c289a8aed9c6e  drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
+v6.18.55   e3134845f2f7fd0eb90e2631b63cde479957b44bda8904ddab74b274718069cf  drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.h
+v6.18.55   ec46fac36a9300b6275aaf17299ff9253c973ba1cf35627808b0923b07f7aa4e  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/core.c
+v6.18.55   e700b02a130f543f12a238928f84ec9b70b238750ca15d3dfb7570b73bf4973c  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/fwil_types.h
+v6.18.55   bf88ed5ceb44279951199d9cd8e9dd0538f5352876425ab8492d27be6b62e96d  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/module.c
+v6.18.55   003495b3c00879aa9e0f32085d2eeb42f318cffbe202c8ed6b2c94848aad99ac  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/vops.h
+v6.18.55   bbc97b72f2bcfa04757184daddab1de03d57da1d9eb3f3f8374722f5351dfa39  drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.c
+v6.18.55   05baaf3bf1d6d3364482b5f139555d4fb9b1b4c0379ad91853696ee3b05063bb  drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.h
+v6.18.55   b45b39f0981a2a057cccc8382be2638a6421e82ab8ce1efe25af0f4a7e0f0d0b  drivers/net/wireless/broadcom/brcm80211/brcmfmac/dmi.c
+v6.18.55   6afeeeab48e2907b8f9b2f7cb6c9999fdf25c565b09847a1e6d9385d80b59b8d  drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.c
+v6.18.55   809332a24eb3135eab24a17c9e54057284b5f5809148dcbe940bc13c157ca719  drivers/net/wireless/broadcom/brcm80211/brcmfmac/feature.h
+v6.18.55   a9f2e84d18370f9e47dfb5b9a9c92dc236b522ba7edc20d06940bdd9e1631c13  drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c
+v6.18.55   166e4115f3d25e27526d94e04322286228e33ae2b6c983985c1d6d2a56c40123  drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h
+v6.18.55   6b90cbb432c14a0e4df4dcb1e9f4c0451997823fba975fd3dd231906bda62fca  drivers/net/wireless/broadcom/brcm80211/brcmfmac/flowring.c
+v6.18.55   4b8c494a06a911f3a01c45aa42e4cb93a53aac78cab644288996a27420200925  drivers/net/wireless/broadcom/brcm80211/brcmfmac/flowring.h
+v6.18.55   adbd105807399daadb6045ba993041ba8bc4dd67e1ec810a67448eefa14ad5b4  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fweh.c
+v6.18.55   d36dbcf93b7aa789d1988463915880c20405d8fa09733e021b69675d7bb7ca2c  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fweh.h
+v6.18.55   1ba05bb9a089f6da2e7cdc863473c6168e2443e5c97d9e4906a94bde8bb202a9  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwil.c
+v6.18.55   770964dcbe004e1df7e7c5faecda90358e44cbd2fd56f25ceb73aaaf6a296f79  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwil.h
+v6.18.55   fa2f1b88f6b33c92a39a86bf4cfda9f368cf025347e03cf4614de9d7be46456d  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwil_types.h
+v6.18.55   e7de3c68cc4af9b4f26cb48dcd326403be77bf2fb1f2ba7d49ddc6c9791e32cd  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwsignal.c
+v6.18.55   51f14e634a8bf96de8d31a4861064038f9755daa1df6be80ef4e391b5e0c1966  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwsignal.h
+v6.18.55   0b495cc8e5287c1f24b1ae411f0d74c6c0bbe491a866c1982f6a0d0eb616a7c1  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwvid.c
+v6.18.55   6d9150aaa8257c87eb7a093819c115ad197fe1c1a9850fd9ba80df747a5952fc  drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwvid.h
+v6.18.55   d4d4e75ba50fcd669b93fd9d8c7a21d72086f98bed5a3d89ca67490f51fc0909  drivers/net/wireless/broadcom/brcm80211/brcmfmac/msgbuf.c
+v6.18.55   982683ed0fe0d984acbac405e1e5a9fe84fe0b1c54a9ab793c5961df8c3c9519  drivers/net/wireless/broadcom/brcm80211/brcmfmac/msgbuf.h
+v6.18.55   0e80aada2e487c7402aa610a3509a1d16976841250919220e592c7add2303bc4  drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
+v6.18.55   d27052440389dbc249e7435fccef43c18f8d07bf641563327ef0cf2bfab3cd7b  drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.h
+v6.18.55   048df2fa9593fa4bf65a3b459e9fca8ae45860bd6dc10a329d026984be6d3c3f  drivers/net/wireless/broadcom/brcm80211/brcmfmac/p2p.c
+v6.18.55   22ef3d1394b01eb096c67fcd08396f2b233ac840af1632d52716580088a6567f  drivers/net/wireless/broadcom/brcm80211/brcmfmac/p2p.h
+v6.18.55   4f4057309679d1106c3407c83960a4bfc657266688fd39dc47d26851382c9af7  drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
+v6.18.55   5d48671dc3226f929b813a0f48038d51a9a1b7de29711f41954fc4b6ce48680b  drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.h
+v6.18.55   995a7c936261e36f9728f78d4de5d0057b4b100f126f7cf6a22f7cc411d02c6f  drivers/net/wireless/broadcom/brcm80211/brcmfmac/pno.c
+v6.18.55   190211270b7ab6f92dc63acde26c2cb87aedc1774f98eafe6953e4f583f94512  drivers/net/wireless/broadcom/brcm80211/brcmfmac/pno.h
+v6.18.55   cc1e10c665025493434978fb86d31d22a12a5d997e247c4bea98011e3d27494d  drivers/net/wireless/broadcom/brcm80211/brcmfmac/proto.c
+v6.18.55   1c815ae635b0aa6434861be03d44eb715a4c6c359f4c9b834566c4de8944e081  drivers/net/wireless/broadcom/brcm80211/brcmfmac/proto.h
+v6.18.55   9b35fe8d215b76c3f2e95acf37aff46e9623ff9ba35911cc732ffedb0dae5b78  drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
+v6.18.55   245881dce2fc3a9765a547ed29a56c0761ccfbaf6d7406ad43081e0d509a2d1b  drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.h
+v6.18.55   ef90882e078eee963a8ae2dcbbd0ef2608af38654d48a16de9c904a55467001c  drivers/net/wireless/broadcom/brcm80211/brcmfmac/tracepoint.c
+v6.18.55   1e76ac445913a9a77bf1d2fb501144048394125b638f831fb12ba4e406799932  drivers/net/wireless/broadcom/brcm80211/brcmfmac/tracepoint.h
+v6.18.55   05eb3f98b60b0e7abb3e3ccf3da9f1875fa06d3a797afd71ded4e9b3f838b200  drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
+v6.18.55   0c9675eb3c21dd861fadf220190ce8ee5cb90f797e15a5f0f237fe773cfd774f  drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.h
+v6.18.55   3ddfd4441d70028324e92e91d2c2dd78d708bf5ed7f26194fb150c5189fe6414  drivers/net/wireless/broadcom/brcm80211/brcmfmac/vendor.c
+v6.18.55   24b201a75470706ceb47d4526db2b246aef7b89c17ec864eb7dfd7042841928f  drivers/net/wireless/broadcom/brcm80211/brcmfmac/vendor.h
+v6.18.55   aff28cf21674307ef7f179927f572c1947e1b7eb74f79b77a9a734f5a12281a6  drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/core.c
+v6.18.55   5a2b30fa87576b3411c6399bd10539d1a05e74549f0af952d6adef78f2ecaaa1  drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/module.c
+v6.18.55   1197bea9205d535c10fbd63dd498e92c2eae882e1392aa5a0e9a66c555d11788  drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/vops.h
+v6.18.55   ff938acbe02c36881a51f83ca93e0265122edbb346fc8ca958946768e5dbb994  drivers/net/wireless/broadcom/brcm80211/brcmfmac/xtlv.c
+v6.18.55   6e2d62dda30960e008bd29c2cd9b5f9b9a20884014f65f6b32d3b9f32f912983  drivers/net/wireless/broadcom/brcm80211/brcmfmac/xtlv.h
+v6.18.55   fba4e66e491186c5fdd295d81602a83abc5f8b827a104f9910fe6aa9214f815f  drivers/net/wireless/broadcom/brcm80211/brcmfmac/Makefile
+v6.18.55   c5d3e784b7629c9af24ee00bb133047baa6439e47893252e6514b64c38713e37  drivers/net/wireless/broadcom/brcm80211/brcmfmac/wcc/Makefile
+v6.18.55   4778fece953ca85f9d9e46a5f8edc1fa23139e09afcb043929ac1778dde4e6ca  drivers/net/wireless/broadcom/brcm80211/brcmfmac/cyw/Makefile
+v6.18.55   6c39522eb3de877fcd9970e5931f89118f75d0894d2dc049ca7be602725e52d2  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bca/Makefile
+v6.18.55   575887415bc7318e5d5d40a982058e4990319d405145d27c69244be7dfd8d3ef  drivers/bluetooth/hci_ldisc.c
+v6.18.55   7ea43973798689b060eb9d7ca4359e87dcd8aa2b49f835cab4d5eb194c10b206  drivers/bluetooth/hci_serdev.c
+v6.18.55   72aa9f33e8be49c1f5b11f0d8d49c4a6309aeccb50dd70440067b56e75a59c56  drivers/bluetooth/hci_h4.c
+v6.18.55   04cb1c7567da800f5b114cbd2f0f56706e7c5c3e2ab405fea0e5680d393227d5  drivers/bluetooth/hci_bcsp.c
+v6.18.55   9bfd549a63c763cb686225beeb9b068594ed20822cd4409ae7bed2f71108422f  drivers/bluetooth/hci_ll.c
+v6.18.55   e57d3ec4822e903549ae594dbc886894df3d8b32564ab6f6f33dfb291a774f9a  drivers/bluetooth/hci_ath.c
+v6.18.55   fd449f2b2ae37618d3cd3b0f8884104fbad38baacf09539b6901d018f516a989  drivers/bluetooth/hci_h5.c
+v6.18.55   284fd2f360ab2a72993252e3565a60c094cbf091878eccd97948b7ecbc8f4cf0  drivers/bluetooth/hci_intel.c
+v6.18.55   7745ad8c06dd7145004524e35f31f7860d067cc3521ea30a5588085155c2e683  drivers/bluetooth/hci_bcm.c
+v6.18.55   c3d8116bac2b44a40b0d2f724aaa2ec74ff218d66dc5c0a948f3e82553759214  drivers/bluetooth/hci_qca.c
+v6.18.55   b55d88f7848acc2c55b4b818fa4e3a2578a742aee626da8b88bbdd8de0d270bb  drivers/bluetooth/hci_ag6xx.c
+v6.18.55   671012f40f2da8d186668661d2e9f588751d84c04ff48fc1181a63955ea3f2f2  drivers/bluetooth/hci_mrvl.c
+v6.18.55   900cd6e641e21961242ed51371fa6b69e2270c7eed54471dc557fdd52ddab498  drivers/bluetooth/hci_aml.c
+v6.18.55   3dcfe554f41987e667b227f0ecda93f3eb426e46f6bc1fea576363e51b37cb62  drivers/bluetooth/hci_uart.h
+v6.18.55   43ab94feac41161ff6adca55002b5494117da72b968a41c972144d92b51d574e  drivers/bluetooth/btbcm.h
+v6.18.55   bef8c2e0c150aae6349a159a95a72aab3d995615bb2d1cae49bedad35ff4b5e1  drivers/bluetooth/btintel.h
+v6.18.55   075eeaf78e4a9288ae228c0f99edbd137fcbd87c2645872cf748a9a33752205e  drivers/bluetooth/btqca.h
+v6.18.55   452d4467259f1da92f0f71bb566499f1fa0e1c89ec4f5bf7412ba8c5489daaa1  drivers/bluetooth/btrtl.h
+v6.18.55   2eed8ec6343efe4f35b4c3ce54f6a3bcc387e16e7c08c549b94f4ad1d2e7bbba  derived:tree

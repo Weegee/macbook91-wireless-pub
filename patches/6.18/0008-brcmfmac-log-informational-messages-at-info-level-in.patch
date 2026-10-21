@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Weegee <748975+Weegee@users.noreply.github.com>
+Date: Tue, 13 Oct 2026 15:32:33 +0200
+Subject: [PATCH] brcmfmac: log informational messages at info level in debug
+ builds
+
+With CONFIG_BRCMDBG, which distribution kernels such as CachyOS enable,
+brcmf_info() was brcmf_err(): the firmware file in use, the firmware
+version and the CLM version were logged as errors on every probe, and
+with the chip reset across system sleep on every resume. They are now
+pr_info() in both configurations.
+---
+ drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.h | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.h b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.h
+index e4f5b98..746e0a7 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.h
++++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/debug.h
+@@ -77,8 +77,13 @@ bool brcmf_err_quiet(struct brcmf_pub *drvr);
+ 
+ #if defined(DEBUG) || defined(CONFIG_BRCM_TRACING)
+ 
+-/* For debug/tracing purposes treat info messages as errors */
+-#define brcmf_info brcmf_err
++/* Informational messages stay at info level in debug builds as well;
++ * distribution kernels (e.g. CachyOS) enable CONFIG_BRCMDBG.
++ */
++#define brcmf_info(fmt, ...)						\
++	do {								\
++		pr_info("%s: " fmt, __func__, ##__VA_ARGS__);		\
++	} while (0)
+ 
+ __printf(3, 4)
+ void __brcmf_dbg(u32 level, const char *func, const char *fmt, ...);

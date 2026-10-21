@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Assembled by packaging/fetch-upstream.sh, never tracked.
+/series/
+/KERNEL-SERIES
+/UPSTREAM.lock
+/build/
