@@ -7,7 +7,7 @@
 
 pkgname=macbook91-wireless-dkms
 _pkgname="${pkgname%-dkms}"
-pkgver=20261021.01
+pkgver=20261026.01
 pkgrel=1
 pkgdesc="Patched brcmfmac and hci_uart for WLAN and Bluetooth of the Apple MacBook9,1 (DKMS)"
 arch=('x86_64')
