@@ -1,0 +1,59 @@
+macbook91-wireless-dkms 20261026.02-1 - RELEASED
+
+State: released, tag v20261026.02 (2026-10-26). SHA256SUMS was regenerated
+with promote-release.sh --seal 20261026.02 in the tagged commit. Released
+without the hardware gate (hw.runtime_20261026_02, NOT RUN), as 20261026.01
+was; the module code is the same as in 20261026.01.
+
+What: the text interfaces follow the house text HIG; no driver change. Every
+tool takes --help and --version; errors read "prog: error: text" with
+hints on stderr; invalid usage exits 2; Ctrl+C and TERM exit 130 and 143.
+The pacman hook warning for an unsupported kernel series is one
+"macbook91-wireless: warning:" message on stderr (was a WARNING block on
+stdout); the install note and the module Makefile use the same message form.
+make without a target lists the targets (was: install). The installed
+macbook91-wireless-verify reports the package version. New packaging helper
+packaging/lib.sh (not packaged); fetch-upstream.sh gets --timeout. The
+twelve patches, series/ and dkms.conf are unchanged; module IDs: 7.3
+20261026.02+12d3581c306b83b5, 7.2 +494451d9a8ce5f25, 6.18
++35e4d7a8bd8c5087 (all unchanged). Details: docs/CHANGELOG.md.
+
+Measured without hardware (2026-10-26):
+- make dist and make arch-pkg: the tarball is the one pinned in PKGBUILD
+  (sha256 d5825741...), also from a clean clone of the committed tree.
+  makepkg --printsrcinfo equals .SRCINFO.
+- diff -r of the unpacked 20261026.01 and 20261026.02 tarballs: Makefile,
+  README.md, VERSION, src/macbook91-wireless/Makefile (messages only),
+  tools/kernel-series, tools/macbook91-wireless-series.hook and
+  tools/macbook91-wireless-verify differ; patches, series/ and dkms.conf do
+  not.
+- The five modules built from the unpacked package sources (module Makefile,
+  scratch directory) against 7.3.0-4-cachyos (clang) and
+  6.18.55-2-cachyos-lts (gcc), IDs as above, vermagic of the target kernel;
+  the only diagnostic is kbuild's notice that the compiler differs from the
+  kernel's. 7.2 was not built (no 7.2 headers on the test machine).
+  Nothing was installed or loaded.
+- namcap: no findings for the PKGBUILD; the package has the five known
+  warnings (docs/NAMCAP.md).
+- tests/run-tests.sh: 53 ok, 0 failed, 0 skipped, in the working tree and in
+  a clean clone of the committed tree with the series assembled offline; the
+  two logs are identical line by line. Private tests: 30 passed, 0 failed,
+  0 blocked. ShellCheck at warning level, bash -n and git diff --check are
+  clean.
+- The repo's macbook91-wireless-verify ran read-only on the test machine
+  (6.18.55-2-cachyos-lts, installed 20261026.01 modules): PASS: 0 FAIL, 0
+  WARN.
+
+NOT RUN for 20261026.02: installing this package and every hardware check
+(the hook and the install note were tested with a simulated
+/usr/lib/modules only). Carried over from 20261026.01, because the module
+code is unchanged: see docs/test-status.json (hw.runtime_20261026_01 and the
+carried-over gates). Not verified (unchanged): 7.3 runtime (WLAN, Bluetooth,
+suspend, recovery), suspend/resume of WLAN and Bluetooth on 6.18, Bluetooth
+function on 6.18, the rebind recovery in action on 6.18, runtime of patch
+0012 (static check only), hibernation (not set up), long mixed suspend
+series, Bluetooth devices across suspend.
+
+Local build of this release, for information only: not tracked, not one of the
+release files and not reproducible (makepkg output differs per machine):
+a526a9b7f0a6a5274efa5df245b04a322eb6c2346359016b40e7b6669e8d31e5  macbook91-wireless-dkms-20261026.02-1-x86_64.pkg.tar.zst

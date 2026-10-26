@@ -7,7 +7,7 @@
 
 pkgname=macbook91-wireless-dkms
 _pkgname="${pkgname%-dkms}"
-pkgver=20261021.01
+pkgver=20261026.02
 pkgrel=1
 pkgdesc="Patched brcmfmac and hci_uart for WLAN and Bluetooth of the Apple MacBook9,1 (DKMS)"
 arch=('x86_64')
@@ -24,16 +24,23 @@ install="$_pkgname.install"
 # linux-firmware-broadcom carries brcm/brcmfmac4350c2-pcie.bin, the only
 # FullMAC firmware for this chip; the Bluetooth controller runs on its ROM and
 # needs no file (docs/FINDINGS.md).
-depends=('dkms' 'linux-firmware-broadcom')
-# DKMS builds per installed kernel and needs that kernel's headers. Only the
-# kernel series listed in KERNEL-SERIES (6.18 and 7.2) are built; other kernels
-# keep their drivers.
-optdepends=('linux-cachyos-headers: build against the CachyOS kernel'
-            'linux-cachyos-lts-headers: build against the CachyOS LTS kernel'
-            'linux-headers: build against the Arch kernel'
-            'clang: required by kernels built with clang, e.g. linux-cachyos'
-            'lld: required by kernels built with clang'
-            'llvm: required by kernels built with clang'
+#
+# DKMS builds per installed kernel and needs that kernel's headers.
+# linux-cachyos-lts-headers is the kernel this package is for by default: the
+# LTS series is always supported, and the headers package depends on
+# linux-cachyos-lts. The current CachyOS series is supported as well, through
+# the optional dependency below; its headers package depends on clang, lld and
+# llvm, which its clang-built kernel needs. Which series are built is
+# KERNEL-SERIES in the sources (packaging/upstream.lock); a kernel of any other
+# series keeps its stock drivers, and the package's pacman hook warns about it
+# after the transaction.
+#
+# The depends array itself is set in package(), not up here. makepkg checks
+# top-level depends before it builds, so a build host without the CachyOS
+# repositories, such as a plain Arch container, would have to install
+# linux-cachyos-lts-headers and cannot. Depends set in package() are not
+# checked at build time, and the built package carries them all the same.
+optdepends=('linux-cachyos-headers: build the patched drivers for the current CachyOS kernel as well'
             'bluez-utils: lets macbook91-wireless-verify read the Bluetooth state')
 makedepends=('make')
 
@@ -42,9 +49,10 @@ makedepends=('make')
 # against packaging/upstream.lock before it enters the tarball; makepkg
 # downloads nothing, and DKMS rebuilds during kernel upgrades run offline.
 source=("$pkgname-$pkgver.tar")
-sha256sums=('65d735b8e5ecd1e312113e1334de74045ef9f23a9bfebe8fa40f3cb50a3997c3')
+sha256sums=('d5825741ce23b453dd80426b265812acddc48cc66c43be9ef50bfc0aabe19a11')
 
 package() {
+    depends=('dkms' 'linux-firmware-broadcom' 'linux-cachyos-lts-headers')
     cd "$pkgname-$pkgver" || exit 1
     make PREFIX=/usr DESTDIR="$pkgdir" install
 }
