@@ -1,4 +1,4 @@
-Structure version: 20261026.01
+Structure version: 20261026.02
 
 Layout rules for this repository. The README describes the same directories
 for a reader; this file is the rule.
@@ -27,8 +27,9 @@ packaging/          files.list (the kernel files fetched), overlay/ (the two
                     Kbuild files), upstream.lock (hashes that gate every
                     fetched file and the derived tree), fetch-upstream.sh,
                     mkdist.py (reproducible tarball), promote-release.sh,
-                    make-package.sh, arch/ (PKGBUILD, .SRCINFO, install
-                    scriptlet).
+                    make-package.sh, lib.sh (text helpers the packaging and
+                    dev scripts source; not packaged), arch/ (PKGBUILD,
+                    .SRCINFO, install scriptlet).
 tools/              macbook91-wireless-verify is packaged to /usr/bin;
                     kernel-series to /usr/lib/macbook91-wireless/, the one
                     reader of KERNEL-SERIES besides the module Makefile

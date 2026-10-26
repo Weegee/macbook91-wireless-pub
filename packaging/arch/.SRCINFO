@@ -1,6 +1,6 @@
 pkgbase = macbook91-wireless-dkms
 	pkgdesc = Patched brcmfmac and hci_uart for WLAN and Bluetooth of the Apple MacBook9,1 (DKMS)
-	pkgver = 20261026.01
+	pkgver = 20261026.02
 	pkgrel = 1
 	url = https://github.com/Weegee/macbook91-wireless-pub
 	install = macbook91-wireless.install
@@ -13,7 +13,7 @@ pkgbase = macbook91-wireless-dkms
 	makedepends = make
 	optdepends = linux-cachyos-headers: build the patched drivers for the current CachyOS kernel as well
 	optdepends = bluez-utils: lets macbook91-wireless-verify read the Bluetooth state
-	source = macbook91-wireless-dkms-20261026.01.tar
+	source = macbook91-wireless-dkms-20261026.02.tar
 	sha256sums = e93dd6328a0aec172173c1c7ef10bdab416d111ce0395deb45fd11e669037559
 
 pkgname = macbook91-wireless-dkms
