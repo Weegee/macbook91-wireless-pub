@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Maintainer: Weegee <748975+Weegee@users.noreply.github.com>
+#
+# Patched brcmfmac and hci_uart (DKMS) making WLAN (BCM4350) and Bluetooth
+# (BCM4350C0, UART) of the Apple MacBook9,1 survive suspend and recover from
+# firmware hangs without a reboot. See README.md and docs/ in the project.
+
+pkgname=macbook91-wireless-dkms
+_pkgname="${pkgname%-dkms}"
+pkgver=20261026.01
+pkgrel=1
+pkgdesc="Patched brcmfmac and hci_uart for WLAN and Bluetooth of the Apple MacBook9,1 (DKMS)"
+arch=('x86_64')
+url='https://github.com/Weegee/macbook91-wireless-pub'
+# This project's own files are GPL-3.0-or-later, except those that build the
+# modules (Makefile, dkms.conf and Kbuild files in /usr/src):
+# GPL-2.0-or-later, the Kbuild file for hci_uart GPL-2.0-only. Kernel files
+# keep their licenses: brcmfmac is ISC; hci_uart is GPL-2.0-or-later except
+# hci_ll.c, hci_qca.c and btqca.h (GPL-2.0-only) and hci_aml.c
+# (GPL-2.0-only OR MIT). README.md maps every path.
+license=('GPL-3.0-or-later' 'GPL-2.0-or-later' 'GPL-2.0-only' 'ISC' 'MIT')
+install="$_pkgname.install"
+
+# linux-firmware-broadcom carries brcm/brcmfmac4350c2-pcie.bin, the only
+# FullMAC firmware for this chip; the Bluetooth controller runs on its ROM and
+# needs no file (docs/FINDINGS.md).
+#
+# DKMS builds per installed kernel and needs that kernel's headers.
+# linux-cachyos-lts-headers is the kernel this package is for by default: the
+# LTS series is always supported, and the headers package depends on
+# linux-cachyos-lts. The current CachyOS series is supported as well, through
+# the optional dependency below; its headers package depends on clang, lld and
+# llvm, which its clang-built kernel needs. Which series are built is
+# KERNEL-SERIES in the sources (packaging/upstream.lock); a kernel of any other
+# series keeps its stock drivers, and the package's pacman hook warns about it
+# after the transaction.
+#
+# The depends array itself is set in package(), not up here. makepkg checks
+# top-level depends before it builds, so a build host without the CachyOS
+# repositories, such as a plain Arch container, would have to install
+# linux-cachyos-lts-headers and cannot. Depends set in package() are not
+# checked at build time, and the built package carries them all the same.
+optdepends=('linux-cachyos-headers: build the patched drivers for the current CachyOS kernel as well'
+            'bluez-utils: lets macbook91-wireless-verify read the Bluetooth state')
+makedepends=('make')
+
+# One source: the reproducible tarball `make dist` writes to dist/. Its kernel
+# half is fetched by packaging/fetch-upstream.sh from git.kernel.org and checked
+# against packaging/upstream.lock before it enters the tarball; makepkg
+# downloads nothing, and DKMS rebuilds during kernel upgrades run offline.
+source=("$pkgname-$pkgver.tar")
+sha256sums=('e93dd6328a0aec172173c1c7ef10bdab416d111ce0395deb45fd11e669037559')
+
+package() {
+    depends=('dkms' 'linux-firmware-broadcom' 'linux-cachyos-lts-headers')
+    cd "$pkgname-$pkgver" || exit 1
+    make PREFIX=/usr DESTDIR="$pkgdir" install
+}
