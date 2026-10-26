@@ -4,15 +4,22 @@
 # Hermetic checks of the repository: no hardware, no root, no network (the
 # fetcher runs --offline against build/upstream-cache and is skipped without
 # it). Exit status 1 on any failure.
+#
+# Text interface (house text HIG, Bash patterns): one line per check on stdout,
+# "ok", "FAIL" or "skip" first, then a count line and, last, "all tests
+# passed" or "N tests failed". "all tests passed" is read by the release
+# checks of the maintainer and stays word for word (STA-1).
+# Abweichung von TXT-5: ok / FAIL / skip is the test-report convention of the
+# docs (docs/test-status.json counts, STATUS.txt), not a message of a tool.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TMP="$(mktemp -d "${TMPDIR:-/tmp}/macbook91-wireless-tests.XXXXXX")"
 trap 'rm -rf "$TMP"' EXIT
-fails=0
-ok() { printf 'ok    %s\n' "$*"; }
+fails=0 oks=0 skips=0
+ok() { printf 'ok    %s\n' "$*"; oks=$((oks + 1)); }
 bad() { printf 'FAIL  %s\n' "$*"; fails=$((fails + 1)); }
-skip() { printf 'skip  %s\n' "$*"; }
+skip() { printf 'skip  %s\n' "$*"; skips=$((skips + 1)); }
 cd "$ROOT" || exit 1
 
 # The checks cover the files of the public tree. A top-level directory named
@@ -62,11 +69,13 @@ else
 fi
 
 # 2. Scripts --------------------------------------------------------------------
-for f in packaging/fetch-upstream.sh packaging/promote-release.sh packaging/make-package.sh tools/macbook91-wireless-verify tools/kernel-series tools/dev-*.sh tests/run-tests.sh; do
+scripts=(packaging/fetch-upstream.sh packaging/promote-release.sh packaging/make-package.sh packaging/lib.sh
+	tools/macbook91-wireless-verify tools/kernel-series tools/dev-*.sh)
+for f in "${scripts[@]}" tests/run-tests.sh packaging/arch/macbook91-wireless.install; do
 	bash -n "$f" || bad "syntax: $f"
 done
 if command -v shellcheck >/dev/null; then
-	shellcheck -S warning packaging/fetch-upstream.sh packaging/promote-release.sh packaging/make-package.sh tools/macbook91-wireless-verify tools/kernel-series tools/dev-*.sh &&
+	shellcheck -S warning "${scripts[@]}" &&
 		ok "shellcheck" || bad "shellcheck"
 else
 	skip "shellcheck not installed"
@@ -76,7 +85,7 @@ fi
 pq=$(awk 'FNR == 1 {prev = ""} {
 	if ($0 ~ /\|[[:space:]]*grep -[A-Za-z]*q/ || (prev ~ /\|[[:space:]]*$/ && $0 ~ /^[[:space:]]*grep -[A-Za-z]*q/))
 		print FILENAME ":" FNR
-	prev = $0 }' packaging/fetch-upstream.sh packaging/promote-release.sh packaging/make-package.sh tools/macbook91-wireless-verify tools/kernel-series tools/dev-*.sh tests/run-tests.sh)
+	prev = $0 }' "${scripts[@]}" tests/run-tests.sh)
 [ -z "$pq" ] && ok "no grep -q at the end of a pipeline" || bad "grep -q ends a pipeline (pipefail): $pq"
 python3 -c 'import ast, sys; ast.parse(open(sys.argv[1]).read(), sys.argv[1])' packaging/mkdist.py 2>/dev/null &&
 	ok "mkdist.py parses" || bad "mkdist.py"
@@ -119,7 +128,7 @@ cp src/macbook91-wireless/Makefile "$TMP/skip/tree/"
 printf '6.18\n7.2\n' >"$TMP/skip/tree/KERNEL-SERIES"
 for rel in 6.12.1-test 7.4.0-test 6.180.1-test; do
 	printf '#define UTS_RELEASE "%s"\n' "$rel" >"$TMP/skip/kdir/include/generated/utsrelease.h"
-	if out=$(make -s -C "$TMP/skip/tree" KDIR="$TMP/skip/kdir" 2>&1) && grep -F 'Nothing built' <<<"$out" >/dev/null &&
+	if out=$(make -s -C "$TMP/skip/tree" KDIR="$TMP/skip/kdir" 2>&1) && grep -F 'nothing built' <<<"$out" >/dev/null &&
 		[ ! -e "$TMP/skip/tree/build" ] && make -s -C "$TMP/skip/tree" KDIR="$TMP/skip/kdir" clean >/dev/null 2>&1; then
 		ok "Makefile skips Linux ${rel%%-*} (not a shipped series)"
 	else
@@ -163,12 +172,14 @@ for k in $ks_rels; do
 done
 [ -z "$kfail" ] && ok "kernel-series --kernel and the DKMS pattern accept exactly the listed series" ||
 	bad "kernel-series --kernel:$kfail"
-# --hook: one WARNING block per installed kernel (a directory with vmlinuz) of
-# a series not listed, nothing for the others, exit 0 either way.
+# --hook: one warning of the package per installed kernel (a directory with
+# vmlinuz) of a series not listed, nothing for the others, exit 0 either way.
+# The warning goes to stderr, where pacman shows hook output.
 for k in 6.18.55-2-cachyos-lts 7.3.0-4-cachyos 7.4.0-1-test 7.5.0-1-test; do mkdir -p "$TMP/ks/modules/$k"; done
 for k in 6.18.55-2-cachyos-lts 7.3.0-4-cachyos 7.4.0-1-test; do : >"$TMP/ks/modules/$k/vmlinuz"; done
-if out=$(ks --hook --modules-root "$TMP/ks/modules") &&
-	[ "$(grep -c '==> WARNING: macbook91-wireless' <<<"$out")" = 1 ] &&
+if out=$(ks --hook --modules-root "$TMP/ks/modules" 2>&1 >"$TMP/ks/hook.out") && [ ! -s "$TMP/ks/hook.out" ] &&
+	[ "$(grep -c '^macbook91-wireless: warning: kernel 7.4.0-1-test' <<<"$out")" = 1 ] &&
+	! grep -E '^(==>|=+$)' <<<"$out" >/dev/null &&
 	grep -F 'kernel 7.4.0-1-test (Linux 7.4) is not a kernel series' <<<"$out" >/dev/null &&
 	! grep -E '6\.18\.55|7\.3\.0|7\.5\.0' <<<"$out" >/dev/null; then
 	ok "kernel-series --hook warns once, for the installed kernel of the unlisted series 7.4"
@@ -324,6 +335,16 @@ if [ -r src/macbook91-wireless/KERNEL-SERIES ]; then
 			bad "series: trees '$have', KERNEL-SERIES '${sers[*]}', lock '$sers_lock'"
 		[ -x "$TMP/root/usr/bin/macbook91-wireless-verify" ] &&
 			[ -r "$TMP/root/usr/lib/modprobe.d/macbook91-wireless.conf" ] && [ ! -e "$d/build" ] && ok "install layout" || bad "install layout"
+		# The installed tools carry the package version, not a placeholder.
+		vv=$(bash "$TMP/root/usr/bin/macbook91-wireless-verify" --version 2>&1)
+		kv=$(bash "$TMP/root/usr/lib/macbook91-wireless/kernel-series" --version 2>&1)
+		if [ "${vv%%$'\n'*}" = "macbook91-wireless-verify $v" ] &&
+			[ "${kv%%$'\n'*}" = "kernel-series (macbook91-wireless-dkms) $v" ] &&
+			! grep -F '@PKGVER@' "$TMP/root/usr/bin/macbook91-wireless-verify" "$TMP/root/usr/lib/macbook91-wireless/kernel-series" >/dev/null; then
+			ok "installed tools report the package version ($v)"
+		else
+			bad "installed tools: version '${vv%%$'\n'*}', '${kv%%$'\n'*}'"
+		fi
 		# kernel-series reads the installed list, and makes the same pattern
 		# as dkms.conf's; the hook sorts after 70-dkms-install.hook.
 		iks="$TMP/root/usr/lib/macbook91-wireless/kernel-series"
@@ -365,6 +386,61 @@ else
 	skip "install and tarball: tree not assembled"
 fi
 
+# Text interface of the tools (house text HIG): -h and --help print the help on
+# stdout with status 0 and nothing on stderr, -V and --version print
+# "prog [(package)] VERSION" as first line, invalid usage ends with status 2, an
+# "error:" message on stderr and nothing on stdout, and --help wins over an
+# invalid option on the same line.
+ver=$(cat VERSION)
+tfail=""
+for t in tools/macbook91-wireless-verify tools/kernel-series packaging/fetch-upstream.sh packaging/promote-release.sh \
+	packaging/make-package.sh tools/dev-suspend-cycle.sh tools/dev-wlan-swap.sh "python3 -I packaging/mkdist.py"; do
+	# shellcheck disable=SC2086  # "python3 -I packaging/mkdist.py" is a command with arguments
+	set -- $t
+	[ "$1" = python3 ] && cmd=("$@") || cmd=(bash "$1")
+	prog=$(basename "${!#}")
+	h=$("${cmd[@]}" --help 2>"$TMP/t.err"); hrc=$?
+	[[ "${h%%$'\n'*}" == "Usage: $prog"* ]] || tfail+=" $prog:--help-usage-line"
+	[ "$hrc" = 0 ] && [ ! -s "$TMP/t.err" ] || tfail+=" $prog:--help-rc($hrc)/stderr"
+	grep -x 'Examples:' <<<"$h" >/dev/null && grep -x 'Exit status:' <<<"$h" >/dev/null || tfail+=" $prog:help-sections"
+	hs=$("${cmd[@]}" -h 2>/dev/null); [ "$hs" = "$h" ] || tfail+=" $prog:-h"
+	v=$("${cmd[@]}" --version 2>"$TMP/t.err"); vrc=$?
+	[[ "${v%%$'\n'*}" =~ ^$prog\ (\(macbook91-wireless-dkms\)\ )?$ver$ ]] && [ "$vrc" = 0 ] && [ ! -s "$TMP/t.err" ] || tfail+=" $prog:--version"
+	[ "$("${cmd[@]}" -V 2>/dev/null)" = "$v" ] || tfail+=" $prog:-V"
+	[ "$("${cmd[@]}" --bogus --help 2>/dev/null)" = "$h" ] || tfail+=" $prog:--help-wins"
+	if [ "$prog" != make-package.sh ]; then   # its other arguments go to makepkg
+		o=$("${cmd[@]}" --bogus 2>"$TMP/t.err"); brc=$?
+		[ "$brc" = 2 ] && [ -z "$o" ] && grep -E "^$prog: error: " "$TMP/t.err" >/dev/null || tfail+=" $prog:--bogus($brc)"
+	fi
+done
+set --
+[ -z "$tfail" ] && ok "help, version and invalid usage of all tools follow the text HIG" || bad "text interface:$tfail"
+# Arguments of the dev helpers are checked before anything is touched.
+dfail=""
+for a in "mem" "foo 3" "mem x" "mem 0" "mem 2 a"; do
+	# shellcheck disable=SC2086
+	bash tools/dev-suspend-cycle.sh $a >/dev/null 2>&1; [ $? = 2 ] || dfail+=" suspend-cycle[$a]"
+done
+for a in "" "--bogus" "--intree extra"; do
+	# shellcheck disable=SC2086
+	bash tools/dev-wlan-swap.sh $a >/dev/null 2>&1; [ $? = 2 ] || dfail+=" wlan-swap[$a]"
+done
+bash tools/dev-wlan-swap.sh "$TMP/no-such-dir" >/dev/null 2>"$TMP/t.err"
+{ [ $? = 1 ] || [ "$(id -u)" = 0 ]; } && grep -F 'brcmfmac.ko does not exist' "$TMP/t.err" >/dev/null || dfail+=" wlan-swap[no DIR]"
+[ -z "$dfail" ] && ok "dev helpers refuse invalid arguments with status 2 before touching anything" || bad "dev helpers:$dfail"
+# --reload without root: error with the command to run, status 2, nothing unloaded.
+if [ "$(id -u)" != 0 ]; then
+	o=$(bash tools/macbook91-wireless-verify --reload 2>"$TMP/t.err"); rc=$?
+	if [ "$rc" = 2 ] && [ -z "$o" ] && grep -F 'macbook91-wireless-verify: error: --reload needs root' "$TMP/t.err" >/dev/null &&
+		grep -F 'sudo macbook91-wireless-verify --reload' "$TMP/t.err" >/dev/null; then
+		ok "verify --reload without root: error, hint with sudo, status 2"
+	else
+		bad "verify --reload without root: exit $rc, $(head -n2 "$TMP/t.err")"
+	fi
+else
+	skip "verify --reload without root: running as root"
+fi
+
 # 7. Licenses: texts, PKGBUILD and the SPDX line of every own file -------------
 # The mapping is README.md, "License": files that build the modules are
 # GPL-2.0-or-later (GPLv2 wants them with a built module), the hci_uart Kbuild
@@ -392,5 +468,10 @@ done < <(tracked -- . ':!release' ':!diag' ':!patches' ':!LICENSE' ':!LICENSES' 
 [ -z "$lic" ] && ok "license texts, PKGBUILD licenses and SPDX lines match the mapping" || bad "licenses:$lic"
 
 echo
-[ "$fails" = 0 ] && echo "all tests passed" || echo "$fails test(s) failed"
+printf '%s ok, %s failed, %s skipped\n' "$oks" "$fails" "$skips"
+if [ "$fails" = 0 ]; then
+	echo "all tests passed"
+else
+	printf '%s %s failed\n' "$fails" "$([ "$fails" = 1 ] && echo test || echo tests)"
+fi
 [ "$fails" = 0 ]

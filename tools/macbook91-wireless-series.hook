@@ -1,11 +1,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 # After every transaction that installs or upgrades a kernel, or this package,
-# print a WARNING block for each installed kernel of a series this package
-# does not support (kernel-series --hook). It builds nothing and never fails
-# the transaction: dkms.conf's BUILD_EXCLUSIVE_KERNEL already makes DKMS skip
-# such a kernel, and this says so where the user sees it. The name sorts after
-# 70-dkms-install.hook, so the warning follows DKMS's own output.
+# print a "macbook91-wireless: warning: ..." message for each installed kernel
+# of a series this package does not support (kernel-series --hook). It builds
+# nothing and never fails the transaction: dkms.conf's BUILD_EXCLUSIVE_KERNEL
+# already makes DKMS skip such a kernel, and this says so where the user sees
+# it. The name sorts after 70-dkms-install.hook, so the warning follows DKMS's
+# own output.
+#
+# Abweichung von TXT-8: Description is shown by pacman as a progress line
+# "(1/2) <Description>"; many libalpm hooks end it with "..." and so does this
+# one.
 
 [Trigger]
 Operation = Install

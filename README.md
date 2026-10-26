@@ -95,8 +95,10 @@ supported, and the package depends on `linux-cachyos-lts-headers` (gcc). The
 current CachyOS series is supported as well; for it install
 `linux-cachyos-headers`, which brings the clang, lld and llvm its clang-built
 kernel needs. A kernel of any other series keeps its stock drivers: DKMS
-skips it, a pacman hook prints a WARNING block for it after every transaction
-that installs a kernel, and `macbook91-wireless-verify` reports a FAIL on it.
+skips it, a pacman hook prints a warning (`macbook91-wireless: warning: kernel
+... is not a kernel series macbook91-wireless supports`) for it after every
+transaction that installs a kernel, and `macbook91-wireless-verify` reports a
+FAIL on it.
 
 | Series | Kernel (tested) | Status |
 | --- | --- | --- |
@@ -160,7 +162,13 @@ cfg80211 limits the channels instead (docs/FINDINGS.md, "Regulatory domain").
 make dist           # fetch the kernel files at the locked tag, write dist/*.tar (git checkout)
 make arch-pkg-dev   # build the package from the working tree
 make test           # hermetic tests
+make                # without a target: lists the targets and variables
 ```
+
+Every script and tool answers `--help` (usage, examples, options, exit status)
+and `--version`; invalid usage ends with status 2 and an `error:` line on
+stderr. Messages go to stderr, results to stdout. The shared helpers of the
+packaging and development scripts are in `packaging/lib.sh`.
 
 `packaging/fetch-upstream.sh` fetches the kernel files listed in
 `packaging/files.list` from the stable tree on git.kernel.org, checks each one

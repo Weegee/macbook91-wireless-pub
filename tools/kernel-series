@@ -15,48 +15,108 @@
 # A kernel belongs to series X.Y when its release starts with "X.Y.", which is
 # exactly what BUILD_EXCLUSIVE_KERNEL="^(X\.Y|...)\." tests.
 #
-#   kernel-series --list              the shipped series, space-separated
-#   kernel-series --kernel RELEASE    exit 0 if RELEASE is of a shipped series,
-#                                     1 if not; a sentence on stdout either way
-#   kernel-series --hook              a WARNING block for every installed kernel
-#                                     of another series (the pacman hook)
-#   kernel-series --dkms-regex        the BUILD_EXCLUSIVE_KERNEL value
+# Usage, modes and exit status: kernel-series --help.
 #
-#   --series-file FILE   the list to read (default: the installed source tree)
-#   --modules-root DIR   where --hook looks for kernels (default /usr/lib/modules)
-#
-# Exit 2: bad arguments, or no readable list.
+# Text interface (house text HIG, Bash patterns): results go to stdout,
+# messages to stderr as "kernel-series: error: text". The unsupported-kernel
+# explanation is the result of --kernel (stdout, read by the install scriptlet
+# and the verifier) and, as "macbook91-wireless: warning: ..." messages on
+# stderr, the output of --hook; its first line is the headline, the rest
+# explains. There is no colour and no progress.
 set -u
+
+PROG=kernel-series
+# make install writes the package version here; run from a checkout, the
+# version is the one in ../VERSION.
+VERSION=@PKGVER@
+case $VERSION in @*) VERSION=$(cat "$(dirname "$0")/../VERSION" 2>/dev/null || echo unknown) ;; esac
+HOMEPAGE=https://github.com/Weegee/macbook91-wireless-pub
 
 SERIES_FILE=/usr/src/macbook91-wireless-@PKGVER@/KERNEL-SERIES
 MODULES_ROOT=/usr/lib/modules
 MODE=''
 REL=''
 
-die() { printf 'kernel-series: %s\n' "$*" >&2; exit 2; }
+# Messages on stderr (KAN-1, FEH-2): "prog: error: text", hints indented.
+err() { printf '%s: error: %s\n' "$PROG" "$1" >&2; shift; [ $# -eq 0 ] || printf '  %s\n' "$@" >&2; }
+die() { err "$@"; exit 2; }
+usage_error() {
+	err "$@"
+	printf 'Usage: %s MODE [OPTIONS]\nRun '"'"'%s --help'"'"' for more\n' "$PROG" "$PROG" >&2
+	exit 2
+}
+
+usage() {
+	cat <<USAGE
+Usage: $PROG MODE [--series-file FILE] [--modules-root DIR]
+
+Say which Linux kernel series the patched macbook91-wireless drivers are built
+for, and what to do on any other. DKMS, the pacman hook, the install scriptlet
+and macbook91-wireless-verify all ask this script, so they cannot disagree.
+
+Examples:
+  $PROG --list
+  $PROG --kernel "\$(uname -r)"
+
+Modes (exactly one):
+  --list             print the shipped series, space-separated
+  --kernel RELEASE   say whether RELEASE belongs to a shipped series
+  --hook             warn on stderr about every installed kernel of another
+                     series (the pacman hook)
+  --dkms-regex       print the BUILD_EXCLUSIVE_KERNEL value for dkms.conf
+
+Options:
+  --series-file FILE   read the list of series from FILE
+  --modules-root DIR   where --hook looks for installed kernels
+  -h, --help           show this help and exit
+  -V, --version        show the version and exit
+
+Files:
+  /usr/src/macbook91-wireless-VERSION/KERNEL-SERIES   the list (default)
+  /usr/lib/modules                                    kernels (default)
+
+Exit status:
+  0  done; for --kernel, RELEASE is of a shipped series
+  1  --kernel: RELEASE is of another series (the explanation is on stdout)
+  2  invalid usage, or no readable list of series
+
+Docs and bug reports: $HOMEPAGE
+USAGE
+}
+
+# -h, --help and -V, --version win over everything else on the line (HIL-1).
+for a in "$@"; do
+	case $a in
+		-h|--help) usage; exit 0 ;;
+		-V|--version) printf '%s (macbook91-wireless-dkms) %s\nLicense: GPL-3.0-or-later\n' "$PROG" "$VERSION"; exit 0 ;;
+	esac
+done
 
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--list|--hook|--dkms-regex) MODE=${1#--}; shift ;;
 		--kernel)
-			[ $# -ge 2 ] || die "--kernel needs a kernel release"
+			[ $# -ge 2 ] || usage_error "--kernel needs a kernel release"
 			MODE=kernel; REL=$2; shift 2 ;;
 		--series-file)
-			[ $# -ge 2 ] || die "--series-file needs a file"
+			[ $# -ge 2 ] || usage_error "--series-file needs a file"
 			SERIES_FILE=$2; shift 2 ;;
 		--modules-root)
-			[ $# -ge 2 ] || die "--modules-root needs a directory"
+			[ $# -ge 2 ] || usage_error "--modules-root needs a directory"
 			MODULES_ROOT=$2; shift 2 ;;
-		*) die "unknown argument: $1" ;;
+		-*) usage_error "unknown option: $1" ;;
+		*) usage_error "unexpected argument: $1" ;;
 	esac
 done
-[ -n "$MODE" ] || die "no mode: use --list, --kernel RELEASE, --hook or --dkms-regex"
+[ -n "$MODE" ] || usage_error "no mode given" "Use --list, --kernel RELEASE, --hook or --dkms-regex"
 
-[ -r "$SERIES_FILE" ] || die "cannot read the list of shipped series, $SERIES_FILE"
+[ -r "$SERIES_FILE" ] ||
+	die "cannot read the list of shipped series: $SERIES_FILE" \
+		"Pass another file with --series-file, or reinstall: sudo pacman -S macbook91-wireless-dkms"
 SERIES=()
 while read -r s; do
 	[ -n "$s" ] || continue
-	[[ $s =~ ^[0-9]+\.[0-9]+$ ]] || die "malformed series '$s' in $SERIES_FILE"
+	[[ $s =~ ^[0-9]+\.[0-9]+$ ]] || die "malformed series '$s' in $SERIES_FILE" "Expected one X.Y per line"
 	SERIES+=("$s")
 done < "$SERIES_FILE"
 [ "${#SERIES[@]}" -gt 0 ] || die "$SERIES_FILE lists no series"
@@ -70,13 +130,13 @@ shipped() {  # RELEASE -> exit 0 when it belongs to a shipped series
 }
 
 series_of() {  # RELEASE -> its X.Y, or nothing
-	[[ $1 =~ ^([0-9]+\.[0-9]+)\. ]] && printf '%s' "${BASH_REMATCH[1]}"
+	[[ $1 =~ ^([0-9]+)\.([0-9]+)\. ]] && printf '%s.%s' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
 }
 
 unsupported() {  # RELEASE -> the explanation, the same for hook, scriptlet and verifier
 	local ks
 	ks=$(series_of "$1")
-	printf 'kernel %s (Linux %s) is not a kernel series macbook91-wireless supports.\n' \
+	printf 'kernel %s (Linux %s) is not a kernel series macbook91-wireless supports\n' \
 		"$1" "${ks:-of unknown series}"
 	printf 'No patched driver is built for it: it runs the stock brcmfmac and\n'
 	printf 'hci_uart, without the suspend and firmware hang fixes of this package.\n'
@@ -104,13 +164,13 @@ case "$MODE" in
 		exit 1
 		;;
 	hook)
+		# One warning of the package per installed kernel of another series
+		# (FEH-5: only where someone can act on it, each kernel once).
 		for d in "$MODULES_ROOT"/*/; do
 			[ -e "$d/vmlinuz" ] || continue
 			rel=$(basename "$d")
 			shipped "$rel" && continue
-			printf '\n==> WARNING: macbook91-wireless ================================\n'
-			unsupported "$rel" | sed 's/^/    /'
-			printf '==================================================================\n\n'
+			unsupported "$rel" | sed -e '1s/^/macbook91-wireless: warning: /' -e '2,$s/^/  /' >&2
 		done
 		;;
 esac

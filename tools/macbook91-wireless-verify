@@ -3,16 +3,26 @@
 #
 # macbook91-wireless-verify: is the patched WLAN/Bluetooth stack of
 # macbook91-wireless what is actually running on this MacBook9,1?
-#
-#   macbook91-wireless-verify            check, print PASS/WARN/FAIL lines,
-#                                        exit 1 on any FAIL
-#   sudo macbook91-wireless-verify --reload
-#                                        load the installed modules now (WLAN
-#                                        and Bluetooth drop for a few seconds),
-#                                        then check
+# Usage, options and exit status: macbook91-wireless-verify --help.
 #
 # Prints no MAC or Bluetooth addresses, SSIDs or device names.
+#
+# Text interface (house text HIG, Bash patterns): the report goes to stdout,
+# messages to stderr as "macbook91-wireless-verify: error: text". The report
+# has no colour, so there is nothing to switch off for NO_COLOR or a pipe.
+#
+# Abweichung von TXT-5: the verdict words PASS, WARN, FAIL and INFO and the
+# final "PASS: 0 FAIL, 0 WARN" line stay. They are quoted by docs/test-status.json,
+# the hardware gates in the diagnostics and the owner's gate steps, and scripts
+# read them (MAS-2); the word list of the HIG would rename all of them.
 set -uo pipefail
+
+PROG=macbook91-wireless-verify
+# make install writes the package version here; run from a checkout, the
+# version is the one in ../VERSION.
+VERSION=@PKGVER@
+case $VERSION in @*) VERSION=$(cat "$(dirname "$0")/../VERSION" 2>/dev/null || echo unknown) ;; esac
+HOMEPAGE=https://github.com/Weegee/macbook91-wireless-pub
 
 PCI=0000:02:00.0
 # The one answer to "is this kernel of a supported series", shared with the
@@ -26,33 +36,105 @@ fail() { printf 'FAIL  %s\n' "$*"; fails=$((fails + 1)); }
 info() { printf 'INFO  %s\n' "$*"; }
 has_netdev() { [ -n "$(ls -A /sys/bus/pci/devices/$PCI/net 2>/dev/null)" ]; }
 
-usage() { sed -n '4,12s/^# \{0,1\}//p' "$0"; }
+# Messages on stderr (KAN-1, FEH-2): "prog: error: text", hints indented.
+err() { printf '%s: error: %s\n' "$PROG" "$1" >&2; shift; [ $# -eq 0 ] || printf '  %s\n' "$@" >&2; }
+step() { printf '%s: %s\n' "$PROG" "$*" >&2; } # progress and state changes, one line each
+usage_error() {
+	err "$@"
+	printf 'Usage: %s [--reload]\nRun '"'"'%s --help'"'"' for more\n' "$PROG" "$PROG" >&2
+	exit 2
+}
+plural() { if [ "$1" = 1 ]; then printf '%s %s' "$1" "$2"; else printf '%s %s' "$1" "$3"; fi; }
 
+usage() {
+	cat <<USAGE
+Usage: $PROG [--reload]
+
+Check that the patched WLAN and Bluetooth drivers of macbook91-wireless are
+the ones running on this MacBook9,1. The report has one line per check,
+starting with PASS, WARN, FAIL or INFO, and a last line with the totals.
+
+Examples:
+  $PROG
+  sudo $PROG --reload
+
+Options:
+      --reload     load the installed modules now, then check (needs root;
+                   WLAN and Bluetooth drop for a few seconds)
+  -h, --help       show this help and exit
+  -V, --version    show the version and exit
+
+Exit status:
+  0  no check failed (warnings do not count)
+  1  at least one check failed, or the modules could not be reloaded
+  2  invalid usage, or --reload without root
+
+Docs and bug reports: $HOMEPAGE
+USAGE
+}
+
+# --reload changes state: say what is unloaded and loaded, and what is waited
+# for (ERF-2, FOR-2). A cancelled reload may leave the modules unloaded; the
+# signal handler says how to load them (SIG-1, SIG-4).
+reloading=0
+on_signal() { # $1: INT or TERM
+	trap - "$1"
+	printf '\n%s: cancelled\n' "$PROG" >&2
+	[ "$reloading" = 0 ] || printf '  The modules may be unloaded; load them with: sudo modprobe brcmfmac hci_uart\n' >&2
+	kill -s "$1" "$$"
+}
 reload() {
-	[ "$(id -u)" = 0 ] || { echo "--reload needs root" >&2; exit 2; }
-	local m
+	[ "$(id -u)" = 0 ] || { err "--reload needs root" "Run: sudo $PROG --reload"; exit 2; }
+	local m i
+	trap 'on_signal INT' INT
+	trap 'on_signal TERM' TERM
+	step "reloading brcmfmac and hci_uart; WLAN and Bluetooth drop for a few seconds"
+	reloading=1
 	for m in brcmfmac_wcc brcmfmac_cyw brcmfmac_bca brcmfmac; do
-		grep -q "^$m " /proc/modules && { modprobe -r "$m" || { echo "cannot unload $m" >&2; exit 1; }; }
+		if grep -q "^$m " /proc/modules; then
+			modprobe -r "$m" || { err "cannot unload $m" "See: journalctl -k -b -n 20"; exit 1; }
+			step "unloaded $m"
+		fi
 	done
-	modprobe brcmfmac || { echo "cannot load brcmfmac" >&2; exit 1; }
+	modprobe brcmfmac || { err "cannot load brcmfmac" "See: journalctl -k -b -n 20"; exit 1; }
+	step "loaded brcmfmac"
 	if grep -q '^hci_uart ' /proc/modules; then
-		modprobe -r hci_uart || { echo "cannot unload hci_uart (in use?)" >&2; exit 1; }
+		modprobe -r hci_uart || { err "cannot unload hci_uart (in use?)" "Check: lsmod | grep hci_uart"; exit 1; }
+		step "unloaded hci_uart"
 	fi
-	modprobe hci_uart || { echo "cannot load hci_uart" >&2; exit 1; }
+	modprobe hci_uart || { err "cannot load hci_uart" "See: journalctl -k -b -n 20"; exit 1; }
+	step "loaded hci_uart"
+	reloading=0
 	# Give the firmware and NetworkManager time to come up before checking.
-	for _ in $(seq 1 30); do
+	step "waiting up to 30 s for the WLAN interface and hci0 (Ctrl+C cancels)"
+	for i in $(seq 1 30); do
 		has_netdev && [ -e /sys/class/bluetooth/hci0 ] && break
 		sleep 1
+		[ $((i % 10)) != 0 ] || step "still waiting after $i of 30 s"
 	done
 	sleep 2
 }
 
-case "${1:-}" in
-'') ;;
---reload) reload ;;
--h|--help) usage; exit 0 ;;
-*) usage >&2; exit 2 ;;
-esac
+# -h, --help and -V, --version win over everything else on the line (HIL-1).
+for a in "$@"; do
+	case $a in
+	--) break ;;
+	-h|--help) usage; exit 0 ;;
+	-V|--version) printf '%s %s\nLicense: GPL-3.0-or-later\n' "$PROG" "$VERSION"; exit 0 ;;
+	esac
+done
+want_reload=0
+while [ $# -gt 0 ]; do
+	case $1 in
+	--reload) want_reload=1 ;;
+	--) shift; break ;;
+	-*) usage_error "unknown option: $1" ;;
+	*) usage_error "unexpected argument: $1" ;;
+	esac
+	shift
+done
+[ $# -eq 0 ] || usage_error "unexpected argument: $1"
+[ "$want_reload" = 0 ] || reload
 
 running=$(uname -r)
 series=${running%%.*}.$(echo "$running" | cut -d. -f2)
@@ -60,7 +142,7 @@ srcdir=$(ls -d /usr/src/macbook91-wireless-* 2>/dev/null | sort -V | tail -n1)
 
 # Package and build ---------------------------------------------------------
 if [ -z "$srcdir" ]; then
-	fail "macbook91-wireless is not installed (/usr/src/macbook91-wireless-*)"
+	fail "macbook91-wireless is not installed (no /usr/src/macbook91-wireless-*); install it with: sudo pacman -S macbook91-wireless-dkms"
 	exit 1
 fi
 # The package carries one source tree per kernel series (KERNEL-SERIES lists
@@ -73,12 +155,13 @@ info "package $pkgver, running kernel $running"
 # the module checks below would only say so less clearly.
 shipped=0
 if [ ! -x "$KERNEL_SERIES" ]; then
-	fail "kernel series: $KERNEL_SERIES is missing (reinstall macbook91-wireless-dkms)"
+	fail "kernel series: $KERNEL_SERIES is missing (reinstall: sudo pacman -S macbook91-wireless-dkms)"
 elif msg=$("$KERNEL_SERIES" --kernel "$running" 2>&1); then
 	shipped=1
 	pass "kernel series: $msg"
 else
-	fail "kernel series: $(tr '\n' ' ' <<<"$msg" | sed 's/ $//')"
+	# The explanation: a headline, then the sentences that explain it.
+	fail "kernel series: $(head -n1 <<<"$msg"). $(tail -n +2 <<<"$msg" | tr '\n' ' ' | sed 's/ $//')"
 fi
 
 # Modules: the file depmod resolves and the loaded copy -----------------------
@@ -101,7 +184,7 @@ check_module() { # name sysfs-name
 	if [ -n "$loaded_src" ] && [ "$loaded_src" = "$file_src" ] && [[ "$taint" == *O* ]]; then
 		pass "$1: patched module $tag loaded"
 	else
-		fail "$1: the loaded module is not the installed patched one (reboot, or sudo $0 --reload)"
+		fail "$1: the loaded module is not the installed patched one (reboot, or: sudo $PROG --reload)"
 	fi
 }
 if [ "$shipped" = 1 ]; then
@@ -201,15 +284,15 @@ if journalctl -k -b 0 -n 1 >/dev/null 2>&1; then
 	n_werr=$(kern "$sw" -p err | grep -ciE 'brcmf|brcmfmac')
 	n_berr=$(kern "$sb" -p err | grep -ciE 'hci0|Bluetooth')
 	n_adv=$(kern "$sb" | grep -c 'unknown advertising packet type')
-	[ "$n_rec" -gt 0 ] && info "journal: brcmfmac recovered the firmware $n_rec time(s) $(when "$sw")"
+	[ "$n_rec" -gt 0 ] && info "journal: brcmfmac recovered the firmware $(plural "$n_rec" time times) $(when "$sw")"
 	[ "$n_giveup" -gt 0 ] && fail "journal: brcmfmac gave up recovering $(when "$sw")"
-	[ "$n_werr" -gt 0 ] && warn "journal: $n_werr WLAN error line(s) $(when "$sw") (journalctl -k -b -p err)"
-	[ "$n_berr" -gt 0 ] && warn "journal: $n_berr Bluetooth error line(s) $(when "$sb") (journalctl -k -b -p err)"
-	[ "$n_adv" -gt 0 ] && warn "journal: $n_adv 'unknown advertising packet type' $(when "$sb")"
+	[ "$n_werr" -gt 0 ] && warn "journal: $(plural "$n_werr" 'WLAN error line' 'WLAN error lines') $(when "$sw") (see: journalctl -k -b -p err)"
+	[ "$n_berr" -gt 0 ] && warn "journal: $(plural "$n_berr" 'Bluetooth error line' 'Bluetooth error lines') $(when "$sb") (see: journalctl -k -b -p err)"
+	[ "$n_adv" -gt 0 ] && warn "journal: 'unknown advertising packet type' logged $(plural "$n_adv" time times) $(when "$sb")"
 	[ "$n_giveup$n_werr$n_berr$n_adv" = 0000 ] &&
 		pass "journal: no WLAN/Bluetooth errors $(when "$sw")"
 else
-	info "journal: not readable (run as root or in group systemd-journal)"
+	info "journal: not readable (run as root, or as a member of the group systemd-journal)"
 fi
 
 printf '%s: %d FAIL, %d WARN\n' "$([ $fails = 0 ] && echo PASS || echo FAIL)" "$fails" "$warns"

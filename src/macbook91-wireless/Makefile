@@ -24,6 +24,10 @@
 # skipped with a message and a zero exit status: it keeps its stock drivers.
 # dkms.conf limits DKMS to the listed series in the first place; this covers a
 # manual build.
+#
+# Messages (house text HIG): "macbook91-wireless: error: text" and
+# "macbook91-wireless: note: text" on stderr, hints indented below. DKMS shows
+# the output of a failed build as it is.
 
 KDIR ?= /lib/modules/$(shell uname -r)/build
 PWD  := $(shell pwd)
@@ -71,39 +75,42 @@ all: check check-build
 	   $(BT)/hci_uart.ko $(OUT)/
 else
 all: check
-	@echo "macbook91-wireless: the kernel is Linux $(SERIES); this tree carries $(SHIPPED). Nothing built, the kernel keeps its stock drivers." >&2
+	@echo "macbook91-wireless: note: the kernel is Linux $(SERIES), this tree carries $(SHIPPED); nothing built, the kernel keeps its stock drivers" >&2
 endif
 
 check:
 	@test -r "$(PWD)/KERNEL-SERIES" || \
-	  { echo "ERROR: the kernel sources are not assembled. This tree is a checkout,"; \
-	    echo "       not a package: run packaging/fetch-upstream.sh once. A tree"; \
-	    echo "       installed from the package is complete."; exit 1; }
-	@test -r "$(KDIR)/include/generated/utsrelease.h" || { echo "ERROR: no utsrelease.h in $(KDIR)"; exit 1; }
-	@test -n "$(SERIES)" || { echo "ERROR: no kernel series in $(KDIR)/include/generated/utsrelease.h"; exit 1; }
+	  { echo "macbook91-wireless: error: the kernel sources are not assembled" >&2; \
+	    echo "  This tree is a checkout, not a package. Assemble it once with: packaging/fetch-upstream.sh" >&2; \
+	    echo "  A tree installed from the package is complete." >&2; exit 1; }
+	@test -r "$(KDIR)/include/generated/utsrelease.h" || \
+	  { echo "macbook91-wireless: error: cannot read $(KDIR)/include/generated/utsrelease.h" >&2; \
+	    echo "  Install the headers of the kernel you build for, or set KDIR to its build directory" >&2; exit 1; }
+	@test -n "$(SERIES)" || { echo "macbook91-wireless: error: no kernel series in $(KDIR)/include/generated/utsrelease.h" >&2; exit 1; }
 
 # Only for a series this tree carries.
 check-build:
 	@test -r "$(TREE)/UPSTREAM.sha256" -a -r "$(BT)/Kbuild" || \
-	  { echo "ERROR: series/$(SERIES) is not assembled (run packaging/fetch-upstream.sh)"; exit 1; }
-	@test -r "$(KCONFIG)" || { echo "ERROR: no .config at $(KCONFIG)"; exit 1; }
-	@test -r "$(KDIR)/Module.symvers" || { echo "ERROR: no Module.symvers in $(KDIR)"; exit 1; }
+	  { echo "macbook91-wireless: error: series/$(SERIES) is not assembled" >&2; \
+	    echo "  Assemble it with: packaging/fetch-upstream.sh" >&2; exit 1; }
+	@test -r "$(KCONFIG)" || { echo "macbook91-wireless: error: cannot read $(KCONFIG)" >&2; exit 1; }
+	@test -r "$(KDIR)/Module.symvers" || { echo "macbook91-wireless: error: cannot read $(KDIR)/Module.symvers" >&2; exit 1; }
 # Integrity of the installed copy (truncated tarball, edits in /usr/src), not
 # provenance: that is established at package build time against upstream.lock.
 	@cd $(TREE) && sha256sum --quiet -c UPSTREAM.sha256 || \
-	  { echo "ERROR: the sources do not match series/$(SERIES)/UPSTREAM.sha256"; exit 1; }
+	  { echo "macbook91-wireless: error: the sources do not match series/$(SERIES)/UPSTREAM.sha256" >&2; exit 1; }
 	@test "$$(cat $(TREE)/KERNEL-SERIES)" = "$(SERIES)" || \
-	  { echo "ERROR: series/$(SERIES) holds sources of Linux $$(cat $(TREE)/KERNEL-SERIES)"; exit 1; }
+	  { echo "macbook91-wireless: error: series/$(SERIES) holds sources of Linux $$(cat $(TREE)/KERNEL-SERIES)" >&2; exit 1; }
 	@grep -qx 'CONFIG_BRCMFMAC=m' $(KCONFIG) && grep -qx 'CONFIG_BRCMFMAC_PCIE=y' $(KCONFIG) || \
-	  { echo "ERROR: the kernel does not build brcmfmac as a module with PCIe"; exit 1; }
+	  { echo "macbook91-wireless: error: the kernel does not build brcmfmac as a module with PCIe" >&2; exit 1; }
 	@grep -qx 'CONFIG_BT_HCIUART=m' $(KCONFIG) && grep -qx 'CONFIG_BT_HCIUART_BCM=y' $(KCONFIG) || \
-	  { echo "ERROR: the kernel does not build hci_uart as a module with Broadcom support"; exit 1; }
+	  { echo "macbook91-wireless: error: the kernel does not build hci_uart as a module with Broadcom support" >&2; exit 1; }
 	@if grep -qx 'CONFIG_CC_IS_CLANG=y' $(KCONFIG); then \
-	   command -v clang >/dev/null || { echo "ERROR: kernel is CONFIG_CC_IS_CLANG=y but clang is not installed"; exit 1; }; \
+	   command -v clang >/dev/null || { echo "macbook91-wireless: error: the kernel is built with clang (CONFIG_CC_IS_CLANG=y), which is not installed" >&2; echo "  Install it with: sudo pacman -S clang lld llvm" >&2; exit 1; }; \
 	 elif grep -qx 'CONFIG_CC_IS_GCC=y' $(KCONFIG); then \
-	   command -v gcc >/dev/null || { echo "ERROR: kernel is CONFIG_CC_IS_GCC=y but gcc is not installed"; exit 1; }; \
+	   command -v gcc >/dev/null || { echo "macbook91-wireless: error: the kernel is built with gcc (CONFIG_CC_IS_GCC=y), which is not installed" >&2; echo "  Install it with: sudo pacman -S gcc" >&2; exit 1; }; \
 	 else \
-	   echo "ERROR: kernel .config declares neither CONFIG_CC_IS_CLANG nor CONFIG_CC_IS_GCC"; exit 1; \
+	   echo "macbook91-wireless: error: $(KCONFIG) declares neither CONFIG_CC_IS_CLANG nor CONFIG_CC_IS_GCC" >&2; exit 1; \
 	 fi
 
 clean:

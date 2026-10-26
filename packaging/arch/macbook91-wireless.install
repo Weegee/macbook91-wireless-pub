@@ -2,6 +2,11 @@
 #
 # The dkms package's alpm hooks build, install and remove the modules; this
 # scriptlet only says what is needed to use them.
+#
+# Text interface (house text HIG): everything this scriptlet prints is a
+# message, so it goes to stderr (KAN-1) as "macbook91-wireless: warning: text"
+# or "macbook91-wireless: note: text" with indented follow-up lines. pacman
+# reads stdout and stderr of a scriptlet through one pipe and shows both.
 
 # Whether the running kernel is of a series the package supports, and what to
 # do if not, is /usr/lib/macbook91-wireless/kernel-series's answer: the same
@@ -11,26 +16,25 @@ _note() {
     running=$(uname -r)
     if ! command -v clang >/dev/null 2>&1 &&
         grep -qsx 'CONFIG_CC_IS_CLANG=y' /usr/lib/modules/"$running"/build/.config; then
-        cat <<'MSG'
-  MISSING COMPILER: the running kernel is built with clang; DKMS needs
+        cat >&2 <<'MSG'
+macbook91-wireless: warning: the running kernel is built with clang, which is not installed
+  DKMS cannot build the modules without it. Install the compiler with:
       sudo pacman -S clang lld llvm
 MSG
     fi
     msg=$(/usr/lib/macbook91-wireless/kernel-series --kernel "$running") ||
-        printf '%s\n' "$msg" | sed 's/^/  /'
-    cat <<'MSG'
-  To use the patched drivers now, without a reboot (WLAN and Bluetooth drop
-  for a few seconds):
+        printf '%s\n' "$msg" | sed -e '1s/^/macbook91-wireless: warning: /' -e '2,$s/^/  /' >&2
+    cat >&2 <<'MSG'
+macbook91-wireless: note: reboot to use the patched drivers, or load them now
+  (WLAN and Bluetooth drop for a few seconds):
       sudo macbook91-wireless-verify --reload
-  Then check, or check after the next reboot:
+  Then check, now or after the next reboot:
       macbook91-wireless-verify
 MSG
 }
 
 post_install() {
-    cat <<'MSG'
-  macbook91-wireless installed.
-MSG
+    echo 'macbook91-wireless: installed' >&2
     _note
 }
 
