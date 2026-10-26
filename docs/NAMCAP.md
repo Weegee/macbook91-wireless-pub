@@ -1,6 +1,6 @@
 # namcap
 
-`namcap` on the 20261021.01 package and PKGBUILD (no findings for the
+`namcap` on the 20261026.01 package and PKGBUILD (no findings for the
 PKGBUILD), after the fix below:
 
 - `No ELF files and not an "any" package` (W): the package ships sources for
@@ -8,9 +8,11 @@ PKGBUILD), after the fix below:
   built and used on this x86_64 machine.
 - `Dependency bash detected and implicitly satisfied` (W): bash is in the
   base system.
-- `Dependency included, but may not be needed ('dkms')`, `('linux-firmware-broadcom')`
-  (W): namcap cannot see that DKMS builds the sources or that the driver
-  loads `brcm/brcmfmac4350c2-pcie.bin`; both are required.
+- `Dependency included, but may not be needed ('dkms')`, `('linux-firmware-broadcom')`,
+  `('linux-cachyos-lts-headers')` (W): namcap cannot see that DKMS builds
+  the sources, that it needs the headers of the kernel it builds for, or
+  that the driver loads `brcm/brcmfmac4350c2-pcie.bin`; all three are
+  required. The headers warning is new in 20261026.01, with the dependency.
 
 Fixed: `Uncommon license identifiers such as 'ISC' require license files`
 (E) - LICENSES/ISC and LICENSES/MIT are installed to
