@@ -15,6 +15,9 @@
 set -uo pipefail
 
 PCI=0000:02:00.0
+# The one answer to "is this kernel of a supported series", shared with the
+# pacman hook and the install scriptlet.
+KERNEL_SERIES=/usr/lib/macbook91-wireless/kernel-series
 fails=0
 warns=0
 pass() { printf 'PASS  %s\n' "$*"; }
@@ -63,16 +66,19 @@ fi
 # The package carries one source tree per kernel series (KERNEL-SERIES lists
 # them); the module identity of the running kernel is the hash of the manifest
 # of its series.
-pkgsers=$(paste -sd, "$srcdir/KERNEL-SERIES" 2>/dev/null | sed 's/,/, /g')
 pkgver=${srcdir##*/macbook91-wireless-}
 want_id="$pkgver+$(sha256sum "$srcdir/series/$series/UPSTREAM.sha256" 2>/dev/null | cut -c1-16)"
+info "package $pkgver, running kernel $running"
+# A kernel of a series this package does not support runs the stock drivers;
+# the module checks below would only say so less clearly.
 shipped=0
-while IFS= read -r s; do
-	[ "$s" = "$series" ] && shipped=1
-done <"$srcdir/KERNEL-SERIES"
-info "package $pkgver for Linux ${pkgsers:-none}, running kernel $running"
-if [ "$shipped" = 0 ]; then
-	warn "the running kernel is not one of Linux ${pkgsers:-none}: it uses its stock drivers"
+if [ ! -x "$KERNEL_SERIES" ]; then
+	fail "kernel series: $KERNEL_SERIES is missing (reinstall macbook91-wireless-dkms)"
+elif msg=$("$KERNEL_SERIES" --kernel "$running" 2>&1); then
+	shipped=1
+	pass "kernel series: $msg"
+else
+	fail "kernel series: $(tr '\n' ' ' <<<"$msg" | sed 's/ $//')"
 fi
 
 # Modules: the file depmod resolves and the loaded copy -----------------------

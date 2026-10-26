@@ -15,7 +15,8 @@ Makefile's `install` target works in both places:
                             packaging/fetch-upstream.sh after checking them
                             against packaging/upstream.lock) and that manifest
                             with its companions
-  tools/macbook91-wireless-verify, Makefile, VERSION, LICENSE, the license
+  tools/macbook91-wireless-verify, tools/kernel-series and the pacman hook
+  next to it, Makefile, VERSION, LICENSE, the license
   texts in LICENSES/, README.md
 
 Anything else in the module tree that git does not track and that is not a
@@ -47,7 +48,8 @@ COMPANIONS = ("UPSTREAM.lock", "KERNEL-SERIES")
 SERIES_COMPANIONS = ("UPSTREAM.sha256", "KERNEL-SERIES", "KERNEL-TAG")
 ARTIFACTS = ("*.o", "*.ko", "*.mod", "*.mod.c", "*.symvers", "*.order", ".*.cmd", "*.a", ".tmp_versions/*")
 EXTRA = (
-    "tools/macbook91-wireless-verify", "Makefile", "VERSION", "LICENSE",
+    "tools/macbook91-wireless-verify", "tools/kernel-series",
+    "tools/macbook91-wireless-series.hook", "Makefile", "VERSION", "LICENSE",
     "LICENSES/GPL-2.0-only.txt", "LICENSES/GPL-2.0-or-later.txt", "LICENSES/ISC",
     "LICENSES/MIT", "README.md",
 )

@@ -52,7 +52,7 @@ fi
 # -I would give up at the first binary data (release/*.tar) and check
 # nothing after it.
 mail_re='[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}'
-mails=$({ tracked -- . ':!patches' | xargs -0 -r grep -IhoE "$mail_re"; grep -h '^From: ' patches/*/*.patch | grep -oE "$mail_re"; } 2>/dev/null |
+mails=$({ tracked -- . ':!patches' | xargs -0 -r grep -IhoE "$mail_re"; grep -h '^From: ' patches/*.patch | grep -oE "$mail_re"; } 2>/dev/null |
 	grep -vE '(noreply|no-reply)[.@]|@users\.noreply\.github\.com$|@localhos[t]$|@example\.(com|org)$' | sort -u)
 [ -z "$mails" ] && ok "no personal e-mail addresses tracked" || bad "e-mail addresses tracked: $mails"
 if tracked -- 'src/macbook91-wireless/series' 'src/macbook91-wireless/kernel' 'src/macbook91-wireless/patches' | grep . >/dev/null; then
@@ -62,11 +62,11 @@ else
 fi
 
 # 2. Scripts --------------------------------------------------------------------
-for f in packaging/fetch-upstream.sh packaging/promote-release.sh packaging/make-package.sh tools/macbook91-wireless-verify tools/dev-*.sh tests/run-tests.sh; do
+for f in packaging/fetch-upstream.sh packaging/promote-release.sh packaging/make-package.sh tools/macbook91-wireless-verify tools/kernel-series tools/dev-*.sh tests/run-tests.sh; do
 	bash -n "$f" || bad "syntax: $f"
 done
 if command -v shellcheck >/dev/null; then
-	shellcheck -S warning packaging/fetch-upstream.sh packaging/promote-release.sh packaging/make-package.sh tools/macbook91-wireless-verify tools/dev-*.sh &&
+	shellcheck -S warning packaging/fetch-upstream.sh packaging/promote-release.sh packaging/make-package.sh tools/macbook91-wireless-verify tools/kernel-series tools/dev-*.sh &&
 		ok "shellcheck" || bad "shellcheck"
 else
 	skip "shellcheck not installed"
@@ -76,13 +76,13 @@ fi
 pq=$(awk 'FNR == 1 {prev = ""} {
 	if ($0 ~ /\|[[:space:]]*grep -[A-Za-z]*q/ || (prev ~ /\|[[:space:]]*$/ && $0 ~ /^[[:space:]]*grep -[A-Za-z]*q/))
 		print FILENAME ":" FNR
-	prev = $0 }' packaging/fetch-upstream.sh packaging/promote-release.sh packaging/make-package.sh tools/macbook91-wireless-verify tools/dev-*.sh tests/run-tests.sh)
+	prev = $0 }' packaging/fetch-upstream.sh packaging/promote-release.sh packaging/make-package.sh tools/macbook91-wireless-verify tools/kernel-series tools/dev-*.sh tests/run-tests.sh)
 [ -z "$pq" ] && ok "no grep -q at the end of a pipeline" || bad "grep -q ends a pipeline (pipefail): $pq"
 python3 -c 'import ast, sys; ast.parse(open(sys.argv[1]).read(), sys.argv[1])' packaging/mkdist.py 2>/dev/null &&
 	ok "mkdist.py parses" || bad "mkdist.py"
 
 # 3. Patches and lockfile -------------------------------------------------------
-if grep -l 'TEST ONLY\|macbook91_halt_fw' patches/*/*.patch 2>/dev/null | grep . >/dev/null; then
+if grep -l 'TEST ONLY\|macbook91_halt_fw' patches/*.patch 2>/dev/null | grep . >/dev/null; then
 	bad "a test-only patch is in patches/"
 else
 	ok "no test-only patches"
@@ -96,21 +96,20 @@ for tag in $(awk '$1 ~ /^v[0-9]/ {print $1}' packaging/upstream.lock | sort -uV)
 	done
 	[ "$missing" = 0 ] && ok "upstream.lock covers files.list for $tag" || bad "upstream.lock: $missing entries missing for $tag"
 	series=$(sed -E 's/^v([0-9]+\.[0-9]+).*/\1/' <<<"$tag")
-	if [ -d "patches/$series" ] && ls "patches/$series"/*.patch >/dev/null 2>&1; then
-		ok "patches/$series exists for $tag"
-	else
-		bad "no patches/$series for $tag"
-	fi
 	newest[$series]=$tag
 done
-# Every patch series has a lock tag and the other way round.
 sers_lock=$(printf '%s\n' "${!newest[@]}" | sort -V | paste -sd' ')
-sers_patches=$(for d in patches/*/; do basename "$d"; done | sort -V | paste -sd' ')
-[ "$sers_lock" = "$sers_patches" ] && ok "lock series ($sers_lock) equal patches/ series" ||
-	bad "lock series '$sers_lock', patches/ series '$sers_patches'"
+# One patch set for every series: patch files directly in patches/, no
+# per-series directory (the fetcher applies the set to every tag with -F0).
+npatch=$(find patches -maxdepth 1 -name '*.patch' | wc -l)
+if [ "$npatch" -gt 0 ] && [ -z "$(find patches -mindepth 1 -type d)" ]; then
+	ok "one patch set ($npatch patches in patches/) for every series ($sers_lock)"
+else
+	bad "patches/ must hold one set of patch files and no subdirectory"
+fi
 # The module's dkms.conf: BUILD_EXCLUSIVE_KERNEL is generated at install time
 # from the series list, every module is taken from the flat build/ directory.
-grep -Fqx 'BUILD_EXCLUSIVE_KERNEL="^@SERIES_RE@\."' src/macbook91-wireless/dkms.conf &&
+grep -Fqx 'BUILD_EXCLUSIVE_KERNEL="@SERIES_RE@"' src/macbook91-wireless/dkms.conf &&
 	[ "$(grep -c '^BUILT_MODULE_LOCATION\[[0-4]\]="build/"$' src/macbook91-wireless/dkms.conf)" = 5 ] &&
 	ok "dkms.conf: series pattern placeholder, 5 modules from build/" || bad "dkms.conf template"
 # The module Makefile builds the kernel's own series, and skips a series it does
@@ -118,7 +117,7 @@ grep -Fqx 'BUILD_EXCLUSIVE_KERNEL="^@SERIES_RE@\."' src/macbook91-wireless/dkms.
 mkdir -p "$TMP/skip/kdir/include/generated" "$TMP/skip/tree"
 cp src/macbook91-wireless/Makefile "$TMP/skip/tree/"
 printf '6.18\n7.2\n' >"$TMP/skip/tree/KERNEL-SERIES"
-for rel in 6.12.1-test 7.3.0-test 6.180.1-test; do
+for rel in 6.12.1-test 7.4.0-test 6.180.1-test; do
 	printf '#define UTS_RELEASE "%s"\n' "$rel" >"$TMP/skip/kdir/include/generated/utsrelease.h"
 	if out=$(make -s -C "$TMP/skip/tree" KDIR="$TMP/skip/kdir" 2>&1) && grep -F 'Nothing built' <<<"$out" >/dev/null &&
 		[ ! -e "$TMP/skip/tree/build" ] && make -s -C "$TMP/skip/tree" KDIR="$TMP/skip/kdir" clean >/dev/null 2>&1; then
@@ -133,6 +132,86 @@ if make -s -C "$TMP/skip/tree" KDIR="$TMP/skip/kdir" >"$TMP/skip/out" 2>&1; then
 else
 	grep -F 'series/7.2 is not assembled' "$TMP/skip/out" >/dev/null && ok "Makefile refuses a listed series that is not assembled" ||
 		bad "Makefile: $(tail -n1 "$TMP/skip/out")"
+fi
+
+# 3b. Kernel series: one script for DKMS, the pacman hook, scriptlet, verifier -
+# tools/kernel-series is the one reader of KERNEL-SERIES outside the module
+# Makefile: make install writes dkms.conf's pattern with it, and the pacman
+# hook, the install scriptlet and the verifier ask it. Hermetic: a series list
+# and a simulated /usr/lib/modules under $TMP.
+KS=tools/kernel-series
+ks() { bash "$KS" --series-file "$TMP/ks/KERNEL-SERIES" "$@"; }
+mkdir -p "$TMP/ks"
+printf '6.18\n7.2\n7.3\n' >"$TMP/ks/KERNEL-SERIES"
+[ "$(ks --list)" = '6.18 7.2 7.3' ] && [ "$(ks --dkms-regex)" = '^(6\.18|7\.2|7\.3)\.' ] &&
+	ok "kernel-series: series list and dkms.conf pattern" ||
+	bad "kernel-series: --list '$(ks --list)', --dkms-regex '$(ks --dkms-regex)'"
+ks_rels='6.18.55-2-cachyos-lts 7.2.11-1-cachyos 7.3.0-4-cachyos 7.4.0-1-test 6.180.1-test 6.1.0 x7.3.0'
+kfail=""
+pat=$(ks --dkms-regex)
+for k in $ks_rels; do
+	out=$(ks --kernel "$k"); rc=$?
+	case "$k" in
+	6.18.* | 7.2.* | 7.3.*) want=0 ;;
+	*) want=1 ;;
+	esac
+	[ "$rc" = "$want" ] || kfail+=" $k:exit$rc"
+	[ "$rc" = 1 ] && ! grep -F 'not a kernel series macbook91-wireless supports' <<<"$out" >/dev/null && kfail+=" $k:text"
+	m=1
+	[[ $k =~ $pat ]] && m=0
+	[ "$m" = "$rc" ] || kfail+=" $k:dkms-pattern-disagrees"
+done
+[ -z "$kfail" ] && ok "kernel-series --kernel and the DKMS pattern accept exactly the listed series" ||
+	bad "kernel-series --kernel:$kfail"
+# --hook: one WARNING block per installed kernel (a directory with vmlinuz) of
+# a series not listed, nothing for the others, exit 0 either way.
+for k in 6.18.55-2-cachyos-lts 7.3.0-4-cachyos 7.4.0-1-test 7.5.0-1-test; do mkdir -p "$TMP/ks/modules/$k"; done
+for k in 6.18.55-2-cachyos-lts 7.3.0-4-cachyos 7.4.0-1-test; do : >"$TMP/ks/modules/$k/vmlinuz"; done
+if out=$(ks --hook --modules-root "$TMP/ks/modules") &&
+	[ "$(grep -c '==> WARNING: macbook91-wireless' <<<"$out")" = 1 ] &&
+	grep -F 'kernel 7.4.0-1-test (Linux 7.4) is not a kernel series' <<<"$out" >/dev/null &&
+	! grep -E '6\.18\.55|7\.3\.0|7\.5\.0' <<<"$out" >/dev/null; then
+	ok "kernel-series --hook warns once, for the installed kernel of the unlisted series 7.4"
+else
+	bad "kernel-series --hook: $(head -n3 <<<"$out")"
+fi
+out=$(ks --hook --modules-root "$TMP/ks/none" 2>&1) && [ -z "$out" ] &&
+	ok "kernel-series --hook prints nothing without such kernels" || bad "kernel-series --hook without kernels: $out"
+bash "$KS" --series-file "$TMP/ks/missing" --list >/dev/null 2>&1
+rc=$?
+[ "$rc" = 2 ] && ok "kernel-series exits 2 without a readable list" || bad "kernel-series without a list: exit $rc"
+# The pacman hook runs after the transaction, on kernel installs and on this
+# package, and cannot abort it.
+H=tools/macbook91-wireless-series.hook
+if grep -qx 'When = PostTransaction' "$H" && grep -qx 'Target = usr/lib/modules/\*/vmlinuz' "$H" &&
+	grep -qx 'Target = usr/src/macbook91-wireless-\*/dkms.conf' "$H" &&
+	grep -qx 'Exec = /usr/lib/macbook91-wireless/kernel-series --hook' "$H" && ! grep -q 'AbortOnFail' "$H"; then
+	ok "pacman hook: kernel-series --hook after the transaction, cannot abort it"
+else
+	bad "pacman hook $H"
+fi
+# The install scriptlet and the verifier ask the script and read no series
+# list of their own.
+own=$(grep -vh '^[[:space:]]*#' packaging/arch/macbook91-wireless.install tools/macbook91-wireless-verify | grep -c 'KERNEL-SERIES')
+if grep -qF '/usr/lib/macbook91-wireless/kernel-series --kernel "$running"' packaging/arch/macbook91-wireless.install &&
+	grep -qx 'KERNEL_SERIES=/usr/lib/macbook91-wireless/kernel-series' tools/macbook91-wireless-verify &&
+	grep -qF '"$KERNEL_SERIES" --kernel "$running"' tools/macbook91-wireless-verify && [ "$own" = 0 ]; then
+	ok "install scriptlet and verifier ask kernel-series, no list of their own"
+else
+	bad "install scriptlet or verifier: kernel-series not used, or $own own reads of KERNEL-SERIES"
+fi
+bash -n packaging/arch/macbook91-wireless.install || bad "syntax: packaging/arch/macbook91-wireless.install"
+# The package: depends set in package() (.SRCINFO: none in the pkgbase
+# section, the LTS headers in the package's own), the current CachyOS
+# headers optional, no Arch kernel headers.
+SI=packaging/arch/.SRCINFO
+if awk '/^pkgname = /{p=1} !p && /^\tdepends = /{bad=1} END{exit bad}' "$SI" &&
+	awk '/^pkgname = /{p=1} p && $0 == "\tdepends = linux-cachyos-lts-headers"{f=1} END{exit !f}' "$SI" &&
+	grep -q $'^\toptdepends = linux-cachyos-headers: ' "$SI" &&
+	! grep -qE $'^\toptdepends = linux-(lts-)?headers' "$SI"; then
+	ok ".SRCINFO: depends in package() with the LTS headers, current headers optional, no Arch headers"
+else
+	bad ".SRCINFO depends: $(grep -n 'depends = ' "$SI" | tr '\n' ' ')"
 fi
 
 # 4. Offline reassembly of every series reproduces the lockfile's derived tree -
@@ -177,7 +256,7 @@ if [ "$cache_ok" = 1 ]; then
 fi
 # The 7.2 source identity (the module ID <version>+494451d9a8ce5f25 and the
 # derived:tree of v7.2.9) is pinned: the series layout must not change it. A
-# deliberate change of patches/7.2, the overlays or the v7.2 tag changes this
+# deliberate change of patches/, the overlays or the v7.2 tag changes this
 # value and is recorded here together with the lockfile.
 if [ -r "$TMP/tree-7.2/series/7.2/UPSTREAM.sha256" ]; then
 	id72=$(sha256sum "$TMP/tree-7.2/series/7.2/UPSTREAM.sha256" | cut -c1-16)
@@ -227,7 +306,7 @@ if [ -r src/macbook91-wireless/KERNEL-SERIES ]; then
 			[[ "${s}0.1-test" =~ $pat ]] && pm+=" accepts:${s}0"
 			[[ "x$s.1-test" =~ $pat ]] && pm+=" accepts:x$s"
 		done
-		for k in 6.12.1-1-lts 7.3.0-1-test 5.15.0 6.1.0 17.2.1; do
+		for k in 6.12.1-1-lts 7.3.0-1-test 7.4.0-1-test 5.15.0 6.1.0 17.2.1; do
 			kser=$(sed -E 's/^([0-9]+\.[0-9]+).*/\1/' <<<"$k")
 			listed=0
 			for s in "${sers[@]}"; do [ "$s" = "$kser" ] && listed=1; done
@@ -240,11 +319,21 @@ if [ -r src/macbook91-wireless/KERNEL-SERIES ]; then
 		[ -z "$pm" ] && ok "BUILD_EXCLUSIVE_KERNEL matches exactly the series list (${sers[*]})" || bad "BUILD_EXCLUSIVE_KERNEL:$pm"
 		# The series list is the list of patch series and of series trees.
 		have=$(for x in "$d"/series/*/; do basename "$x"; done | sort -V | paste -sd' ')
-		[ "$have" = "${sers[*]}" ] && [ "${sers[*]}" = "$sers_patches" ] &&
-			ok "installed series trees ($have) equal KERNEL-SERIES and patches/" ||
-			bad "series: trees '$have', KERNEL-SERIES '${sers[*]}', patches '$sers_patches'"
+		[ "$have" = "${sers[*]}" ] && [ "${sers[*]}" = "$sers_lock" ] &&
+			ok "installed series trees ($have) equal KERNEL-SERIES and the lock series" ||
+			bad "series: trees '$have', KERNEL-SERIES '${sers[*]}', lock '$sers_lock'"
 		[ -x "$TMP/root/usr/bin/macbook91-wireless-verify" ] &&
 			[ -r "$TMP/root/usr/lib/modprobe.d/macbook91-wireless.conf" ] && [ ! -e "$d/build" ] && ok "install layout" || bad "install layout"
+		# kernel-series reads the installed list, and makes the same pattern
+		# as dkms.conf's; the hook sorts after 70-dkms-install.hook.
+		iks="$TMP/root/usr/lib/macbook91-wireless/kernel-series"
+		if [ -x "$iks" ] && grep -qx "SERIES_FILE=/usr/src/macbook91-wireless-$v/KERNEL-SERIES" "$iks" &&
+			[ "$(bash "$iks" --series-file "$d/KERNEL-SERIES" --dkms-regex)" = "$pat" ] &&
+			cmp -s tools/macbook91-wireless-series.hook "$TMP/root/usr/share/libalpm/hooks/71-macbook91-wireless-series.hook"; then
+			ok "installed kernel-series reads the installed list, same pattern as dkms.conf; hook installed"
+		else
+			bad "installed kernel-series or hook"
+		fi
 		for s in "${sers[@]}"; do
 			[ -r "$d/series/$s/kernel/drivers/bluetooth/Kbuild" ] &&
 				(cd "$d/series/$s" && sha256sum --quiet -c UPSTREAM.sha256) &&
@@ -265,7 +354,10 @@ if [ -r src/macbook91-wireless/KERNEL-SERIES ]; then
 				grep -E "/series/$s/$f\$" <<<"$lst" >/dev/null || miss+=" $s/$f"
 			done
 		done
-		[ -z "$miss" ] && ok "source tarball holds the tree of every series" || bad "tarball lacks:$miss"
+		for f in tools/kernel-series tools/macbook91-wireless-series.hook; do
+			grep -E "^[^/]+/$f\$" <<<"$lst" >/dev/null || miss+=" $f"
+		done
+		[ -z "$miss" ] && ok "source tarball holds the tree of every series and the series script" || bad "tarball lacks:$miss"
 	else
 		bad "mkdist: $(tail -n1 "$TMP/mk.log")"
 	fi

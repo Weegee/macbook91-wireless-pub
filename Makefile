@@ -46,15 +46,23 @@ install:
 	find "$(SRCDIR)" \( -name '*.o' -o -name '*.ko' -o -name '*.mod' -o -name '*.mod.c' \
 		-o -name '.*.cmd' -o -name 'Module.symvers' -o -name 'modules.order' \) -delete
 
-	# dkms.conf carries the version and the kernel series of this tarball:
-	# KERNEL-SERIES (6.18, 7.2) becomes the pattern (6\.18|7\.2).
-	re=$$(sed 's/\./\\\\./g' "$(MODULE)/KERNEL-SERIES" | paste -sd'|') && \
-	sed -i -e "s/@PKGVER@/$(VERSION)/" -e "s/@SERIES_RE@/($$re)/" "$(SRCDIR)/dkms.conf"
+	# dkms.conf carries the version and the kernel series of this tarball,
+	# the series from KERNEL-SERIES through the script the pacman hook, the
+	# install scriptlet and the verifier ask, so they cannot name different
+	# series.
+	sed -i "s/@PKGVER@/$(VERSION)/" "$(SRCDIR)/dkms.conf"
+	re=$$(bash tools/kernel-series --dkms-regex --series-file "$(SRCDIR)/KERNEL-SERIES") && \
+	sed -i "s|@SERIES_RE@|$$(printf '%s' "$$re" | sed 's/[\\&|]/\\&/g')|" "$(SRCDIR)/dkms.conf" && \
+	grep -q '^BUILD_EXCLUSIVE_KERNEL="^(' "$(SRCDIR)/dkms.conf"
 
 	install -Dm644 "$(MODULE)/modprobe.d/macbook91-wireless.conf" \
 		"$(DESTDIR)$(PREFIX)/lib/modprobe.d/macbook91-wireless.conf"
 	install -Dm755 tools/macbook91-wireless-verify \
 		"$(DESTDIR)$(PREFIX)/bin/macbook91-wireless-verify"
+	install -Dm755 tools/kernel-series "$(DESTDIR)$(PREFIX)/lib/$(MODNAME)/kernel-series"
+	sed -i "s/@PKGVER@/$(VERSION)/" "$(DESTDIR)$(PREFIX)/lib/$(MODNAME)/kernel-series"
+	install -Dm644 tools/macbook91-wireless-series.hook \
+		"$(DESTDIR)$(PREFIX)/share/libalpm/hooks/71-macbook91-wireless-series.hook"
 	install -Dm644 README.md "$(DESTDIR)$(PREFIX)/share/doc/$(NAME)/README.md"
 	install -Dm644 LICENSES/ISC "$(DESTDIR)$(PREFIX)/share/licenses/$(NAME)/ISC"
 	install -Dm644 LICENSES/MIT "$(DESTDIR)$(PREFIX)/share/licenses/$(NAME)/MIT"
