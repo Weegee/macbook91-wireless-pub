@@ -1,7 +1,7 @@
 # namcap
 
-`namcap` on the 20261026.01 package and PKGBUILD (no findings for the
-PKGBUILD), after the fix below:
+`namcap` on the 20261026.02 package and PKGBUILD (no findings for the
+PKGBUILD; the same five warnings as for 20261026.01), after the fix below:
 
 - `No ELF files and not an "any" package` (W): the package ships sources for
   DKMS; it stays `x86_64` like macbook91-cs4208, since the modules are only

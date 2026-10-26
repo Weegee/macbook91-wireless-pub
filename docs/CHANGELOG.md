@@ -4,6 +4,50 @@ Versions have the form YYYYMMDD.NN (release date, NN counts releases that
 day). The release tag is v<version>. Releases before 20261021.01 are not part
 of this repository; their entries below are kept as history.
 
+## 20261026.02
+
+**Text interfaces follow the house text HIG. No driver change.** Patches,
+kernel sources, Kbuild files and `dkms.conf` are the same as in 20261026.01;
+the source identities are unchanged (7.3 `12d3581c306b83b5`, 6.18
+`35e4d7a8bd8c5087`, 7.2 `494451d9a8ce5f25`), the modules report
+`20261026.02+<id>`. Built for 6.18 and 7.3; NOT RUN on the hardware
+(`docs/test-status.json`, `hw.runtime_20261026_02`).
+
+- Every tool takes `--help` and `--version` (`-h`, `-V`), and they win over
+  other arguments. Usage follows one order: Usage, purpose, Examples,
+  Options, Environment, Files, Exit status, Docs. `--version` prints
+  `PROG (macbook91-wireless-dkms) VERSION` on its first line; the installed
+  `macbook91-wireless-verify` reports the package version.
+- Errors read `prog: error: text` on stderr with hints indented below;
+  invalid usage exits 2, a failed run exits 1. Ctrl+C
+  and TERM stop a run with 130 or 143 and clean up. Progress goes to stderr,
+  results to stdout.
+- The unsupported-kernel warning of the pacman hook is one
+  `macbook91-wireless: warning: kernel X (Linux Y) is not a kernel series
+  macbook91-wireless supports` message plus an indented explanation, on
+  stderr (was a `==> WARNING` block on stdout). The install note and the
+  module Makefile use the same `macbook91-wireless: warning:/note:/error:`
+  form. Anything that greps pacman.log for `WARNING: macbook91-wireless`
+  must use `macbook91-wireless: warning:` now.
+- `make` without a target lists the targets and variables; it used to
+  install. `make install` is unchanged and the PKGBUILD names it.
+- `packaging/fetch-upstream.sh`: `--timeout SECONDS` (default 120) for each
+  download, early checks of `--tag` and of a missing cache with `--offline`,
+  a progress line for the download. `packaging/promote-release.sh` checks
+  `--seal VERSION` before the private tests run. New shared helpers in
+  `packaging/lib.sh` (not packaged).
+- `tools/dev-suspend-cycle.sh` exits 1 when a cycle failed and reports
+  missing arguments as usage errors. `tools/dev-wlan-swap.sh` checks DIR,
+  root and the PCI device before it unloads the first module.
+  `packaging/mkdist.py` reports `--out` without a value as a usage error
+  instead of a traceback.
+- Kept: the verdict words PASS, WARN, FAIL, INFO of
+  `macbook91-wireless-verify` and its `PASS: N FAIL, M WARN` line (the
+  documented result format, Abweichung von TXT-5); the last line `all tests
+  passed` of `make test`.
+- `tests/run-tests.sh` (53 checks) tests the text interface of all eight
+  tools and the new hook output.
+
 ## 20261026.01
 
 **Kernel series 7.3, the LTS kernel as the default, one patch set.** The
