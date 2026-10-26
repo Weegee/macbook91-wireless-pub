@@ -27,19 +27,28 @@ file with uncommitted changes.
 Entries are sorted, owned by 0:0, mode 0755 for executables and 0644
 otherwise, all with mtime 0, and the tar is not compressed (compressor output
 differs between implementations). Same scheme as macbook91-cs4208.
+
+Text interface (house text HIG, Python patterns): the result "SHA256  path" is
+the only line on stdout; messages go to stderr as "mkdist.py: error: text"
+with indented hints. Exit status 0 / 1 / 2 (written, refused or failed,
+invalid usage), 130 and 143 when cancelled. Usage: mkdist.py --help.
 """
 
 from __future__ import annotations
 
+import argparse
 import fnmatch
 import hashlib
 import io
 import os
+import signal
 import subprocess
 import sys
 import tarfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROG = "mkdist.py"
+HOMEPAGE = "https://github.com/Weegee/macbook91-wireless-pub"
 NAME = "macbook91-wireless-dkms"
 MODULE = "src/macbook91-wireless"
 # Module-root companions of the series trees under series/<S>/ (whose own
@@ -59,9 +68,84 @@ def git(*args: str) -> str:
     return subprocess.run(["git", "-C", ROOT, *args], check=True, capture_output=True, text=True).stdout
 
 
-def fail(msg: str) -> int:
-    print(f"mkdist: {msg}", file=sys.stderr)
+HELP = f"""\
+Usage: {PROG} [OPTIONS]
+
+Build the source tarball of {NAME}
+byte-reproducibly. It is the file packaging/arch/PKGBUILD pins by its sha256.
+
+Examples:
+  python3 packaging/mkdist.py
+  python3 packaging/mkdist.py --allow-dirty --out /tmp/dist
+
+Options:
+  --allow-dirty   accept tracked files with uncommitted changes (development
+                  builds; a release is built from a committed tree)
+  --out DIR       write the tarball into DIR (default dist/)
+  -h, --help      show this help and exit
+  -V, --version   show the version and exit
+
+Files:
+  dist/{NAME}-VERSION.tar          the tarball
+  dist/{NAME}-VERSION.tar.sha256   its checksum
+
+Exit status:
+  0  written; stdout has "SHA256  path"
+  1  refused or failed: uncommitted changes, module tree not assembled,
+     unexpected files
+  2  invalid usage
+
+Docs and bug reports: {HOMEPAGE}
+"""
+
+
+def err(msg: str, *hints: str) -> None:
+    """A failure and what helps, hints indented (FEH-1, FEH-2)."""
+    print(f"{PROG}: error: {msg}", file=sys.stderr)
+    for hint in hints:
+        print(f"  {hint}", file=sys.stderr)
+
+
+def fail(msg: str, *hints: str) -> int:
+    err(msg, *hints)
     return 1
+
+
+def some(names: list[str], limit: int = 5) -> str:
+    """The first names of a list, with the number of the rest (TXT-10)."""
+    shown = ", ".join(names[:limit])
+    return shown if len(names) <= limit else f"{shown} and {len(names) - limit} more"
+
+
+def plural(count: int, singular: str, many: str) -> str:
+    return f"{count} {singular if count == 1 else many}"
+
+
+class Parser(argparse.ArgumentParser):
+    """Usage errors as "prog: error: text", exit status 2 (KAN-3, HIL-3)."""
+
+    def error(self, message: str):  # type: ignore[override]
+        err(message)
+        print(f"Run '{PROG} --help' for usage", file=sys.stderr)
+        raise SystemExit(2)
+
+
+def parse(argv: list[str]) -> argparse.Namespace:
+    # -h, --help and -V, --version win over everything else on the line (HIL-1).
+    for arg in argv:
+        if arg == "--":
+            break
+        if arg in ("-h", "--help"):
+            print(HELP, end="")
+            raise SystemExit(0)
+        if arg in ("-V", "--version"):
+            with open(os.path.join(ROOT, "VERSION"), encoding="ascii") as fh:
+                print(f"{PROG} ({NAME}) {fh.read().strip()}\nLicense: GPL-3.0-or-later")
+            raise SystemExit(0)
+    parser = Parser(prog=PROG, add_help=False, allow_abbrev=False)
+    parser.add_argument("--allow-dirty", action="store_true")
+    parser.add_argument("--out", metavar="DIR")
+    return parser.parse_args(argv)
 
 
 def generated() -> list[str] | None:
@@ -87,22 +171,23 @@ def generated() -> list[str] | None:
 
 
 def main(argv: list[str]) -> int:
-    allow_dirty = "--allow-dirty" in argv
-    out_dir = os.path.join(ROOT, "dist")
-    if "--out" in argv:
-        out_dir = os.path.abspath(argv[argv.index("--out") + 1])
+    args = parse(argv)
+    allow_dirty = args.allow_dirty
+    out_dir = os.path.abspath(args.out) if args.out else os.path.join(ROOT, "dist")
     with open(os.path.join(ROOT, "VERSION"), encoding="ascii") as fh:
         version = fh.read().strip()
 
     if not allow_dirty and git("status", "--porcelain", "--untracked-files=no").strip():
-        return fail("working tree has uncommitted changes; commit first (or --allow-dirty)")
+        return fail("the working tree has uncommitted changes",
+                    "Commit them, or build a development tarball with --allow-dirty")
 
     gen = generated()
     if gen is None:
-        return fail("module tree not assembled; run packaging/fetch-upstream.sh")
+        return fail("the module tree is not assembled", "Assemble it with: packaging/fetch-upstream.sh")
     missing = [g for g in gen if not os.path.isfile(os.path.join(ROOT, MODULE, g))]
     if missing:
-        return fail(f"files of UPSTREAM.sha256 missing: {', '.join(missing[:5])}")
+        return fail(f"{plural(len(missing), 'file', 'files')} listed in UPSTREAM.sha256 missing: {some(missing)}",
+                    "Assemble the tree again with: packaging/fetch-upstream.sh")
 
     tracked = [f for f in git("ls-files", "-z", "--", MODULE, *EXTRA).split("\0") if f]
     gen_set = set(gen)
@@ -113,12 +198,13 @@ def main(argv: list[str]) -> int:
             continue
         unknown.append(f)
     if unknown:
-        return fail(f"unexpected files in the module tree: {', '.join(sorted(unknown)[:10])}")
+        return fail(f"unexpected files in the module tree: {some(sorted(unknown), 10)}",
+                    "Remove them, or track them with git add if they belong to the package")
 
     files = sorted(set(tracked) | {f"{MODULE}/{g}" for g in gen})
     for f in EXTRA:
         if f not in files:
-            return fail(f"{f} is not tracked")
+            return fail(f"{f} is not tracked", f"Track it with: git add {f}")
 
     prefix = f"{NAME}-{version}"
     raw = io.BytesIO()
@@ -147,9 +233,23 @@ def main(argv: list[str]) -> int:
     digest = hashlib.sha256(raw.getvalue()).hexdigest()
     with open(target + ".sha256", "w", encoding="ascii") as fh:
         fh.write(f"{digest}  {prefix}.tar\n")
+    print(f"{PROG}: wrote {target} ({plural(len(files), 'file', 'files')}) and {os.path.basename(target)}.sha256", file=sys.stderr)
     print(f"{digest}  {target}")
     return 0
 
 
+def cancelled(signum: int, _frame: object) -> None:
+    """Report the cancel once and end by the signal's status: 130, 143 (SIG-1)."""
+    print(f"\n{PROG}: cancelled", file=sys.stderr)
+    raise SystemExit(128 + signum)
+
+
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    signal.signal(signal.SIGTERM, cancelled)
+    signal.signal(signal.SIGINT, cancelled)
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except subprocess.CalledProcessError as exc:
+        sys.exit(fail(f"git failed: {' '.join(exc.cmd[3:])}", (exc.stderr or "").strip() or "Run it from the repository"))
+    except OSError as exc:
+        sys.exit(fail(f"{exc.strerror}: {exc.filename}" if exc.filename else str(exc)))

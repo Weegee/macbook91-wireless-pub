@@ -16,19 +16,84 @@
 # checks, at the end, what the working tree would publish. A clone without that
 # directory runs neither.
 #
+# Text interface (house text HIG, Bash patterns): what the script does is
+# "promote-release.sh: text" lines on stderr, failures "promote-release.sh:
+# error: text" with indented hints, exit status 0 / 1 / 2. It has no result on
+# stdout; the output of the private test suites passes through. Usage and exit
+# status: promote-release.sh --help. The helpers are in lib.sh.
+#
 set -euo pipefail
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+ROOT="$(cd "$HERE/.." && pwd)"
+PROG=promote-release.sh
+
+usage() {
+	cat <<USAGE
+Usage: $PROG [--seal VERSION]
+
+Copy the built package into release/VERSION/ (scheme of macbook91-cs4208). It
+does not commit, tag, push or publish anything. In the maintainer's repository
+the private tests run first and the export guard checks, at the end, what the
+working tree would publish.
+
+Examples:
+  $PROG
+  $PROG --seal 20261026.02
+
+Options:
+  --seal VERSION   regenerate SHA256SUMS of release/VERSION after STATUS.txt,
+                   which it covers, has been filled in
+  -h, --help       show this help and exit
+  -V, --version    show the version and exit
+
+Environment:
+  TMPDIR   where the export for the guard is built (default /tmp)
+
+Files:
+  packaging/arch/   PKGBUILD, .SRCINFO and the install file it copies
+  dist/             the built package and source tarball it takes
+  release/VERSION/  the result; history, never overwritten (the 2 newest stay)
+
+Exit status:
+  0  done
+  1  refused or failed: a check or a gate did not pass
+  2  invalid usage
+
+Docs and bug reports: $HOMEPAGE
+USAGE
+}
+
+. "$HERE/lib.sh"
+help_or_version "$@"
 
 # --seal <version>: regenerate an existing release directory's SHA256SUMS.
 # Promotion writes a STATUS.txt template that has to be filled in by hand, and
 # STATUS.txt is itself covered by SHA256SUMS - so the checksums must be redone
 # afterwards, by this option rather than by hand.
 SEALED=""
-if [ "${1:-}" = "--seal" ]; then
-	SEALED="${2:?usage: promote-release.sh --seal <version>}"
+while [ $# -gt 0 ]; do
+	case "$1" in
+	--seal) need_value "$1" "$#"; SEALED=$2; shift 2 ;;
+	--) shift; [ $# -eq 0 ] || usage_error "unexpected argument: $1"; break ;;
+	-*) usage_error "unknown option: $1" ;;
+	*) usage_error "unexpected argument: $1" ;;
+	esac
+done
+if [ -n "$SEALED" ] && [ ! -d "$ROOT/release/$SEALED" ]; then
+	die "no such release: release/$SEALED" "Releases there: $(cd "$ROOT/release" && printf '%s ' */ | sed 's|/||g; s/ $//')"
 fi
 
-HERE="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(cd "$HERE/.." && pwd)"
+# What an interrupted or failed run leaves behind is removed: the scratch tree
+# of the guard, and a release directory that this run began and did not finish.
+GUARD_TMP=''
+PROMOTING=''
+cleanup() {
+	[ -z "$GUARD_TMP" ] || rm -rf "$GUARD_TMP"
+	[ -z "$PROMOTING" ] || rm -rf "$PROMOTING"
+}
+trap cleanup EXIT
+trap_signals
 
 # The private gates (maintainer's repository only; absent in a public clone).
 PRIV="$ROOT/private"
@@ -37,41 +102,40 @@ private_tests() {
 	[ -d "$PRIV/tests" ] || return 0
 	for t in "$PRIV"/tests/run-*.sh; do
 		[ -e "$t" ] || continue
-		echo "private tests: $t"
-		bash "$t" || { echo "refusing: $t failed" >&2; return 1; }
+		step "running private tests: $t"
+		bash "$t" || { err "private tests failed: $t" "Fix them, then run $PROG again"; return 1; }
 	done
 }
 # Exports a commit built from the working tree (tracked and new files that are not
 # ignored; nothing is staged, no ref moves, the index stays as it is) and runs the
 # guard over the exported tree. Group P is reported but not counted, as in the exporter.
 guard_gate() {
-	local tmp tree commit rc=0
+	local tree commit rc=0
 	[ -d "$PRIV/export" ] || return 0
 	[ -f "$PRIV/export/guard.sh" ] && [ -f "$PRIV/export/export-tree.sh" ] ||
-		{ echo "refusing: $PRIV/export lacks guard.sh or export-tree.sh" >&2; return 1; }
-	tmp=$(mktemp -d "${TMPDIR:-/tmp}/promote-guard.XXXXXX")
-	GIT_INDEX_FILE="$tmp/index" git -C "$ROOT" read-tree HEAD &&
-		GIT_INDEX_FILE="$tmp/index" git -C "$ROOT" add -A -- . &&
-		tree=$(GIT_INDEX_FILE="$tmp/index" git -C "$ROOT" write-tree) &&
+		{ err "$PRIV/export lacks guard.sh or export-tree.sh"; return 1; }
+	step "running the export guard over the working tree"
+	GUARD_TMP=$(mktemp -d "${TMPDIR:-/tmp}/promote-guard.XXXXXX")
+	GIT_INDEX_FILE="$GUARD_TMP/index" git -C "$ROOT" read-tree HEAD &&
+		GIT_INDEX_FILE="$GUARD_TMP/index" git -C "$ROOT" add -A -- . &&
+		tree=$(GIT_INDEX_FILE="$GUARD_TMP/index" git -C "$ROOT" write-tree) &&
 		commit=$(git -C "$ROOT" commit-tree -p HEAD -m "promote gate: working tree" "$tree") ||
-		{ echo "refusing: cannot build the commit for the guard" >&2; rm -rf "$tmp"; return 1; }
-	if ! bash "$PRIV/export/export-tree.sh" --conf "$PRIV/export" "$ROOT" "$tmp/out" "$commit" >"$tmp/export.log" 2>&1; then
-		echo "refusing: the export for the guard failed:" >&2
-		tail -n 5 "$tmp/export.log" >&2
-		rm -rf "$tmp"
+		{ err "cannot build the commit for the guard"; return 1; }
+	if ! bash "$PRIV/export/export-tree.sh" --conf "$PRIV/export" "$ROOT" "$GUARD_TMP/out" "$commit" >"$GUARD_TMP/export.log" 2>&1; then
+		err "the export for the guard failed, last lines of its log:"
+		tail -n 5 "$GUARD_TMP/export.log" | sed 's/^/  /' >&2
 		return 1
 	fi
-	bash "$PRIV/export/guard.sh" --conf "$PRIV/export" --warn P tree "$tmp/out" >"$tmp/hits.tsv" 2>"$tmp/guard.err" || rc=$?
+	bash "$PRIV/export/guard.sh" --conf "$PRIV/export" --warn P tree "$GUARD_TMP/out" >"$GUARD_TMP/hits.tsv" 2>"$GUARD_TMP/guard.err" || rc=$?
 	if [ "$rc" != 0 ]; then
-		echo "refusing: the guard found hits in what would be published (MAC, UUID, IP, SSID, e-mail and serial values are masked, other text such as a host name is shown):" >&2
-		head -n 40 "$tmp/hits.tsv" >&2
-		tail -n 1 "$tmp/guard.err" >&2
-		echo "fix them before committing; --seal <version> runs the guard again" >&2
-		rm -rf "$tmp"
+		err "the guard found hits in what would be published" \
+			"MAC, UUID, IP, SSID, e-mail and serial values are masked, other text such as a host name is shown:"
+		head -n 40 "$GUARD_TMP/hits.tsv" | sed 's/^/  /' >&2
+		tail -n 1 "$GUARD_TMP/guard.err" | sed 's/^/  /' >&2
+		printf '  Fix them before committing; %s --seal VERSION runs the guard again\n' "$PROG" >&2
 		return 1
 	fi
-	tail -n 1 "$tmp/guard.err"
-	rm -rf "$tmp"
+	step "export $(tail -n 1 "$GUARD_TMP/guard.err")"
 }
 private_tests
 
@@ -83,14 +147,13 @@ seal() { # seal DIR
 	for f in "$1"/*.tar; do
 		[ -e "$f" ] && { src=$(basename "$f"); break; }
 	done
-	[ -n "$src" ] || { echo "no source tarball in $1" >&2; return 1; }
+	[ -n "$src" ] || { err "no source tarball in $1" "Promote a built package first: $PROG"; return 1; }
 	(cd "$1" && sha256sum -- $TRACKED_FILES "$src" > SHA256SUMS)
-	echo "sealed $1/SHA256SUMS over: $TRACKED_FILES $src"
+	step "sealed $1/SHA256SUMS over: $TRACKED_FILES $src"
 }
 
 if [ -n "$SEALED" ]; then
 	DIR="$ROOT/release/$SEALED"
-	[ -d "$DIR" ] || { echo "no such release: $DIR" >&2; exit 1; }
 	seal "$DIR"
 	guard_gate
 	exit 0
@@ -107,31 +170,30 @@ SRCTAR="$ROOT/dist/${PKGNAME}-${PKGVER}.tar"
 
 # 1. release/<ver>/ is promoted, immutable history - never overwritten.
 if [ -e "$DEST" ]; then
-	echo "refusing: $DEST already exists - release history is not overwritten" >&2
-	exit 1
+	die "release/$PKGVER already exists" \
+		"Release history is not overwritten. Raise pkgver in packaging/arch/PKGBUILD for a new release," \
+		"or regenerate its checksums: $PROG --seal $PKGVER"
 fi
 
 # 2. .SRCINFO must actually match the PKGBUILD being promoted.
 GENERATED_SRCINFO="$(cd "$ARCH" && makepkg --printsrcinfo)"
 if ! diff -q <(printf '%s\n' "$GENERATED_SRCINFO") "$ARCH/.SRCINFO" >/dev/null 2>&1; then
-	echo "refusing: makepkg --printsrcinfo differs from $ARCH/.SRCINFO - run make srcinfo first" >&2
-	exit 1
+	die "makepkg --printsrcinfo differs from $ARCH/.SRCINFO" "Run: make srcinfo"
 fi
 
 # 3. the built package for this exact version must already exist.
 if [ ! -e "$PKGFILE" ]; then
-	echo "refusing: $PKGFILE does not exist - build it first (make arch-pkg)" >&2
-	exit 1
+	die "$PKGFILE does not exist" "Build it first: make arch-pkg"
 fi
 
 # 3b. ...from the tarball the PKGBUILD pins, not from some other build.
 PINNED=$(sed -n "s/^sha256sums=('\([0-9a-f]*\)').*/\1/p" "$ARCH/PKGBUILD")
 if [ ! -e "$SRCTAR" ] || [ "$(sha256sum "$SRCTAR" | cut -d' ' -f1)" != "$PINNED" ]; then
-	echo "refusing: $SRCTAR is missing or does not match the PKGBUILD's sha256sums - run make arch-pkg" >&2
-	exit 1
+	die "$SRCTAR is missing or does not match the sha256sums of the PKGBUILD" "Run: make arch-pkg"
 fi
 
 install -dm755 "$DEST"
+PROMOTING="$DEST"
 cp "$ARCH/PKGBUILD" "$DEST/PKGBUILD"
 cp "$ARCH/.SRCINFO" "$DEST/.SRCINFO"
 cp "$ARCH/macbook91-wireless.install" "$DEST/macbook91-wireless.install"
@@ -153,6 +215,7 @@ $PKGSUM  $(basename "$PKGFILE")
 EOF
 
 seal "$DEST"
+PROMOTING=''
 
 # 4. retention (STRUCTURE.md, release/): only the two newest release
 # directories are kept. Older ones are removed only after the new one is fully
@@ -173,12 +236,12 @@ prune_old_releases() {
 			continue
 		fi
 		rm -rf "${ROOT:?}/release/$v"
-		echo "pruned release/$v (kept the $keep newest)"
+		step "pruned release/$v (kept the $keep newest)"
 	done < <(printf '%s\n' "${vers[@]}" | sort -V -r)
 }
 prune_old_releases
 
-guard_gate || { echo "$DEST stays in place for inspection" >&2; exit 1; }
-echo "promoted $PKGNAME $PKGVER-$PKGREL to $DEST"
-echo "fill in $DEST/STATUS.txt, then re-seal the checksums it is part of:"
-echo "  $HERE/promote-release.sh --seal $PKGVER"
+guard_gate || { note "release/$PKGVER stays in place for inspection"; exit 1; }
+step "promoted $PKGNAME $PKGVER-$PKGREL to release/$PKGVER"
+note "fill in release/$PKGVER/STATUS.txt, then re-seal the checksums it is part of:" \
+	"$HERE/promote-release.sh --seal $PKGVER"
