@@ -14,7 +14,7 @@
 #
 # Nothing under series/ is tracked in the project's repository:
 # packaging/fetch-upstream.sh assembles one tree per kernel series, series/<S>/
-# (kernel.org stable files from packaging/files.list, patches/<S>/ applied, two
+# (kernel.org stable files from packaging/files.list, patches/ applied, two
 # Kbuild overlays), lists the series in KERNEL-SERIES and checks every tree
 # against packaging/upstream.lock. This Makefile never fetches anything, so a
 # DKMS rebuild during a kernel upgrade runs offline.

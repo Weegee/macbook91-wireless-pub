@@ -4,15 +4,20 @@
 # Assemble the kernel half of src/macbook91-wireless from primary sources.
 #
 # This repository carries no kernel code. It carries the patches that say what
-# this project changes (patches/<series>/) and the list of kernel files they
-# apply to (packaging/files.list); this script reconstructs the rest:
+# this project changes (patches/, one set for every kernel series) and the list
+# of kernel files they apply to (packaging/files.list); this script
+# reconstructs the rest:
 #
 #   fetched   every path in files.list, from the stable tree on git.kernel.org,
 #             at one tag per kernel series (default: the newest tag of each
 #             series in packaging/upstream.lock)
-#   derived   series/<S>/kernel/ = the fetched files + patches/<S>/*.patch
+#   derived   series/<S>/kernel/ = the fetched files + patches/*.patch
 #             + packaging/overlay/*.Kbuild (the two Kbuild files that build the
 #             brcmfmac and hci_uart directories out of tree)
+#
+# The one patch set must apply to the tag of every series with patch -F0:
+# line offsets are tolerated, fuzz is not. A series it does not fit is not
+# given a second set; the set is reworked until it fits all of them.
 #
 # Each series is a self-contained tree, series/<S>/{kernel,patches,
 # KERNEL-SERIES,KERNEL-TAG,UPSTREAM.sha256}; the module root holds the list of
@@ -101,9 +106,10 @@ declare -A SERIES_TAG=()
 for t in "${TAGS[@]}"; do
 	s="$(series_of "$t")"
 	[ -z "${SERIES_TAG[$s]:-}" ] || die "two tags for Linux $s: ${SERIES_TAG[$s]} and $t"
-	[ -d "$ROOT/patches/$s" ] || die "no patch series for Linux $s (patches/$s)"
 	SERIES_TAG[$s]="$t"
 done
+PATCHES="$ROOT/patches"
+ls "$PATCHES"/*.patch >/dev/null 2>&1 || die "no patches in $PATCHES"
 
 mapfile -t FILES < <(sed -e 's/#.*//' -e 's/[[:space:]]*$//' "$LIST" | grep -v '^$')
 [ "${#FILES[@]}" -gt 0 ] || die "files.list is empty"
@@ -131,7 +137,7 @@ trap 'rm -rf "$WORK"' EXIT
 
 assemble() { # assemble SERIES TAG: WORK/series/SERIES, from the cache
 	local s="$1" tag="$2" f c have p out="$WORK/series/$1" K
-	local patches="$ROOT/patches/$s"
+	local patches="$PATCHES"
 	K="$out/kernel"
 	# Fetch into the cache. A cached file is checked like a downloaded one,
 	# so the cache cannot bring anything in.

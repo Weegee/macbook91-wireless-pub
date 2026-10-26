@@ -8,7 +8,7 @@
 # packaging/fetch-upstream.sh refuses to build from a (tag, path) pair it does
 # not find here and fails hard, with no override, when a pair it does find has
 # different bytes. derived:tree is the hash of UPSTREAM.sha256, the manifest of
-# the assembled tree (fetched files with patches/<series>/ applied, the Kbuild
+# the assembled tree (fetched files with patches/ applied, the Kbuild
 # overlays, the patches themselves and KERNEL-SERIES/KERNEL-TAG), so any change
 # to a patch or an overlay changes it too and has to be recorded here.
 #
@@ -18,8 +18,12 @@
 # v7.2.9 seeded 2026-10-13 from git.kernel.org stable; the fetched files are
 # byte-identical to the sparse checkout the patches were developed on.
 #
-# v6.18.55 added 2026-10-20 (LTS series, fetched from git.kernel.org stable);
-# patches/6.18 is the 7.2 series rebased with offsets only.
+# v6.18.55 added 2026-10-20 (LTS series, fetched from git.kernel.org stable).
+#
+# 2026-10-26: one patch set for every series (patches/, the former 7.2 set);
+# the 6.18 set it replaced differed in hunk line numbers, index and From lines
+# only. The derived:tree of v6.18.55 changed with the copy of the patches in
+# its manifest; its kernel/ tree is byte for byte the same as before.
 
 v7.2.9     32ebf65e5aa69162f8bc1f2f1d5793e8a337fcd47cc4d0c8bee23f0ba4f2d87d  drivers/net/wireless/broadcom/brcm80211/include/brcm_hw_ids.h
 v7.2.9     1ed2dcc37d792957f2f722b38f6ac1688d210f83316ddacc53a107b7cc3cfe0d  drivers/net/wireless/broadcom/brcm80211/include/brcmu_d11.h
@@ -214,4 +218,4 @@ v6.18.55   43ab94feac41161ff6adca55002b5494117da72b968a41c972144d92b51d574e  dri
 v6.18.55   bef8c2e0c150aae6349a159a95a72aab3d995615bb2d1cae49bedad35ff4b5e1  drivers/bluetooth/btintel.h
 v6.18.55   075eeaf78e4a9288ae228c0f99edbd137fcbd87c2645872cf748a9a33752205e  drivers/bluetooth/btqca.h
 v6.18.55   452d4467259f1da92f0f71bb566499f1fa0e1c89ec4f5bf7412ba8c5489daaa1  drivers/bluetooth/btrtl.h
-v6.18.55   2eed8ec6343efe4f35b4c3ce54f6a3bcc387e16e7c08c549b94f4ad1d2e7bbba  derived:tree
+v6.18.55   35e4d7a8bd8c5087ec44ba63858b82816f2f31950bfd560e044cb487f8ced029  derived:tree
