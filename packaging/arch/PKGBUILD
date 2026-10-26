@@ -49,7 +49,7 @@ makedepends=('make')
 # against packaging/upstream.lock before it enters the tarball; makepkg
 # downloads nothing, and DKMS rebuilds during kernel upgrades run offline.
 source=("$pkgname-$pkgver.tar")
-sha256sums=('e93dd6328a0aec172173c1c7ef10bdab416d111ce0395deb45fd11e669037559')
+sha256sums=('d5825741ce23b453dd80426b265812acddc48cc66c43be9ef50bfc0aabe19a11')
 
 package() {
     depends=('dkms' 'linux-firmware-broadcom' 'linux-cachyos-lts-headers')
