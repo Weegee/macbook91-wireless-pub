@@ -1,4 +1,4 @@
-Structure version: 20261021.01
+Structure version: 20261026.01
 
 Layout rules for this repository. The README describes the same directories
 for a reader; this file is the rule.
@@ -16,21 +16,26 @@ src/macbook91-wireless/   the DKMS module tree, copied to
                     (the lock lines of their tags). The Makefile builds the
                     series of the target kernel into build/, which dkms.conf
                     names for all five modules.
-patches/<series>/   the project's changes to kernel code, one series per kernel
-                    series, `git format-patch --zero-commit` output of the
-                    development tree build/dev/<series> (branch macbook91).
-                    Never a test-only patch. Every series with a tag in
-                    upstream.lock has one, and the other way round (tests/
-                    check it). patches/6.18 is patches/7.2 rebased with line
-                    offsets only.
+patches/            the project's changes to kernel code: one set for every
+                    kernel series in upstream.lock, applied to each tag with
+                    patch -F0 (line offsets, no fuzz); no per-series
+                    directory (tests/ check it). `git format-patch
+                    --zero-commit` output of the development tree
+                    build/dev/<series> (branch macbook91). Never a test-only
+                    patch.
 packaging/          files.list (the kernel files fetched), overlay/ (the two
                     Kbuild files), upstream.lock (hashes that gate every
                     fetched file and the derived tree), fetch-upstream.sh,
                     mkdist.py (reproducible tarball), promote-release.sh,
                     make-package.sh, arch/ (PKGBUILD, .SRCINFO, install
                     scriptlet).
-tools/              macbook91-wireless-verify is packaged to /usr/bin; dev-*.sh
-                    are development helpers and not packaged.
+tools/              macbook91-wireless-verify is packaged to /usr/bin;
+                    kernel-series to /usr/lib/macbook91-wireless/, the one
+                    reader of KERNEL-SERIES besides the module Makefile
+                    (dkms.conf pattern, pacman hook, install scriptlet,
+                    verifier); macbook91-wireless-series.hook to
+                    /usr/share/libalpm/hooks/71-macbook91-wireless-series.hook.
+                    dev-*.sh are development helpers and not packaged.
 tests/              hermetic tests: no root, no hardware, no network.
 docs/               FINDINGS.md (status-tagged findings), CHANGELOG.md,
                     test-status.json (the gate record),

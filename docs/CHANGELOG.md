@@ -4,6 +4,51 @@ Versions have the form YYYYMMDD.NN (release date, NN counts releases that
 day). The release tag is v<version>. Releases before 20261021.01 are not part
 of this repository; their entries below are kept as history.
 
+## 20261026.01
+
+**Kernel series 7.3, the LTS kernel as the default, one patch set.** The
+twelve patches are unchanged; the module code of 6.18 and 7.2 is the same as
+in 20261021.01. Built for all three series; NOT RUN on the hardware
+(`docs/test-status.json`, `hw.runtime_20261026_01`).
+
+- Linux 7.3 (tag v7.3, the base of the CachyOS kernel 7.3.0-4) is a
+  supported series next to 6.18 (LTS) and 7.2. The patch set applies to v7.3
+  with `patch -F0`, and the lines it adds and removes are the same on all
+  three series. 95 of the 96 fetched v7.3 files are byte-identical to
+  CachyOS's kernel tree at tag cachyos-7.3.0-4; `brcmfmac/pcie.c` differs in
+  `brcmf_pcie_pm_enter_D3` only, where CachyOS no longer fails a suspend on a
+  missing D3 acknowledgement without WoWLAN. Patch 0003 handles that path
+  itself (with `pm_reset` the device is removed before the handshake; after a
+  timeout it is removed and the suspend goes on).
+- Upstream changes from v7.2.9 to v7.3 in files the patches touch: the ACPI
+  ID table of `hci_bcm.c` uses designated initializers; `hci_ldisc.c` checks
+  the length in its TX loop; `brcmf_detach` takes RTNL and the wiphy lock to
+  remove an interface without a netdev (the P2P device, which this package
+  turns off by default); `msgbuf.c` checks flow ring IDs. None of them
+  overlaps a patch hunk.
+- 7.2 stays: the unchanged set applies to v7.2.9 and the modules build
+  against `7.2.11-1-cachyos` headers. With 7.4, 7.2 is dropped (newest
+  series, previous one, LTS at most).
+- One patch set: `patches/6.18/` and `patches/7.2/` were the same patches
+  with other hunk line numbers; `patches/` now holds the one set and the
+  fetcher applies it to every series. The assembled `series/6.18/kernel/` and
+  all of `series/7.2/` are byte for byte the same as before.
+- One answer to "is this series supported": `/usr/lib/macbook91-wireless/kernel-series`
+  reads `KERNEL-SERIES` and writes dkms.conf's `BUILD_EXCLUSIVE_KERNEL` at
+  install time; a new pacman hook (`71-macbook91-wireless-series.hook`) prints
+  a WARNING block after every transaction for each installed kernel of a
+  series the package does not support (no build, no abort); the install note
+  and `macbook91-wireless-verify` ask the same script. The verifier reports
+  an unsupported running series as FAIL (was WARN).
+- Package: depends on `linux-cachyos-lts-headers` (all depends are set in
+  `package()`, so makepkg builds without the CachyOS repositories);
+  `linux-cachyos-headers` is the one optional kernel. The Arch kernel headers
+  and clang, lld and llvm are no longer named (`linux-cachyos-headers` depends
+  on the three).
+- Source identity: 6.18 `35e4d7a8bd8c5087` (was `2eed8ec6343efe4f`; only the
+  copy of the patches in its manifest changed), 7.2 `494451d9a8ce5f25`
+  (unchanged), 7.3 `12d3581c306b83b5`.
+
 ## 20261021.01
 
 **First release in the public repository: documentation, licensing and

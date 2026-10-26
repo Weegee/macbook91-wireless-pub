@@ -43,8 +43,8 @@ maintainer and they carry no trailer.
 Measurements and their status (verified, not verified, hypothesis) are in
 [docs/FINDINGS.md](docs/FINDINGS.md).
 
-Every patch is in `patches/<series>/` and is written to be reviewable on its
-own. The modules activate their Mac-specific behaviour only where the kernel
+Every patch is in `patches/`, one set for every kernel series, and is written
+to be reviewable on its own. The modules activate their Mac-specific behaviour only where the kernel
 already detects an Apple machine (`hci_bcm`) or only on the PCIe path of
 `brcmfmac`; every other machine running these modules keeps upstream
 behaviour, except for the message levels.
@@ -86,16 +86,21 @@ sudo pacman -U dist/macbook91-wireless-dkms-*.pkg.tar.zst
 sudo macbook91-wireless-verify --reload   # or reboot
 ```
 
-DKMS builds the modules for every installed kernel of a series listed in
-`/usr/src/macbook91-wireless-*/KERNEL-SERIES` (currently 6.18 and 7.2) and
-needs that kernel's headers (`linux-cachyos-headers`,
-`linux-cachyos-lts-headers`) and the compiler the kernel was built with: for
-a kernel built with clang, such as `linux-cachyos` 7.2, `clang lld llvm`; for
-a gcc-built kernel, such as the CachyOS LTS kernel 6.18, `gcc`. Other
-kernels keep their stock drivers; DKMS skips them.
+DKMS builds the modules for every installed kernel of a series the package
+supports and needs that kernel's headers. The list is
+`/usr/src/macbook91-wireless-*/KERNEL-SERIES`, written from
+`packaging/upstream.lock`; `/usr/lib/macbook91-wireless/kernel-series --list`
+prints it. The CachyOS LTS kernel is the default: its series is always
+supported, and the package depends on `linux-cachyos-lts-headers` (gcc). The
+current CachyOS series is supported as well; for it install
+`linux-cachyos-headers`, which brings the clang, lld and llvm its clang-built
+kernel needs. A kernel of any other series keeps its stock drivers: DKMS
+skips it, a pacman hook prints a WARNING block for it after every transaction
+that installs a kernel, and `macbook91-wireless-verify` reports a FAIL on it.
 
 | Series | Kernel (tested) | Status |
 | --- | --- | --- |
+| 7.3 | `7.3.0-4-cachyos` (clang) | release 20261026.01: all five modules build (vermagic `7.3.0-4-cachyos`); not run on the MacBook9,1 (NOT VERIFIED), see [docs/test-status.json](docs/test-status.json) |
 | 7.2 | `7.2.11-1-cachyos` (clang) | run on the MacBook9,1 up to release 20261015.01; later releases carry that result over, see [docs/test-status.json](docs/test-status.json) |
 | 6.18 | `6.18.55-2-cachyos-lts` (gcc) | run on the MacBook9,1 with release 20261020.02: `macbook91-wireless-verify` 0 FAIL, 0 WARN, WLAN up (VERIFIED); suspend/resume, Bluetooth function and the rebind recovery NOT VERIFIED on 6.18, see [docs/test-status.json](docs/test-status.json) |
 
@@ -159,13 +164,15 @@ make test           # hermetic tests
 
 `packaging/fetch-upstream.sh` fetches the kernel files listed in
 `packaging/files.list` from the stable tree on git.kernel.org, checks each one
-against `packaging/upstream.lock`, applies `patches/<series>/` and adds two
-Kbuild files, once per kernel series: the result is one self-contained tree
+against `packaging/upstream.lock`, applies `patches/` and adds two Kbuild
+files, once per kernel series: the result is one self-contained tree
 `series/<S>/` in the module directory, and the module Makefile builds the one
-that matches the target kernel (`UTS_RELEASE`). A new kernel series needs a
-new patch series and lockfile entries (`--accept-new`); a new stable tag of a
-series that is already shipped is a lockfile update and changes only that
-series' module ID.
+that matches the target kernel (`UTS_RELEASE`). The one patch set applies to
+every series with `patch -F0` (line offsets, no fuzz). A new kernel series
+needs lockfile entries (`--accept-new`) and must take the same set; where it
+does not, the set is reworked so that it fits every series, never split per
+series. A new stable tag of a series that is already shipped is a lockfile
+update and changes only that series' module ID.
 
 ## License
 
@@ -203,7 +210,7 @@ them, keep the license of the kernel file. The other license texts are in
   `packaging/overlay/`. [LICENSES/ISC](LICENSES/ISC) is the Broadcom ISC text;
   [LICENSES/MIT](LICENSES/MIT) is the MIT text of `hci_aml.c`
   (Copyright (C) 2024 Amlogic, Inc.). Nothing else in this repository is MIT.
-- **`patches/<series>/`:** each hunk has the license of the file it changes:
+- **`patches/`:** each hunk has the license of the file it changes:
   ISC for `brcmfmac`, GPL-2.0-or-later for `hci_ldisc.c` (0001) and
   `hci_bcm.c` (0009, 0010).
 - **No license stated here:** `diag/` (command output recorded on the test
