@@ -1,0 +1,51 @@
+macbook91-wireless-dkms 20261102.01-1 - RELEASED
+
+State: released, tag v20261102.01 (2026-11-02). SHA256SUMS was regenerated
+with promote-release.sh --seal 20261102.01 in the tagged commit. The hardware
+gate (hw.runtime_20261102_01) was NOT RUN; the module code is the same as in
+20261026.02 and 20261026.01.
+
+What: audit findings of the text interfaces; no driver change.
+macbook91-wireless-verify prints its totals line ("FAIL: 1 FAIL, 0 WARN")
+also when the package is not installed, where it exited without it. Its
+firmware and DKMS hints name a command to copy. The development helper
+dev-wlan-swap.sh says "WLAN connected after N s". kernel-series names its
+shared message prefix as a deviation. The comments, Makefiles, install note
+and tests name the house HIG, text part. The twelve patches, series/ and
+dkms.conf are unchanged; module IDs: 7.3 20261102.01+12d3581c306b83b5, 7.2
++494451d9a8ce5f25, 6.18 +35e4d7a8bd8c5087 (all unchanged). Details:
+docs/CHANGELOG.md.
+
+Measured without hardware (2026-11-02):
+- make dist and make arch-pkg, both offline: the tarball is the one pinned in
+  PKGBUILD (sha256 4e716841...). The fetcher cache was rebuilt from the
+  20261026.02 tarball by reversing its patch set; the fetcher checked every
+  file against packaging/upstream.lock, and the derived:tree hashes of all
+  three series match. makepkg --printsrcinfo equals .SRCINFO.
+- diff -r of the unpacked 20261026.02 and 20261102.01 tarballs: Makefile,
+  src/macbook91-wireless/Makefile (comments only), tools/kernel-series,
+  tools/macbook91-wireless-verify and VERSION differ; patches, series/ and
+  dkms.conf do not.
+- namcap: no findings for the PKGBUILD; the package has the five known
+  warnings (docs/NAMCAP.md).
+- tests/run-tests.sh: 56 ok, 0 failed, 0 skipped, in the working tree with
+  the series assembled offline (53 checks in 20261026.02, 3 new). Private
+  tests: 29 passed, 0 failed, 1 blocked (the one blocked check is
+  core.hooksPath, which is not set in this clone). ShellCheck at warning
+  level on the 8 tracked shell scripts and the install note, and git diff
+  --check, are clean.
+- The modules were not built for this version, and the verifier was not run on
+  a MacBook9,1.
+
+NOT RUN for 20261102.01: installing this package and every hardware check.
+Carried over from 20261026.01 and 20261026.02, because the module code is
+unchanged: see docs/test-status.json (hw.runtime_20261026_01 and the
+carried-over gates). Not verified (unchanged): 7.3 runtime (WLAN, Bluetooth,
+suspend, recovery), suspend/resume of WLAN and Bluetooth on 6.18, Bluetooth
+function on 6.18, the rebind recovery in action on 6.18, runtime of patch
+0012 (static check only), hibernation (not set up), long mixed suspend
+series, Bluetooth devices across suspend.
+
+Local build of this release, for information only: not tracked, not one of the
+release files and not reproducible (makepkg output differs per machine):
+d4128f72f36b2498e6859a6e706e6d9cb85e08e5452d83fbb7ae287ade694a20  macbook91-wireless-dkms-20261102.01-1-x86_64.pkg.tar.zst
