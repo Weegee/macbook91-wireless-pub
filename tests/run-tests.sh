@@ -5,7 +5,7 @@
 # fetcher runs --offline against build/upstream-cache and is skipped without
 # it). Exit status 1 on any failure.
 #
-# Text interface (house text HIG, Bash patterns): one line per check on stdout,
+# Text interface (house HIG text part, Bash patterns): one line per check on stdout,
 # "ok", "FAIL" or "skip" first, then a count line and, last, "all tests
 # passed" or "N tests failed". "all tests passed" is read by the release
 # checks of the maintainer and stays word for word (STA-1).
@@ -386,7 +386,7 @@ else
 	skip "install and tarball: tree not assembled"
 fi
 
-# Text interface of the tools (house text HIG): -h and --help print the help on
+# Text interface of the tools (house HIG, text part): -h and --help print the help on
 # stdout with status 0 and nothing on stderr, -V and --version print
 # "prog [(package)] VERSION" as first line, invalid usage ends with status 2, an
 # "error:" message on stderr and nothing on stdout, and --help wins over an
@@ -414,7 +414,7 @@ for t in tools/macbook91-wireless-verify tools/kernel-series packaging/fetch-ups
 	fi
 done
 set --
-[ -z "$tfail" ] && ok "help, version and invalid usage of all tools follow the text HIG" || bad "text interface:$tfail"
+[ -z "$tfail" ] && ok "help, version and invalid usage of all tools follow the house HIG, text part" || bad "text interface:$tfail"
 # Arguments of the dev helpers are checked before anything is touched.
 dfail=""
 for a in "mem" "foo 3" "mem x" "mem 0" "mem 2 a"; do
@@ -439,6 +439,37 @@ if [ "$(id -u)" != 0 ]; then
 	fi
 else
 	skip "verify --reload without root: running as root"
+fi
+
+# The verifier's last line (MAS-2, TYP-10): scripts and the hardware gates read
+# "PASS|FAIL: N FAIL, M WARN", also when the package is not installed. A stub
+# ls that finds no /usr/src/macbook91-wireless-* makes that case the same on
+# every host; the verifier reads nothing else of the machine before it ends.
+mkdir "$TMP/nols"
+printf '#!/bin/sh\nexit 2\n' >"$TMP/nols/ls"
+chmod +x "$TMP/nols/ls"
+o=$(PATH="$TMP/nols:$PATH" bash tools/macbook91-wireless-verify 2>"$TMP/t.err"); rc=$?
+if [ "$rc" = 1 ] && [ "$(tail -n1 <<<"$o")" = "FAIL: 1 FAIL, 0 WARN" ] && [ "$(wc -l <<<"$o")" = 2 ] &&
+	grep -q '^FAIL  macbook91-wireless is not installed' <<<"$o" && [ ! -s "$TMP/t.err" ]; then
+	ok "verify without the package: FAIL row, totals line, status 1"
+else
+	bad "verify without the package: exit $rc, output: $(tr '\n' '|' <<<"$o")"
+fi
+# ERF-3: the hints of the verifier are commands that can be copied.
+if grep -qF 'missing; install it with: sudo pacman -S linux-firmware-broadcom' tools/macbook91-wireless-verify &&
+	grep -qF 'sudo dkms install macbook91-wireless/$pkgver -k $running' tools/macbook91-wireless-verify; then
+	ok "verify hints name the command (firmware package, dkms install)"
+else
+	bad "verify hints: firmware or dkms hint without a command"
+fi
+# TXT-7, TXT-5: the swap helper writes "WLAN", units with a space, in help and result.
+swap_help=$(bash tools/dev-wlan-swap.sh --help)
+if grep -qF 'stdout: "WLAN connected after N s"' <<<"$swap_help" &&
+	grep -qF 'echo "WLAN connected after ${i} s"' tools/dev-wlan-swap.sh &&
+	! grep -qE 'wifi (not )?connected|[0-9]s"' tools/dev-wlan-swap.sh; then
+	ok "dev-wlan-swap.sh: WLAN, durations with a space"
+else
+	bad "dev-wlan-swap.sh: wifi or a duration without a space"
 fi
 
 # 7. Licenses: texts, PKGBUILD and the SPDX line of every own file -------------

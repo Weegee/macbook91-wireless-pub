@@ -16,7 +16,7 @@
 # checks, at the end, what the working tree would publish. A clone without that
 # directory runs neither.
 #
-# Text interface (house text HIG, Bash patterns): what the script does is
+# Text interface (house HIG text part, Bash patterns): what the script does is
 # "promote-release.sh: text" lines on stderr, failures "promote-release.sh:
 # error: text" with indented hints, exit status 0 / 1 / 2. It has no result on
 # stdout; the output of the private test suites passes through. Usage and exit

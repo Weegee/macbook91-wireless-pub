@@ -11,11 +11,11 @@
 # BRCMFMAC_PARAMS="name=value ..." passes module parameters to brcmfmac.
 # Needs root (rmmod, insmod, driver bind).
 #
-# Text interface (house text HIG, Bash patterns): "wifi connected after Ns" is
-# the result on stdout; steps and failures are "dev-wlan-swap.sh: text" lines
-# on stderr. Everything that can be checked is checked before the first module
-# is unloaded. Exit status 0 / 1 / 2: connected, failed, invalid usage. Usage:
-# --help.
+# Text interface (house HIG text part, Bash patterns): "WLAN connected after
+# N s" is the result on stdout; steps and failures are "dev-wlan-swap.sh: text"
+# lines on stderr. Everything that can be checked is checked before the first
+# module is unloaded. Exit status 0 / 1 / 2: connected, failed, invalid usage.
+# Usage: --help.
 set -euo pipefail
 
 PROG=dev-wlan-swap.sh
@@ -45,7 +45,7 @@ Environment:
   BRCMFMAC_PARAMS   module parameters for brcmfmac, "name=value ..."
 
 Exit status:
-  0  WLAN connected (stdout: "wifi connected after Ns")
+  0  WLAN connected (stdout: "WLAN connected after N s")
   1  a step failed, or WLAN not connected after 30 s
   2  invalid usage, or not run as root
 
@@ -112,9 +112,9 @@ echo "$DEV" > /sys/bus/pci/drivers/brcmfmac/bind || swap_failed "cannot bind $DE
 step "bound $DEV; waiting up to 30 s for NetworkManager (Ctrl+C cancels)"
 SWAPPING=0
 for i in $(seq 1 30); do
-	nmcli -t -f TYPE,STATE dev | grep -x 'wifi:connected' >/dev/null && { echo "wifi connected after ${i}s"; exit 0; }
+	nmcli -t -f TYPE,STATE dev | grep -x 'wifi:connected' >/dev/null && { echo "WLAN connected after ${i} s"; exit 0; }
 	[ $((i % 10)) -ne 0 ] || step "still waiting after $i of 30 s"
 	sleep 1
 done
-err "wifi not connected after 30s" "Check: nmcli dev status; journalctl -k -b -n 30"
+err "WLAN not connected after 30 s" "Check: nmcli dev status; journalctl -k -b -n 30"
 exit 1

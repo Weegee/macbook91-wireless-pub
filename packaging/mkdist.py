@@ -28,7 +28,7 @@ Entries are sorted, owned by 0:0, mode 0755 for executables and 0644
 otherwise, all with mtime 0, and the tar is not compressed (compressor output
 differs between implementations). Same scheme as macbook91-cs4208.
 
-Text interface (house text HIG, Python patterns): the result "SHA256  path" is
+Text interface (house HIG text part, Python patterns): the result "SHA256  path" is
 the only line on stdout; messages go to stderr as "mkdist.py: error: text"
 with indented hints. Exit status 0 / 1 / 2 (written, refused or failed,
 invalid usage), 130 and 143 when cancelled. Usage: mkdist.py --help.

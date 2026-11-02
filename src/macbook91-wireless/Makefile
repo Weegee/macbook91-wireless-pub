@@ -25,7 +25,7 @@
 # dkms.conf limits DKMS to the listed series in the first place; this covers a
 # manual build.
 #
-# Messages (house text HIG): "macbook91-wireless: error: text" and
+# Messages (house HIG, text part): "macbook91-wireless: error: text" and
 # "macbook91-wireless: note: text" on stderr, hints indented below. DKMS shows
 # the output of a failed build as it is.
 

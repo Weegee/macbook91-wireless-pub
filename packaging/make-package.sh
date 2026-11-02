@@ -13,7 +13,7 @@
 # A release is built with `make arch-pkg` instead, which also requires a
 # committed tree and the tarball checksum pinned in packaging/arch/PKGBUILD.
 #
-# Text interface (house text HIG, Bash patterns): one "make-package.sh: text"
+# Text interface (house HIG text part, Bash patterns): one "make-package.sh: text"
 # line on stderr, then the output of make and makepkg. Usage and exit status:
 # make-package.sh --help. The helpers are in lib.sh.
 #

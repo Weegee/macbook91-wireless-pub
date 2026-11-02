@@ -3,7 +3,7 @@
 # The dkms package's alpm hooks build, install and remove the modules; this
 # scriptlet only says what is needed to use them.
 #
-# Text interface (house text HIG): everything this scriptlet prints is a
+# Text interface (house HIG, text part): everything this scriptlet prints is a
 # message, so it goes to stderr (KAN-1) as "macbook91-wireless: warning: text"
 # or "macbook91-wireless: note: text" with indented follow-up lines. pacman
 # reads stdout and stderr of a scriptlet through one pipe and shows both.

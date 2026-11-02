@@ -36,7 +36,7 @@
 # tag is added with --accept-new, and the new lockfile lines are reviewed and
 # committed like any other change.
 #
-# Text interface (house text HIG, Bash patterns): progress and results are
+# Text interface (house HIG text part, Bash patterns): progress and results are
 # "fetch-upstream.sh: text" lines on stderr, failures "fetch-upstream.sh:
 # error: text" with indented hints, exit status 0 / 1 / 2. Usage, options and
 # exit status: fetch-upstream.sh --help. The helpers are in lib.sh.

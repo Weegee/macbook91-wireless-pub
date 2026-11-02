@@ -9,7 +9,7 @@
 #   tools/dev-suspend-cycle.sh MODE N [SLEEP] [PAUSE]   MODE: mem | freeze
 # Writes a report to stdout; MAC addresses are masked. Needs root (rtcwake).
 #
-# Text interface (house text HIG, Bash patterns): the report (one "cycle ..."
+# Text interface (house HIG text part, Bash patterns): the report (one "cycle ..."
 # line per cycle and the "RESULT ..." line) is the result on stdout and stays
 # as it is, because the run protocols quote it. Progress and failures are
 # "dev-suspend-cycle.sh: text" lines on stderr. Exit status 0 / 1 / 2: every

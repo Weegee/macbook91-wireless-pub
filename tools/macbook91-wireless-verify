@@ -7,7 +7,7 @@
 #
 # Prints no MAC or Bluetooth addresses, SSIDs or device names.
 #
-# Text interface (house text HIG, Bash patterns): the report goes to stdout,
+# Text interface (house HIG text part, Bash patterns): the report goes to stdout,
 # messages to stderr as "macbook91-wireless-verify: error: text". The report
 # has no colour, so there is nothing to switch off for NO_COLOR or a pipe.
 #
@@ -34,6 +34,10 @@ pass() { printf 'PASS  %s\n' "$*"; }
 warn() { printf 'WARN  %s\n' "$*"; warns=$((warns + 1)); }
 fail() { printf 'FAIL  %s\n' "$*"; fails=$((fails + 1)); }
 info() { printf 'INFO  %s\n' "$*"; }
+# The last line of the report: the verdict and the totals. Scripts and the
+# hardware gates read it (MAS-2), so every end of the report prints it, also
+# the early exit below.
+summary() { printf '%s: %d FAIL, %d WARN\n' "$([ $fails = 0 ] && echo PASS || echo FAIL)" "$fails" "$warns"; }
 has_netdev() { [ -n "$(ls -A /sys/bus/pci/devices/$PCI/net 2>/dev/null)" ]; }
 
 # Messages on stderr (KAN-1, FEH-2): "prog: error: text", hints indented.
@@ -143,6 +147,7 @@ srcdir=$(ls -d /usr/src/macbook91-wireless-* 2>/dev/null | sort -V | tail -n1)
 # Package and build ---------------------------------------------------------
 if [ -z "$srcdir" ]; then
 	fail "macbook91-wireless is not installed (no /usr/src/macbook91-wireless-*); install it with: sudo pacman -S macbook91-wireless-dkms"
+	summary
 	exit 1
 fi
 # The package carries one source tree per kernel series (KERNEL-SERIES lists
@@ -192,7 +197,7 @@ if [ "$shipped" = 1 ]; then
 		st=$(dkms status -m macbook91-wireless -v "$pkgver" -k "$running" 2>/dev/null)
 		case "$st" in
 		*installed*) pass "dkms: built and installed for $running" ;;
-		*) fail "dkms: not installed for $running (${st:-no status}); check headers and clang" ;;
+		*) fail "dkms: not installed for $running (${st:-no status}); install the headers of this kernel, then run: sudo dkms install macbook91-wireless/$pkgver -k $running" ;;
 		esac
 	fi
 	check_module brcmfmac brcmfmac
@@ -223,7 +228,7 @@ fi
 if ls /usr/lib/firmware/brcm/brcmfmac4350c2-pcie.bin* >/dev/null 2>&1; then
 	pass "firmware: brcm/brcmfmac4350c2-pcie.bin present"
 else
-	fail "firmware: brcm/brcmfmac4350c2-pcie.bin missing (linux-firmware-broadcom)"
+	fail "firmware: brcm/brcmfmac4350c2-pcie.bin missing; install it with: sudo pacman -S linux-firmware-broadcom"
 fi
 
 # Sleep hooks that fight the driver -----------------------------------------
@@ -295,5 +300,5 @@ else
 	info "journal: not readable (run as root, or as a member of the group systemd-journal)"
 fi
 
-printf '%s: %d FAIL, %d WARN\n' "$([ $fails = 0 ] && echo PASS || echo FAIL)" "$fails" "$warns"
+summary
 [ "$fails" = 0 ]

@@ -17,12 +17,16 @@
 #
 # Usage, modes and exit status: kernel-series --help.
 #
-# Text interface (house text HIG, Bash patterns): results go to stdout,
+# Text interface (house HIG text part, Bash patterns): results go to stdout,
 # messages to stderr as "kernel-series: error: text". The unsupported-kernel
 # explanation is the result of --kernel (stdout, read by the install scriptlet
 # and the verifier) and, as "macbook91-wireless: warning: ..." messages on
 # stderr, the output of --hook; its first line is the headline, the rest
 # explains. There is no colour and no progress.
+# Abweichung von FEH-2, NAM-1: messages start with "kernel-series:", the same
+# name as the helper of macbook91-cs4208. The file is installed to
+# /usr/lib/macbook91-wireless/, not to PATH, so no command collides; the test
+# suite reads the "kernel-series: error:" prefix (section 6, help and usage).
 set -u
 
 PROG=kernel-series

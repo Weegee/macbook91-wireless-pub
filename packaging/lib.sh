@@ -2,7 +2,7 @@
 # shellcheck shell=bash
 #
 # Text helpers shared by the development and packaging scripts
-# (packaging/*.sh, tools/dev-*.sh). Sourced, never run. House text HIG: results
+# (packaging/*.sh, tools/dev-*.sh). Sourced, never run. House HIG, text part: results
 # go to stdout, messages to stderr as "prog: error: text", hints indented,
 # exit status 0 / 1 / 2 (done, failed, invalid usage).
 #

@@ -23,7 +23,7 @@
 # in the lockfile); MAKEPKG_FLAGS
 # passes options to makepkg (e.g. --syncdeps in CI).
 #
-# Messages (house text HIG): "make TARGET: error: text" on stderr, hints
+# Messages (house HIG, text part): "make TARGET: error: text" on stderr, hints
 # indented below; the output of the tools they run is theirs.
 
 NAME := macbook91-wireless-dkms
