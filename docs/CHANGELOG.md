@@ -4,6 +4,33 @@ Versions have the form YYYYMMDD.NN (release date, NN counts releases that
 day). The release tag is v<version>. Releases before 20261021.01 are not part
 of this repository; their entries below are kept as history.
 
+## 20261102.01
+
+**Audit findings of the text interfaces. No driver change.** Patches, kernel
+sources, Kbuild files and `dkms.conf` are the same as in 20261026.02; the
+source identities are unchanged (7.3 `12d3581c306b83b5`, 6.18
+`35e4d7a8bd8c5087`, 7.2 `494451d9a8ce5f25`), the modules report
+`20261102.01+<id>`. Built for 6.18, 7.2 and 7.3 from the lockfile's tags;
+NOT RUN on the hardware (`docs/test-status.json`, `hw.runtime_20261102_01`).
+
+- `macbook91-wireless-verify` prints its last line, `FAIL: 1 FAIL, 0 WARN`,
+  also when the package is not installed (it exited without it); scripts and
+  the hardware gates read that line (MAS-2, TYP-10). The firmware hint reads
+  `missing; install it with: sudo pacman -S linux-firmware-broadcom`, and a
+  DKMS build that is missing reads `install the headers of this kernel, then
+  run: sudo dkms install macbook91-wireless/VERSION -k KERNEL`.
+- `tools/dev-wlan-swap.sh` says `WLAN connected after N s` (was `wifi
+  connected after Ns`) and `WLAN not connected after 30 s`; durations carry a
+  space (TXT-7). Nothing in the repository reads that line.
+- `tools/kernel-series` names its message prefix, shared with the helper of
+  macbook91-cs4208, as a deviation (FEH-2, NAM-1); the tests read it.
+- References in comments, the Makefiles, the install note and the tests name
+  the house HIG, text part, in place of the earlier text guide. Check rows,
+  verdict words and exit statuses of the verifier are unchanged.
+- `tests/run-tests.sh` (56 checks): three new checks for the totals line
+  without the package, the commands in the hints and the swap helper's
+  wording.
+
 ## 20261026.02
 
 **Text interfaces follow the house text HIG. No driver change.** Patches,
