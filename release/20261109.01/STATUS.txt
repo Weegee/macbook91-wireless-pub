@@ -1,0 +1,54 @@
+macbook91-wireless-dkms 20261109.01-1 - RELEASED
+
+State: released, tag v20261109.01 (2026-11-09). SHA256SUMS was regenerated
+with promote-release.sh --seal 20261109.01 in the tagged commit. The hardware
+gate (hw.runtime_modules_20261109_01_carried_over) was NOT RUN; the module
+code is the same as in 20261102.01.
+
+What: the documentation follows the house documentation HIG; no driver
+change. README.md has the order of the house README template, numbered steps
+with one action each, commands without trailing comments, output in separate
+blocks, the warning before the step it concerns, and a status for every
+command that was not run. The README claim that "sha256sum -c
+--ignore-missing" skips STATUS.txt and upstream.lock was wrong and is
+corrected: only .SRCINFO is skipped (GitHub serves it as default.SRCINFO).
+docs/CHANGELOG.md has ISO dates in its headings and the incompatible changes
+of 20261026.02 and 20261026.01 first. The twelve patches, series/ and
+dkms.conf are unchanged; module IDs: 7.3 20261109.01+12d3581c306b83b5, 7.2
++494451d9a8ce5f25, 6.18 +35e4d7a8bd8c5087 (all unchanged). Details:
+docs/CHANGELOG.md.
+
+Measured without hardware (2026-11-09):
+- make dist and make arch-pkg in a clean clone at the release commit: the
+  tarball is the one pinned in PKGBUILD (sha256 5106add9...); two builds give
+  the same tarball. makepkg --printsrcinfo equals .SRCINFO.
+- diff -r of the unpacked 20261102.01 and 20261109.01 tarballs (356 files
+  each): README.md and VERSION differ; patches, series/, dkms.conf, the
+  Makefiles and the tools do not.
+- namcap: no findings for the PKGBUILD; the package has the five known
+  warnings (docs/NAMCAP.md).
+- tests/run-tests.sh: 56 ok, 0 failed, 0 skipped. Private tests: 29 passed,
+  0 failed, 1 blocked (the one blocked check is core.hooksPath, which is not
+  set in the clone). ShellCheck at warning level on the 8 tracked shell
+  scripts and the install note, and git diff --check, are clean.
+- Read-only commands of the README on the test machine: macbook91-wireless-
+  verify (7.3.3-1-cachyos, release 20261102.01 installed: 0 FAIL, 0 WARN),
+  kernel-series --list, the module parameter check, sha256sum -c
+  --ignore-missing against the public release 20261102.01.
+- The modules were not built for this version, and the verifier was not run
+  on the modules of this version.
+
+NOT RUN for 20261109.01: installing this package, every README command that
+needs root (makepkg -si, pacman -U and -R, macbook91-wireless-verify
+--reload, the sed edits of the regulatory domain) and every hardware check.
+Carried over from 20261102.01, because the module code is unchanged: see
+docs/test-status.json (hw.runtime_modules_20261109_01_carried_over and the
+carried-over gates). Not verified (unchanged): 7.3 runtime (WLAN, Bluetooth,
+suspend, recovery), suspend/resume of WLAN and Bluetooth on 6.18, Bluetooth
+function on 6.18, the rebind recovery in action on 6.18, runtime of patch
+0012 (static check only), hibernation (not set up), long mixed suspend
+series, Bluetooth devices across suspend.
+
+Local build of this release, for information only: not tracked, not one of the
+release files and not reproducible (makepkg output differs per machine):
+3dc8a645f8e99213eb8a0ae682f3103a069f270da0316252e894d8dd37055517  macbook91-wireless-dkms-20261109.01-1-x86_64.pkg.tar.zst
