@@ -14,7 +14,7 @@ pkgbase = macbook91-wireless-dkms
 	optdepends = linux-cachyos-headers: build the patched drivers for the current CachyOS kernel as well
 	optdepends = bluez-utils: lets macbook91-wireless-verify read the Bluetooth state
 	source = macbook91-wireless-dkms-20261109.01.tar
-	sha256sums = 4e71684171bbfa1b3751fb267b776a628576a2a3a07bef0ec41845c4c48ef6f9
+	sha256sums = 5106add9fa59534b5651f26dfd593f285127d5dd49b36390ab4924d9192de0b1
 
 pkgname = macbook91-wireless-dkms
 	depends = dkms
