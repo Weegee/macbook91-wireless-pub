@@ -4,6 +4,46 @@ Versions have the form YYYYMMDD.NN (release date, NN counts releases that
 day). The release tag is v<version>. Releases before 20261021.01 are not part
 of this repository; their entries below are kept as history.
 
+## 20261109.01 (2026-11-09)
+
+**Documentation follows the house documentation HIG. No driver change.**
+Patches, kernel sources, Kbuild files, `dkms.conf` and the tools are the same
+as in 20261102.01: `diff -r` of the unpacked tarballs (356 files each) shows
+`README.md` and `VERSION` only. The source identities are unchanged (7.3
+`12d3581c306b83b5`, 6.18 `35e4d7a8bd8c5087`, 7.2 `494451d9a8ce5f25`), the
+modules report `20261109.01+<id>`. The modules were not built for this
+version; NOT RUN on the hardware (`docs/test-status.json`,
+`hw.runtime_modules_20261109_01_carried_over`).
+
+- README: the order follows the house README template: what the package
+  fixes, Installation (prerequisites, release files, checkout), Usage (check
+  the state, regulatory domain, messages that are not faults, roll back),
+  Kernel series, Firmware, Verification status, Configuration, Development,
+  Documentation, Bug reports, AI assistance, License, See also.
+- README: steps are numbered with one action each, every command has its own
+  block without a trailing comment, its output stands in a separate block,
+  and the warning about `--ignore-missing` stands before the step it
+  concerns. The regulatory-domain step has a check and a way back, the
+  rollback has a check, and commands that were not run say NOT VERIFIED.
+- Corrected: `sha256sum -c --ignore-missing SHA256SUMS` skips only
+  `.SRCINFO` when the files come from a GitHub release (GitHub serves it as
+  `default.SRCINFO`). `STATUS.txt` and `upstream.lock` read `OK`; the README
+  said all three were skipped. Checked on 2026-11-09 against the public
+  release 20261102.01.
+- README: examples carry real output of the test machine
+  (`macbook91-wireless-verify`, `kernel-series --list`, a module parameter).
+  New sections Bug reports, Documentation and See also; the paragraph about
+  relative links moved to Documentation.
+- The 7.3 row of the kernel series table records the read-only run of
+  `macbook91-wireless-verify` on 2026-11-09 (release 20261102.01,
+  `7.3.3-1-cachyos`: 0 FAIL, 0 WARN, WLAN up). Suspend/resume, Bluetooth
+  function and the rebind recovery stay NOT VERIFIED on 7.3.
+- This changelog: headings carry ISO dates, and the incompatible changes of
+  20261026.02 and 20261026.01 stand first, marked **Incompatible:**.
+- `make test`: 56 ok, 0 failed, 0 skipped, in a clean clone at the release
+  commit. `namcap`: no findings for the PKGBUILD, the package has the five
+  known warnings (`docs/NAMCAP.md`).
+
 ## 20261102.01 (2026-11-02)
 
 **Audit findings of the text interfaces. No driver change.** Patches, kernel
