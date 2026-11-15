@@ -1,0 +1,49 @@
+macbook91-wireless-dkms 20261115.01-1 - RELEASED
+
+State: released, tag v20261115.01 (2026-11-15). SHA256SUMS was regenerated
+with promote-release.sh --seal 20261115.01 in the tagged commit. The hardware
+gate (hw.runtime_modules_20261115_01_carried_over) was NOT RUN; the module
+code is the same as in 20261109.01.
+
+What: packaging/fetch-upstream.sh takes the kernel files from the GitHub
+mirror gregkh/linux when git.kernel.org does not answer. GitHub Actions
+runners could not reach git.kernel.org (curl exit 28, four attempts per
+file), so the CI build failed. The fetcher tries git.kernel.org first with a
+connect timeout of 10 seconds; at the first failure it prints one warning and
+takes the rest of the run from the mirror. Both sources failing is the old
+error, exit status 1. New option --source auto|kernel.org|github. The
+lockfile check is unchanged: every file is checked against upstream.lock
+whichever source delivered it. The twelve patches, series/ and dkms.conf are
+unchanged; module IDs: 7.3 20261115.01+12d3581c306b83b5, 7.2
++494451d9a8ce5f25, 6.18 +35e4d7a8bd8c5087 (all unchanged). Details:
+docs/CHANGELOG.md.
+
+Measured without hardware (2026-11-15):
+- make dist twice: the same tarball (sha256 9ce80375...), pinned in PKGBUILD.
+  make arch-pkg built the package from it. Every kernel file was fetched from
+  git.kernel.org and checked against upstream.lock.
+- diff -r of the unpacked 20261109.01 and 20261115.01 tarballs (356 files
+  each): README.md and VERSION differ; patches, series/, dkms.conf, the
+  Makefiles and the tools do not.
+- namcap: no findings for the PKGBUILD; the package has the five known
+  warnings (docs/NAMCAP.md).
+- tests/run-tests.sh: 63 ok, 0 failed, 0 skipped (seven new checks for the
+  fallback, run against a fake curl). Private tests: 29 passed, 0 failed,
+  1 blocked.
+- The modules were not built for this version, and the verifier was not run
+  on the modules of this version.
+
+NOT RUN for 20261115.01: installing this package and every hardware check.
+The mirror fallback was tested with a fake curl only; whether the GitHub
+Actions runners reach the mirror is shown by the CI build of this release.
+Carried over from 20261109.01, because the module code is unchanged: see
+docs/test-status.json (hw.runtime_modules_20261115_01_carried_over and the
+carried-over gates). Not verified (unchanged): 7.3 runtime (WLAN, Bluetooth,
+suspend, recovery), suspend/resume of WLAN and Bluetooth on 6.18, Bluetooth
+function on 6.18, the rebind recovery in action on 6.18, runtime of patch
+0012 (static check only), hibernation (not set up), long mixed suspend
+series, Bluetooth devices across suspend.
+
+Local build of this release, for information only: not tracked, not one of the
+release files and not reproducible (makepkg output differs per machine):
+56a5251bfad8b2b9065e5f3b65b95fdf873c353c5adee555422fd67f119e9138  macbook91-wireless-dkms-20261115.01-1-x86_64.pkg.tar.zst
