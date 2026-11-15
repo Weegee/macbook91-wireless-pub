@@ -10,7 +10,10 @@
 #
 #   fetched   every path in files.list, from the stable tree on git.kernel.org,
 #             at one tag per kernel series (default: the newest tag of each
-#             series in packaging/upstream.lock)
+#             series in packaging/upstream.lock). When git.kernel.org does not
+#             answer, the same paths come from the GitHub mirror gregkh/linux
+#             for the rest of the run; the hashes in upstream.lock decide what
+#             is accepted, not the source
 #   derived   series/<S>/kernel/ = the fetched files + patches/*.patch
 #             + packaging/overlay/*.Kbuild (the two Kbuild files that build the
 #             brcmfmac and hci_uart directories out of tree)
@@ -52,6 +55,10 @@ CACHE="$ROOT/build/upstream-cache"
 DEST="$ROOT/src/macbook91-wireless"
 
 BASE_URL='https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain'
+# Fallback: the GitHub mirror of the stable tree. Same tags, same bytes; the
+# lockfile check (check below) is what makes that safe, and it is the same for
+# both sources.
+MIRROR_URL='https://raw.githubusercontent.com/gregkh/linux'
 
 PROG=fetch-upstream.sh
 OPT_TAGS=()
@@ -59,18 +66,21 @@ OPT_OFFLINE=0
 OPT_ACCEPT_NEW=0
 OPT_UPDATE_DERIVED=0
 OPT_TIMEOUT=120
+OPT_SOURCE=auto
 
 usage() {
 	cat <<USAGE
 Usage: $PROG [OPTIONS]
 
 Assemble the kernel half of src/macbook91-wireless from the stable tree on
-git.kernel.org, locked by packaging/upstream.lock. It runs at package build
-time (make dist), never at DKMS build time.
+git.kernel.org, locked by packaging/upstream.lock. When git.kernel.org does not
+answer, the files come from the GitHub mirror gregkh/linux instead. It runs at
+package build time (make dist), never at DKMS build time.
 
 Examples:
   $PROG
   $PROG --tag v7.3 --offline
+  $PROG --source github
   $PROG --update-derived
 
 Options:
@@ -79,6 +89,10 @@ Options:
                       newest tag of every series in upstream.lock
   --dest DIR          assemble into DIR (default src/macbook91-wireless)
   --cache DIR         download cache (default build/upstream-cache)
+  --source NAME       download from kernel.org, from github (the mirror
+                      gregkh/linux) or from auto: kernel.org first, and the
+                      mirror for the rest of the run once kernel.org fails
+                      (default auto)
   --offline           use the cache only; never touch the network
   --timeout SECONDS   give up on one download after SECONDS (default 120)
   --accept-new        record hashes for a tag the lockfile does not know yet;
@@ -122,6 +136,13 @@ while [ $# -gt 0 ]; do
 		need_value "$1" "$#"; need_number "$1" "$2"
 		[ "$2" -gt 0 ] || usage_error "--timeout must be at least 1 second"
 		OPT_TIMEOUT=$2; shift 2 ;;
+	--source)
+		need_value "$1" "$#"
+		case $2 in
+		auto|kernel.org|github) OPT_SOURCE=$2 ;;
+		*) usage_error "unknown source: $2" "Use auto, kernel.org or github" ;;
+		esac
+		shift 2 ;;
 	--offline) OPT_OFFLINE=1; shift ;;
 	--accept-new) OPT_ACCEPT_NEW=1; shift ;;
 	--update-derived) OPT_UPDATE_DERIVED=1; shift ;;
@@ -177,7 +198,11 @@ if [ "$MISSING" -gt 0 ]; then
 		die "$FIRST_MISSING and --offline was given" \
 			"Missing in total: $(plural "$MISSING" file files)" \
 			"Run without --offline to download them"
-	step "downloading $(plural "$MISSING" file files) from git.kernel.org (Ctrl+C cancels)"
+	if [ "$OPT_SOURCE" = github ]; then
+		step "downloading $(plural "$MISSING" file files) from the GitHub mirror gregkh/linux (Ctrl+C cancels)"
+	else
+		step "downloading $(plural "$MISSING" file files) from git.kernel.org (Ctrl+C cancels)"
+	fi
 fi
 
 # The lockfile's hash for (tag, path), or nothing.
@@ -195,6 +220,44 @@ check() { # check TAG PATH FILE: the file's bytes against the lockfile
 	elif [ "$want" != "$have" ]; then
 		die "$1 $2 does not match upstream.lock" "sha256 is $have" "upstream.lock says $want"
 	fi
+}
+
+# Where the next download goes. "auto" starts at kernel.org and moves to the
+# mirror at the first failure and stays there, so a blocked kernel.org costs
+# one timeout per run and not one per file.
+SOURCE_NOW=kernel.org
+[ "$OPT_SOURCE" != github ] || SOURCE_NOW=github
+
+fetch_from() { # fetch_from SOURCE TAG PATH OUTPUT: curl's status
+	local url ct
+	case $1 in
+	kernel.org) url="$BASE_URL/$3?h=$2"; ct=10 ;;
+	github) url="$MIRROR_URL/$2/$3"; ct=20 ;;
+	esac
+	curl -fsS --retry 3 --retry-delay 2 --connect-timeout "$ct" --max-time "$OPT_TIMEOUT" \
+		-o "$4" "$url"
+}
+
+download() { # download TAG PATH OUTPUT: moves to the mirror in auto mode, dies on failure
+	local tag=$1 f=$2 out=$3 rc=0 tried
+	fetch_from "$SOURCE_NOW" "$tag" "$f" "$out" || rc=$?
+	[ "$rc" -ne 0 ] || return 0
+	rm -f "$out"
+	if [ "$SOURCE_NOW" = kernel.org ] && [ "$OPT_SOURCE" = auto ]; then
+		warn "git.kernel.org did not deliver $f (curl exit $rc); using the GitHub mirror gregkh/linux"
+		SOURCE_NOW=github
+		rc=0
+		fetch_from github "$tag" "$f" "$out" || rc=$?
+		[ "$rc" -ne 0 ] || return 0
+		rm -f "$out"
+		tried="Tried git.kernel.org and the GitHub mirror gregkh/linux (last curl exit $rc)"
+	elif [ "$SOURCE_NOW" = github ]; then
+		tried="Tried the GitHub mirror gregkh/linux (curl exit $rc)"
+	else
+		tried="Tried git.kernel.org (curl exit $rc); --source github uses the GitHub mirror"
+	fi
+	die "download failed: $f at $tag" "$tried" \
+		"Check the network and run again; the files downloaded so far stay in $CACHE"
 }
 
 # Assemble in a scratch tree and move it into place only when everything is
@@ -218,10 +281,7 @@ assemble() { # assemble SERIES TAG: WORK/series/SERIES, from the cache
 			[ "$OPT_OFFLINE" = 0 ] || die "$f is not cached for $tag and --offline was given"
 			mkdir -p "$(dirname "$c")"
 			PART="$c.part"
-			curl -fsS --retry 3 --retry-delay 2 --connect-timeout 20 --max-time "$OPT_TIMEOUT" \
-				-o "$PART" "$BASE_URL/$f?h=$tag" ||
-				die "download failed: $f at $tag" \
-					"Check the network and run again; the files downloaded so far stay in $CACHE"
+			download "$tag" "$f" "$PART"
 			mv "$PART" "$c"
 			PART=''
 			DOWNLOADED=$((DOWNLOADED + 1))

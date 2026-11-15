@@ -52,7 +52,8 @@ you build.
 - For the checkout route: a git checkout of the repository, because
   `make dist` builds the tarball from the files Git tracks (a source tarball or
   a zip download is not enough), a clean working tree and network access to
-  git.kernel.org for the kernel files.
+  git.kernel.org for the kernel files (or to the GitHub mirror gregkh/linux,
+  which the build uses when git.kernel.org does not answer).
 
 ### Install from the release files
 
@@ -126,6 +127,7 @@ To go back, see [Roll back and remove](#roll-back-and-remove).
    ```
 
 2. Build the package. `make` fetches the kernel files from git.kernel.org
+   (from the GitHub mirror gregkh/linux if git.kernel.org does not answer)
    and checks each against `packaging/upstream.lock`:
 
    ```fish
@@ -370,6 +372,12 @@ needs lockfile entries (`--accept-new`) and must take the same set; where it
 does not, the set is reworked so that it fits every series, never split per
 series. A later stable tag of a series that is already shipped is a lockfile
 update and changes only that series' module ID.
+
+If git.kernel.org does not answer, the fetcher prints one warning and takes
+the rest of the run from the GitHub mirror gregkh/linux, which carries the same
+tags. The source never decides what is accepted: every file is checked against
+`packaging/upstream.lock` as before. `--source kernel.org` or `--source github`
+picks one source and turns the fallback off.
 
 ## Documentation
 

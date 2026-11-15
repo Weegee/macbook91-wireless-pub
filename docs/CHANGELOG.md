@@ -4,6 +4,30 @@ Versions have the form YYYYMMDD.NN (release date, NN counts releases that
 day). The release tag is v<version>. Releases before 20261021.01 are not part
 of this repository; their entries below are kept as history.
 
+## 20261115.01 (2026-11-15)
+
+**The build fetches from a mirror when git.kernel.org does not answer. No
+driver change.** Patches, kernel sources, Kbuild files, `dkms.conf` and the
+tools are the same as in 20261109.01; only `packaging/fetch-upstream.sh`, the
+README and the tests changed.
+
+- `packaging/fetch-upstream.sh`: GitHub Actions runners could not reach
+  git.kernel.org (curl exit 28 after four attempts per file), so the CI build
+  failed. The fetcher now tries git.kernel.org first with a connect timeout
+  of 10 seconds. At the first failure it prints one warning and takes the rest
+  of the run from the GitHub mirror gregkh/linux, which carries the same
+  tags. A failure of both sources names both and exits with status 1, as
+  before.
+- New option `--source auto|kernel.org|github` (default `auto`) picks one
+  source and turns the fallback off.
+- Unchanged: every fetched file is checked against `packaging/upstream.lock`
+  with the same hashes, and a wrong hash is a hard failure whichever source
+  delivered it.
+- `make test`: seven new checks for the fallback, with a fake curl and an
+  invented tree: kernel.org answers, kernel.org fails and the mirror serves
+  the rest, both fail, wrong bytes from the mirror, `--source github`,
+  `--source kernel.org` and an unknown source name.
+
 ## 20261109.01 (2026-11-09)
 
 **Documentation follows the house documentation HIG. No driver change.**

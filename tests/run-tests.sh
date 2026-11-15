@@ -276,6 +276,123 @@ else
 	skip "source ID of series 7.2: not reassembled"
 fi
 
+# 4b. Download source: git.kernel.org first, the GitHub mirror when it fails ---
+# The fetcher runs against a fake curl and a small invented tree (tag v9.9,
+# three files of a few bytes): when git.kernel.org fails, the rest of the run
+# comes from the mirror; both failing is the old error, exit status 1; and
+# bytes from the mirror go through the same lockfile check as any other bytes.
+FB="$TMP/fallback"
+mkdir -p "$FB/packaging/overlay" "$FB/patches" "$FB/bin" "$FB/served" "$FB/p/a" "$FB/p/b"
+cp packaging/fetch-upstream.sh packaging/lib.sh "$FB/packaging/"
+cp packaging/overlay/*.Kbuild "$FB/packaging/overlay/"
+fb_files=(drivers/bluetooth/fixture.c drivers/bluetooth/other.h drivers/net/wireless/broadcom/brcm80211/fixture.h)
+printf '%s\n' "${fb_files[@]}" >"$FB/packaging/files.list"
+: >"$FB/packaging/upstream.lock"
+for f in "${fb_files[@]}"; do
+	mkdir -p "$FB/served/${f%/*}" "$FB/p/a/${f%/*}" "$FB/p/b/${f%/*}"
+	printf 'int a; /* %s */\n' "$f" >"$FB/served/$f"
+	printf 'int a; /* %s */\n' "$f" >"$FB/p/a/$f"
+	printf 'int b; /* %s */\n' "$f" >"$FB/p/b/$f"
+	printf 'v9.9  %s  %s\n' "$(sha256sum <"$FB/served/$f" | cut -d' ' -f1)" "$f" >>"$FB/packaging/upstream.lock"
+done
+(cd "$FB/p" && diff -u a/drivers/bluetooth/fixture.c b/drivers/bluetooth/fixture.c) >"$FB/patches/fixture.patch" || true
+cat >"$FB/bin/curl" <<'FAKECURL'
+#!/usr/bin/env bash
+# Fake curl: FAKE_KO and FAKE_GH are ok, fail or tamper; every call is logged.
+out='' url='' opts=''
+while [ $# -gt 0 ]; do
+	case "$1" in
+	-o) out=$2; shift 2 ;;
+	--connect-timeout|--max-time|--retry|--retry-delay) opts="$opts $1=$2"; shift 2 ;;
+	-*) shift ;;
+	*) url=$1; shift ;;
+	esac
+done
+printf '%s%s\n' "$url" "$opts" >>"$FAKE_LOG"
+case "$url" in
+https://git.kernel.org/*) mode=$FAKE_KO; path=${url#*/plain/}; path=${path%%\?*} ;;
+https://raw.githubusercontent.com/gregkh/linux/*) mode=$FAKE_GH; path=${url#*/gregkh/linux/v9.9/} ;;
+*) exit 6 ;;
+esac
+case "$mode" in
+fail) exit 28 ;;
+tamper) printf 'tampered\n' >"$out" ;;
+*) cp "$FAKE_SERVED/$path" "$out" ;;
+esac
+FAKECURL
+chmod +x "$FB/bin/curl" "$FB/packaging/fetch-upstream.sh"
+fb_run() { # fb_run KO GH [fetcher options]: the fetcher in the fixture, fresh cache
+	local ko=$1 gh=$2
+	shift 2
+	rm -rf "$FB/cache" "$FB/out"
+	: >"$FB/log"
+	FB_RC=0
+	PATH="$FB/bin:$PATH" FAKE_KO=$ko FAKE_GH=$gh FAKE_LOG="$FB/log" FAKE_SERVED="$FB/served" \
+		"$FB/packaging/fetch-upstream.sh" --tag v9.9 --cache "$FB/cache" --dest "$FB/out" "$@" \
+		>"$FB/stdout" 2>"$FB/stderr" || FB_RC=$?
+}
+fb_count() { grep -c "$1" "$FB/log" || true; }
+
+# The first run records the derived:tree hash of the fixture; the runs after
+# it check against it, so a tampered file is caught by the file hash.
+fb_run ok fail --accept-new
+if [ "$FB_RC" = 0 ] && [ "$(fb_count '^https://git\.kernel\.org/')" = 3 ] &&
+	[ "$(fb_count raw\.githubusercontent)" = 0 ] && ! grep -q warning "$FB/stderr" &&
+	grep -q -e '--connect-timeout=10' "$FB/log" && grep -q derived:tree "$FB/packaging/upstream.lock"; then
+	ok "fetch-upstream.sh: kernel.org answers, the mirror is not asked, no warning"
+else
+	bad "fetch-upstream.sh: kernel.org answers, the mirror is not asked: exit $FB_RC, $(head -c 300 "$FB/stderr")"
+fi
+
+fb_run fail ok
+if [ "$FB_RC" = 0 ] && [ -s "$FB/out/UPSTREAM.lock" ] &&
+	[ "$(grep -c 'warning: git.kernel.org did not deliver' "$FB/stderr")" = 1 ] &&
+	grep -q 'using the GitHub mirror gregkh/linux' "$FB/stderr" &&
+	[ "$(fb_count '^https://git\.kernel\.org/')" = 1 ] &&
+	[ "$(fb_count '^https://raw\.githubusercontent\.com/gregkh/linux/v9\.9/')" = 3 ] &&
+	cmp -s "$FB/served/${fb_files[1]}" "$FB/cache/v9.9/${fb_files[1]}"; then
+	ok "fetch-upstream.sh: kernel.org fails once, the mirror serves the rest, files are verified"
+else
+	bad "fetch-upstream.sh: fallback to the mirror: exit $FB_RC, kernel.org calls $(fb_count '^https://git\.kernel\.org/'), $(head -c 300 "$FB/stderr")"
+fi
+
+fb_run fail fail
+if [ "$FB_RC" = 1 ] && grep -q 'download failed: ' "$FB/stderr" &&
+	grep -q 'git.kernel.org and the GitHub mirror gregkh/linux' "$FB/stderr" && [ ! -e "$FB/out/UPSTREAM.lock" ]; then
+	ok "fetch-upstream.sh: both sources failing is an error that names both, exit 1"
+else
+	bad "fetch-upstream.sh: both sources failing: exit $FB_RC, $(head -c 300 "$FB/stderr")"
+fi
+
+fb_run fail tamper
+if [ "$FB_RC" = 1 ] && grep -q 'does not match upstream.lock' "$FB/stderr" && [ ! -e "$FB/out/UPSTREAM.lock" ]; then
+	ok "fetch-upstream.sh: wrong bytes from the mirror are rejected by the lockfile check"
+else
+	bad "fetch-upstream.sh: wrong bytes from the mirror: exit $FB_RC, $(head -c 300 "$FB/stderr")"
+fi
+
+fb_run fail ok --source github
+if [ "$FB_RC" = 0 ] && [ "$(fb_count git\.kernel\.org)" = 0 ] && ! grep -q warning "$FB/stderr"; then
+	ok "fetch-upstream.sh --source github never asks kernel.org"
+else
+	bad "fetch-upstream.sh --source github: exit $FB_RC, $(head -c 300 "$FB/stderr")"
+fi
+
+fb_run fail ok --source kernel.org
+if [ "$FB_RC" = 1 ] && [ "$(fb_count raw\.githubusercontent)" = 0 ] && grep -q -- '--source github' "$FB/stderr"; then
+	ok "fetch-upstream.sh --source kernel.org does not fall back and names the way out"
+else
+	bad "fetch-upstream.sh --source kernel.org: exit $FB_RC, $(head -c 300 "$FB/stderr")"
+fi
+
+"$FB/packaging/fetch-upstream.sh" --source nowhere >/dev/null 2>"$FB/stderr"
+FB_RC=$?
+if [ "$FB_RC" = 2 ] && grep -q 'unknown source: nowhere' "$FB/stderr"; then
+	ok "fetch-upstream.sh --source with an unknown name is a usage error, exit 2"
+else
+	bad "fetch-upstream.sh --source nowhere: exit $FB_RC, $(head -c 300 "$FB/stderr")"
+fi
+
 # 5. LE advertising fixup, compiled from the assembled hci_bcm.c --------------
 n=0
 for tree in "$TMP"/tree-*; do
