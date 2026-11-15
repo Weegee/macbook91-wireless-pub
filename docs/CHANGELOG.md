@@ -9,7 +9,12 @@ of this repository; their entries below are kept as history.
 **The build fetches from a mirror when git.kernel.org does not answer. No
 driver change.** Patches, kernel sources, Kbuild files, `dkms.conf` and the
 tools are the same as in 20261109.01; only `packaging/fetch-upstream.sh`, the
-README and the tests changed.
+README and the tests changed. `diff -r` of the unpacked tarballs (356 files
+each) shows `README.md` and `VERSION` only, so the source identities are
+unchanged (7.3 `12d3581c306b83b5`, 6.18 `35e4d7a8bd8c5087`, 7.2
+`494451d9a8ce5f25`). The modules were not built for this version; NOT RUN on
+the hardware (`docs/test-status.json`,
+`hw.runtime_modules_20261115_01_carried_over`).
 
 - `packaging/fetch-upstream.sh`: GitHub Actions runners could not reach
   git.kernel.org (curl exit 28 after four attempts per file), so the CI build
@@ -26,7 +31,9 @@ README and the tests changed.
 - `make test`: seven new checks for the fallback, with a fake curl and an
   invented tree: kernel.org answers, kernel.org fails and the mirror serves
   the rest, both fail, wrong bytes from the mirror, `--source github`,
-  `--source kernel.org` and an unknown source name.
+  `--source kernel.org` and an unknown source name. Result: 63 ok, 0 failed,
+  0 skipped. `namcap`: no findings for the PKGBUILD, the package has the five
+  known warnings (`docs/NAMCAP.md`).
 
 ## 20261109.01 (2026-11-09)
 
