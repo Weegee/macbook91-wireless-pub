@@ -1,0 +1,15 @@
+  [36m● INFO[0m  [1mpackage 20261102.01, running kernel 7.3.3-1-cachyos[0m [2m[0m
+  [32m✔ PASS[0m  [1mkernel series   [0m [2mkernel 7.3.3-1-cachyos is of Linux 7.3, a supported series (6.18 7.2 7.3)[0m
+  [32m✔ PASS[0m  [1mdkms            [0m [2mbuilt and installed for 7.3.3-1-cachyos[0m
+  [32m✔ PASS[0m  [1mbrcmfmac        [0m [2mpatched module 20261102.01+12d3581c306b83b5 loaded[0m
+  [32m✔ PASS[0m  [1mbrcmfmac-wcc    [0m [2mpatched module 20261102.01+12d3581c306b83b5 loaded[0m
+  [32m✔ PASS[0m  [1mhci_uart        [0m [2mpatched module 20261102.01+12d3581c306b83b5 loaded[0m
+  [32m✔ PASS[0m  [1mbrcmfmac        [0m [2mchip reset across system sleep on[0m
+  [32m✔ PASS[0m  [1mbrcmfmac        [0m [2mhang recovery by rebind on[0m
+  [32m✔ PASS[0m  [1mbrcmfmac        [0m [2mWi-Fi P2P off (modprobe.d)[0m
+  [32m✔ PASS[0m  [1mfirmware        [0m [2mbrcm/brcmfmac4350c2-pcie.bin present[0m
+  [32m✔ PASS[0m  [1mno sleep hook unloads brcmfmac or hci_uart[0m [2m[0m
+  [32m✔ PASS[0m  [1mWLAN            [0m [2mBCM4350 bound to brcmfmac, interface up[0m
+  [36m● INFO[0m  [1mBluetooth       [0m [2mhci0 present, blocked by rfkill (user setting)[0m
+  [32m✔ PASS[0m  [1mjournal         [0m [2mno WLAN/Bluetooth errors since 2026-11-08 20:31[0m
+[32m[1m▌ PASS[0m  [1m0 FAIL, 0 WARN[0m

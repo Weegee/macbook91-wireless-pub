@@ -1,0 +1,4 @@
+[32m[1m▌ PASS[0m  [1m0 FAIL, 0 WARN[0m  [2m12 checks passed[0m
+  [36m● INFO[0m  package 20261102.01, running kernel 7.3.3-1-cachyos
+  [36m● INFO[0m  Bluetooth: hci0 present, blocked by rfkill (user setting)
+[2m  macbook91-wireless-verify --all  lists every check[0m

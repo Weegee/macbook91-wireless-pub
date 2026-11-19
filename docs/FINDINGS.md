@@ -173,36 +173,15 @@ maintainer).
 
 ### Message `Failed to set mode: Failed (0x03)`
 
-- **VERIFIED** (journal): bluetoothd logs it twice per boot, shortly after
-  it starts and at login; at login kded6 also logs
-  `PendingCall Error: "Failed"`.
-- **REPORTED**: Bluetooth is switched off through KDE on purpose (to save
-  power) and only switched on when needed. **VERIFIED**: rfkill
-  soft-blocked, BlueDevil `bluetoothBlocked=true`.
-- **VERIFIED** (source v7.2.9): `Set Powered` on a blocked adapter ends
-  with `-ERFKILL`; `mgmt_errno_status()` does not know `-ERFKILL` and
-  reports `Failed` (0x03) instead of `RFKILLED` (0x12).
-- **VERIFIED** (btmon while bluetoothd restarts, blocked): the failing
-  command is `Set Powered (0x0005)`, status `Failed (0x03)`, twice about one
-  second apart; all other commands succeed. Without the block, bluetoothd
-  starts without the message and switches the adapter on (live tests T1 and
-  T2, `diag/2026-10-14/live-tests.md`).
-- **VERIFIED** (time correlation): kded6 (BlueDevil) logs
-  `PendingCall Error: "Failed"` 2 ms after the second failure; the second
-  command therefore comes from a D-Bus call in kded6. The first follows
-  14 ms after the management interface starts, presumably bluetoothd's
-  AutoEnable (**HYPOTHESIS**, not checked in the source of bluetoothd).
-- Assessment: harmless, a consequence of the maintainer's choice. No fix in the
-  package: the code is in `bluetooth.ko` and bluetoothd, which the package
-  does not replace.
-- Side observation (**VERIFIED**): if bluetoothd is restarted while the
-  adapter is on, it logs `Failed to set privacy: Rejected (0x0b)`; the
-  kernel rejects Set Privacy while the controller is powered (`mgmt.c`,
-  `hdev_is_powered()`). At boot the adapter is off (**HYPOTHESIS**, not
-  checked).
-
-## Journal retention
-
-- **VERIFIED**: journald keeps only about three boots (`SystemMaxUse=50M`).
-  Older findings come from saved sysinfo dumps (kernel 7.2.6): flow-ring
-  timeouts and the Bluetooth error `-16` were already there.
+- **VERIFIED** (journal, btmon, source v7.2.9): bluetoothd logs it twice per
+  boot while the adapter is rfkill-blocked. `Set Powered` on a blocked adapter
+  ends with `-ERFKILL`; `mgmt_errno_status()` does not know it and reports
+  `Failed` (0x03) instead of `RFKILLED` (0x12). Without the block there is no
+  message (live tests T1, T2, `diag/2026-10-14/live-tests.md`).
+- **REPORTED**: Bluetooth is switched off through KDE on purpose.
+- **HYPOTHESIS**: the first call is bluetoothd's AutoEnable, the second a D-Bus
+  call from kded6 (BlueDevil), which logs `PendingCall Error: "Failed"` 2 ms later.
+- Assessment: harmless, no fix in the package; the code is in `bluetooth.ko`
+  and bluetoothd. If bluetoothd restarts while the adapter is on, it logs
+  `Failed to set privacy: Rejected (0x0b)` (**VERIFIED**; `mgmt.c` rejects it
+  while the controller is powered).

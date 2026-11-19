@@ -73,9 +73,8 @@ usage() {
 Usage: $PROG [OPTIONS]
 
 Assemble the kernel half of src/macbook91-wireless from the stable tree on
-git.kernel.org, locked by packaging/upstream.lock. When git.kernel.org does not
-answer, the files come from the GitHub mirror gregkh/linux instead. It runs at
-package build time (make dist), never at DKMS build time.
+git.kernel.org, locked by packaging/upstream.lock; the GitHub mirror gregkh/linux
+takes over when git.kernel.org does not answer. Runs at package build time.
 
 Examples:
   $PROG
@@ -84,32 +83,23 @@ Examples:
   $PROG --update-derived
 
 Options:
-  --tag vX.Y.Z        assemble this stable tag; repeat for several series.
-                      Series not named keep what DEST holds. Default: the
-                      newest tag of every series in upstream.lock
+  --tag vX.Y.Z        assemble this stable tag; repeat for several series
+                      (default: the newest tag of every series in the lock)
   --dest DIR          assemble into DIR (default src/macbook91-wireless)
   --cache DIR         download cache (default build/upstream-cache)
-  --source NAME       download from kernel.org, from github (the mirror
-                      gregkh/linux) or from auto: kernel.org first, and the
-                      mirror for the rest of the run once kernel.org fails
-                      (default auto)
+  --source NAME       kernel.org, github or auto: kernel.org first, the mirror
+                      for the rest of the run once it fails (default auto)
   --offline           use the cache only; never touch the network
   --timeout SECONDS   give up on one download after SECONDS (default 120)
   --accept-new        record hashes for a tag the lockfile does not know yet;
                       never overrides a hash it already knows
-  --update-derived    replace the derived:tree hash of each tag after a change
-                      to patches/ or packaging/overlay/ (fetched files stay
-                      locked)
+  --update-derived    replace the derived:tree hash after a change to patches/
+                      or packaging/overlay/
   -h, --help          show this help and exit
   -V, --version       show the version and exit
 
 Environment:
   TMPDIR   where the scratch tree is built (default /tmp)
-
-Files:
-  packaging/upstream.lock   hashes of every fetched file and derived tree
-  packaging/files.list      the kernel files that are fetched
-  build/upstream-cache/     downloaded files, checked like fresh ones
 
 Exit status:
   0  assembled

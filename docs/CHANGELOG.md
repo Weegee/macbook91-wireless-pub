@@ -1,420 +1,127 @@
 # Changelog
 
 Versions have the form YYYYMMDD.NN (release date, NN counts releases that
-day). The release tag is v<version>. Releases before 20261021.01 are not part
-of this repository; their entries below are kept as history.
+day); the tag is v<version>. Releases before 20261021.01 are not part of this
+repository. Test evidence per version is in [test-status.json](test-status.json).
 
 ## 20261115.01 (2026-11-15)
 
-**The build fetches from a mirror when git.kernel.org does not answer. No
-driver change.** Patches, kernel sources, Kbuild files, `dkms.conf` and the
-tools are the same as in 20261109.01; only `packaging/fetch-upstream.sh`, the
-README and the tests changed. `diff -r` of the unpacked tarballs (356 files
-each) shows `README.md` and `VERSION` only, so the source identities are
-unchanged (7.3 `12d3581c306b83b5`, 6.18 `35e4d7a8bd8c5087`, 7.2
-`494451d9a8ce5f25`). The modules were not built for this version; NOT RUN on
-the hardware (`docs/test-status.json`,
-`hw.runtime_modules_20261115_01_carried_over`).
+No driver change. The build fetches the kernel files from the GitHub mirror
+gregkh/linux when git.kernel.org does not answer (GitHub Actions runners could
+not reach it).
 
-- `packaging/fetch-upstream.sh`: GitHub Actions runners could not reach
-  git.kernel.org (curl exit 28 after four attempts per file), so the CI build
-  failed. The fetcher now tries git.kernel.org first with a connect timeout
-  of 10 seconds. At the first failure it prints one warning and takes the rest
-  of the run from the GitHub mirror gregkh/linux, which carries the same
-  tags. A failure of both sources names both and exits with status 1, as
-  before.
-- New option `--source auto|kernel.org|github` (default `auto`) picks one
-  source and turns the fallback off.
-- Unchanged: every fetched file is checked against `packaging/upstream.lock`
-  with the same hashes, and a wrong hash is a hard failure whichever source
-  delivered it.
-- `make test`: seven new checks for the fallback, with a fake curl and an
-  invented tree: kernel.org answers, kernel.org fails and the mirror serves
-  the rest, both fail, wrong bytes from the mirror, `--source github`,
-  `--source kernel.org` and an unknown source name. Result: 63 ok, 0 failed,
-  0 skipped. `namcap`: no findings for the PKGBUILD, the package has the five
-  known warnings (`docs/NAMCAP.md`).
+- `packaging/fetch-upstream.sh`: new option `--source auto|kernel.org|github`
+  (default `auto`). Every file is still checked against `packaging/upstream.lock`,
+  whichever source delivered it.
+- The modules were not built for this version; not run on the hardware.
 
 ## 20261109.01 (2026-11-09)
 
-**Documentation follows the house documentation HIG. No driver change.**
-Patches, kernel sources, Kbuild files, `dkms.conf` and the tools are the same
-as in 20261102.01: `diff -r` of the unpacked tarballs (356 files each) shows
-`README.md` and `VERSION` only. The source identities are unchanged (7.3
-`12d3581c306b83b5`, 6.18 `35e4d7a8bd8c5087`, 7.2 `494451d9a8ce5f25`), the
-modules report `20261109.01+<id>`. The modules were not built for this
-version; NOT RUN on the hardware (`docs/test-status.json`,
-`hw.runtime_modules_20261109_01_carried_over`).
+No driver change. Documentation rewritten: numbered steps, real command output,
+a check and a way back for each step.
 
-- README: the order follows the house README template: what the package
-  fixes, Installation (prerequisites, release files, checkout), Usage (check
-  the state, regulatory domain, messages that are not faults, roll back),
-  Kernel series, Firmware, Verification status, Configuration, Development,
-  Documentation, Bug reports, AI assistance, License, See also.
-- README: steps are numbered with one action each, every command has its own
-  block without a trailing comment, its output stands in a separate block,
-  and the warning about `--ignore-missing` stands before the step it
-  concerns. The regulatory-domain step has a check and a way back, the
-  rollback has a check, and commands that were not run say NOT VERIFIED.
-- Corrected: `sha256sum -c --ignore-missing SHA256SUMS` skips only
-  `.SRCINFO` when the files come from a GitHub release (GitHub serves it as
-  `default.SRCINFO`). `STATUS.txt` and `upstream.lock` read `OK`; the README
-  said all three were skipped. Checked on 2026-11-09 against the public
-  release 20261102.01.
-- README: examples carry real output of the test machine
-  (`macbook91-wireless-verify`, `kernel-series --list`, a module parameter).
-  New sections Bug reports, Documentation and See also; the paragraph about
-  relative links moved to Documentation.
-- The 7.3 row of the kernel series table records the read-only run of
-  `macbook91-wireless-verify` on 2026-11-09 (release 20261102.01,
-  `7.3.3-1-cachyos`: 0 FAIL, 0 WARN, WLAN up). Suspend/resume, Bluetooth
-  function and the rebind recovery stay NOT VERIFIED on 7.3.
-- This changelog: headings carry ISO dates, and the incompatible changes of
-  20261026.02 and 20261026.01 stand first, marked **Incompatible:**.
-- `make test`: 56 ok, 0 failed, 0 skipped, in a clean clone at the release
-  commit. `namcap`: no findings for the PKGBUILD, the package has the five
-  known warnings (`docs/NAMCAP.md`).
+- Fixed: `sha256sum -c --ignore-missing SHA256SUMS` skips only the `.SRCINFO`
+  line on a GitHub release; the README had said three lines.
+- Not built, not run on the hardware.
 
 ## 20261102.01 (2026-11-02)
 
-**Audit findings of the text interfaces. No driver change.** Patches, kernel
-sources, Kbuild files and `dkms.conf` are the same as in 20261026.02; the
-source identities are unchanged (7.3 `12d3581c306b83b5`, 6.18
-`35e4d7a8bd8c5087`, 7.2 `494451d9a8ce5f25`), the modules report
-`20261102.01+<id>`. Built for 6.18, 7.2 and 7.3 from the lockfile's tags;
-NOT RUN on the hardware (`docs/test-status.json`, `hw.runtime_20261102_01`).
+No driver change. Text of the tools revised.
 
-- `macbook91-wireless-verify` prints its last line, `FAIL: 1 FAIL, 0 WARN`,
-  also when the package is not installed (it exited without it); scripts and
-  the hardware gates read that line (MAS-2, TYP-10). The firmware hint reads
-  `missing; install it with: sudo pacman -S linux-firmware-broadcom`, and a
-  DKMS build that is missing reads `install the headers of this kernel, then
-  run: sudo dkms install macbook91-wireless/VERSION -k KERNEL`.
-- `tools/dev-wlan-swap.sh` says `WLAN connected after N s` (was `wifi
-  connected after Ns`) and `WLAN not connected after 30 s`; durations carry a
-  space (TXT-7). Nothing in the repository reads that line.
-- `tools/kernel-series` names its message prefix, shared with the helper of
-  macbook91-cs4208, as a deviation (FEH-2, NAM-1); the tests read it.
-- References in comments, the Makefiles, the install note and the tests name
-  the house HIG, text part, in place of the earlier text guide. Check rows,
-  verdict words and exit statuses of the verifier are unchanged.
-- `tests/run-tests.sh` (56 checks): three new checks for the totals line
-  without the package, the commands in the hints and the swap helper's
-  wording.
+- `macbook91-wireless-verify` prints its last line (`FAIL: 1 FAIL, 0 WARN`)
+  also when the package is not installed; the hints name a command to copy.
+- `tools/dev-wlan-swap.sh` says `WLAN connected after N s`.
 
 ## 20261026.02 (2026-10-26)
 
-**Text interfaces follow the house text HIG. No driver change.** Patches,
-kernel sources, Kbuild files and `dkms.conf` are the same as in 20261026.01;
-the source identities are unchanged (7.3 `12d3581c306b83b5`, 6.18
-`35e4d7a8bd8c5087`, 7.2 `494451d9a8ce5f25`), the modules report
-`20261026.02+<id>`. Built for 6.18 and 7.3; NOT RUN on the hardware
-(`docs/test-status.json`, `hw.runtime_20261026_02`).
+No driver change. Output and help of all tools follow one form.
 
-**Incompatible:** the output of the pacman hook and the default target of
-`make` changed. Check scripts and habits that rely on them:
+**Incompatible:**
 
-- The unsupported-kernel warning of the pacman hook is one
-  `macbook91-wireless: warning: kernel X (Linux Y) is not a kernel series
-  macbook91-wireless supports` message plus an indented explanation, on
-  stderr (was a `==> WARNING` block on stdout). The install note and the
-  module Makefile use the same `macbook91-wireless: warning:/note:/error:`
-  form. Anything that greps pacman.log for `WARNING: macbook91-wireless`
-  must use `macbook91-wireless: warning:` now.
-- `make` without a target lists the targets and variables; it used to
-  install. `make install` is unchanged and the PKGBUILD names it.
+- The warning of the pacman hook for an unsupported kernel is one line
+  `macbook91-wireless: warning: kernel X (Linux Y) is not a kernel series macbook91-wireless supports`
+  on stderr, with an indented explanation (was a `==> WARNING` block on stdout).
+  Search pacman.log for `macbook91-wireless: warning:` now.
+- `make` without a target lists the targets and variables (it used to install).
+  `make install` is unchanged.
 
 Other changes:
 
-- Every tool takes `--help` and `--version` (`-h`, `-V`), and they win over
-  other arguments. Usage follows one order: Usage, purpose, Examples,
-  Options, Environment, Files, Exit status, Docs. `--version` prints
-  `PROG (macbook91-wireless-dkms) VERSION` on its first line; the installed
-  `macbook91-wireless-verify` reports the package version.
-- Errors read `prog: error: text` on stderr with hints indented below;
-  invalid usage exits 2, a failed run exits 1. Ctrl+C
-  and TERM stop a run with 130 or 143 and clean up. Progress goes to stderr,
-  results to stdout.
-- `packaging/fetch-upstream.sh`: `--timeout SECONDS` (default 120) for each
-  download, early checks of `--tag` and of a missing cache with `--offline`,
-  a progress line for the download. `packaging/promote-release.sh` checks
-  `--seal VERSION` before the private tests run. New shared helpers in
-  `packaging/lib.sh` (not packaged).
-- `tools/dev-suspend-cycle.sh` exits 1 when a cycle failed and reports
-  missing arguments as usage errors. `tools/dev-wlan-swap.sh` checks DIR,
-  root and the PCI device before it unloads the first module.
-  `packaging/mkdist.py` reports `--out` without a value as a usage error
-  instead of a traceback.
-- Kept: the verdict words PASS, WARN, FAIL, INFO of
-  `macbook91-wireless-verify` and its `PASS: N FAIL, M WARN` line (the
-  documented result format, Abweichung von TXT-5); the last line `all tests
-  passed` of `make test`.
-- `tests/run-tests.sh` (53 checks) tests the text interface of all eight
-  tools and the new hook output.
+- Every tool takes `--help` and `--version`. Errors read `prog: error: text`
+  on stderr; usage errors exit 2, failed runs 1.
+- Not run on the hardware.
 
 ## 20261026.01 (2026-10-26)
 
-**Kernel series 7.3, the LTS kernel as the default, one patch set.** The
-twelve patches are unchanged; the module code of 6.18 and 7.2 is the same as
-in 20261021.01. Built for all three series; NOT RUN on the hardware
-(`docs/test-status.json`, `hw.runtime_20261026_01`).
+Kernel series 7.3, the LTS kernel as the default, one patch set. The twelve
+patches are unchanged.
 
 **Incompatible:** `macbook91-wireless-verify` reports a running kernel of an
-unsupported series as FAIL (was WARN), so it exits 1 there; and
-`patches/6.18/` and `patches/7.2/` are replaced by one `patches/` directory.
-The bullets that start with "One patch set" and "One answer" below give the
-details.
+unsupported series as FAIL (was WARN) and exits 1; `patches/6.18/` and
+`patches/7.2/` are replaced by one `patches/`.
 
-- Linux 7.3 (tag v7.3, the base of the CachyOS kernel 7.3.0-4) is a
-  supported series next to 6.18 (LTS) and 7.2. The patch set applies to v7.3
-  with `patch -F0`, and the lines it adds and removes are the same on all
-  three series. 95 of the 96 fetched v7.3 files are byte-identical to
-  CachyOS's kernel tree at tag cachyos-7.3.0-4; `brcmfmac/pcie.c` differs in
-  `brcmf_pcie_pm_enter_D3` only, where CachyOS no longer fails a suspend on a
-  missing D3 acknowledgement without WoWLAN. Patch 0003 handles that path
-  itself (with `pm_reset` the device is removed before the handshake; after a
-  timeout it is removed and the suspend goes on).
-- Upstream changes from v7.2.9 to v7.3 in files the patches touch: the ACPI
-  ID table of `hci_bcm.c` uses designated initializers; `hci_ldisc.c` checks
-  the length in its TX loop; `brcmf_detach` takes RTNL and the wiphy lock to
-  remove an interface without a netdev (the P2P device, which this package
-  turns off by default); `msgbuf.c` checks flow ring IDs. None of them
-  overlaps a patch hunk.
-- 7.2 stays: the unchanged set applies to v7.2.9 and the modules build
-  against `7.2.11-1-cachyos` headers. With 7.4, 7.2 is dropped (newest
-  series, previous one, LTS at most).
-- One patch set: `patches/6.18/` and `patches/7.2/` were the same patches
-  with other hunk line numbers; `patches/` now holds the one set and the
-  fetcher applies it to every series. The assembled `series/6.18/kernel/` and
-  all of `series/7.2/` are byte for byte the same as before.
-- One answer to "is this series supported": `/usr/lib/macbook91-wireless/kernel-series`
-  reads `KERNEL-SERIES` and writes dkms.conf's `BUILD_EXCLUSIVE_KERNEL` at
-  install time; a new pacman hook (`71-macbook91-wireless-series.hook`) prints
-  a WARNING block after every transaction for each installed kernel of a
-  series the package does not support (no build, no abort); the install note
-  and `macbook91-wireless-verify` ask the same script. The verifier reports
-  an unsupported running series as FAIL (was WARN).
-- Package: depends on `linux-cachyos-lts-headers` (all depends are set in
-  `package()`, so makepkg builds without the CachyOS repositories);
-  `linux-cachyos-headers` is the one optional kernel. The Arch kernel headers
-  and clang, lld and llvm are no longer named (`linux-cachyos-headers` depends
-  on the three).
-- Source identity: 6.18 `35e4d7a8bd8c5087` (was `2eed8ec6343efe4f`; only the
-  copy of the patches in its manifest changed), 7.2 `494451d9a8ce5f25`
-  (unchanged), 7.3 `12d3581c306b83b5`.
+- Linux 7.3 is supported next to 6.18 (LTS) and 7.2. With 7.4, 7.2 is dropped.
+- One list of supported series (`/usr/lib/macbook91-wireless/kernel-series`)
+  feeds DKMS, the install note, the verifier and a new pacman hook that warns
+  after a kernel install for an unsupported series.
+- The package depends on `linux-cachyos-lts-headers`; `linux-cachyos-headers`
+  is the one optional kernel.
+- Not run on the hardware.
 
 ## 20261021.01 (2026-10-21)
 
-**First release in the public repository: documentation, licensing and
-attribution only. No driver change.** Patches, kernel sources, Kbuild files,
-the module Makefile, `dkms.conf` and `macbook91-wireless-verify` are the
-same as in 20261020.02 (module payload compared, see below). The source
-identities are unchanged, `494451d9a8ce5f25` for 7.2 and `2eed8ec6343efe4f`
-for 6.18; the modules report them as `20261021.01+<id>`.
+First release in the public repository. No driver change.
 
-Commit hashes named in entries up to 20261021.01 belong to the maintainer's private history and do not exist in the public repository.
-
-- README: AI assistance note (what Claude wrote, how hardware checks
-  count, the Co-Authored-By trailer on commits and on the first public
-  snapshot); installation from the release files, with the checksum check
-  spelled out (`sha256sum -c --ignore-missing` must print OK for the
-  PKGBUILD, the `.install` file and the tarball) or `make dist &&
-  make arch-pkg` from a git checkout; the license section maps the public
-  paths; the provenance of the ISC-licensed `brcm80211.Kbuild` is stated;
-  a note says where the relative links work: all of them in the Git
-  repository, `LICENSE` and `LICENSES/` also in an unpacked tarball, none
-  in the installed README (`docs/` and `diag/` exist only in the Git
-  repository).
-- `LICENSES/GPL-3.0-or-later.txt` added (the text of `LICENSE`). The source
-  tarball carries `LICENSE` only, and the README says so.
-- `STRUCTURE.md` no longer says that logs are never tracked (redacted logs
-  are, in `diag/`) and lists the SPDX copy of the license.
-- `packaging/arch/PKGBUILD` and `.SRCINFO`: `url` is the public repository.
-- `diag/`: the host name in the two raw logs is replaced by `testhost` (the
-  host field is the only change, line counts are equal); `diag/README.md`
-  added; the wording of the two live-test reports, `DIAGNOSIS.md` and the
-  files in `docs/` is neutral.
-- Development helpers renamed to `tools/dev-suspend-cycle.sh` and
-  `tools/dev-wlan-swap.sh` (not packaged); the test globs follow.
-- `.gitignore` names build and test output only.
-- Texts that mentioned earlier releases or project-internal notes now say
-  that these are not part of this repository (README, `docs/test-status.json`,
-  the live-test reports, the 20261020.01 entry below);
-  `packaging/promote-release.sh` makes no claim about Git history.
-- The decompiled DSDT excerpt (Apple's code) is no longer part of the
-  repository; `diag/README.md` describes in this project's words what it
-  showed (ARPT under RP09, CMPE under RP10).
-  The 2026-10-15 live-test report no longer cites a scratch directory. The
-  README says that commits carry the trailer and that the patch files do
-  not.
-- `release/` holds the current release only; older release directories are
-  no longer part of the tree.
-- Module payload compared with the 20261020.02 tarball (`diff -r` of the
-  unpacked tarballs, 241 files each): only `README.md` and `VERSION`
-  differ. Kernel sources, patches, Kbuild files, `KERNEL-SERIES`, the module
-  Makefile, `dkms.conf`, `modprobe.d`, the verify tool, the install
-  Makefile and the license texts are byte for byte the same.
-- Modules built unprivileged from the 20261020.02 tarball and from the
-  20261021.01 tarball at the same path, for `7.2.11-1-cachyos` (clang) and
-  `6.18.55-2-cachyos-lts` (gcc). Built with the same package version
-  (`PKGVER=20261021.01` for both), all five `.ko` files (`brcmfmac`,
-  `brcmfmac-wcc`, `brcmfmac-cyw`, `brcmfmac-bca`, `hci_uart`) are byte for
-  byte the same. Built with each tarball's own version they differ in the
-  version string only (`srcversion` is the same): the module ID is the
-  package version plus the source part, and the source part is the same
-  (`494451d9a8ce5f25` on 7.2, `2eed8ec6343efe4f` on 6.18). This is a build
-  comparison, not a hardware check.
-- NOT RUN for 20261021.01: no hardware check, no install. The 6.18 result
-  of 20261020.02 and the 7.2 result of 20261015.01 (already carried over by
-  20261020.01 and 20261020.02) are carried over again because the module
-  payload is identical to that of 20261020.02 apart from the version
-  string. NOT VERIFIED on 6.18 as before: suspend/resume, Bluetooth
-  function, the rebind recovery in action.
+- README: installation from the release files with the checksum check, AI
+  assistance note, license map.
+- `LICENSES/GPL-3.0-or-later.txt` added; host names in `diag/` replaced by
+  `testhost`; the Apple DSDT excerpt removed; development helpers renamed to
+  `tools/dev-*.sh`. Not run on the hardware.
 
 ## 20261020.02 (2026-10-20)
 
-**6.18: hardware gate run, partly verified.** The package builds for the
-CachyOS LTS kernel 6.18 as well as for 7.2. On `6.18.55-2-cachyos-lts`,
-`macbook91-wireless-verify` reports 0 FAIL and 0 WARN with the 20261020.02
-modules loaded and WLAN up (VERIFIED 2026-10-20). Suspend/resume, Bluetooth
-function and the rebind recovery on 6.18 are NOT VERIFIED. The 7.2 modules
-are unchanged in source.
+Kernel 6.18 (CachyOS LTS) supported next to 7.2; the 7.2 modules are unchanged.
 
-- New patch series `patches/6.18/`: the twelve patches of `patches/7.2/`
-  rebased onto kernel.org v6.18.55 with line offsets only (`patch -F0`, no
-  fuzz). `packaging/upstream.lock` pins v6.18.55 next to v7.2.9.
-- The package carries one source tree per kernel series, `series/6.18/` and
-  `series/7.2/`, each with its own manifest. The source identity of the 7.2
-  modules is unchanged, `20261020.02+494451d9a8ce5f25` (the manifest keeps
-  its lines, so its hash stays that of the flat tree; a test pins it); the
-  6.18 modules carry `20261020.02+2eed8ec6343efe4f`.
-- `packaging/fetch-upstream.sh` assembles every series of the lockfile
-  (newest tag per series by default, `--tag` repeatable) and writes the list
-  of series to `KERNEL-SERIES`.
-- The module Makefile takes the series from the target kernel's
-  `utsrelease.h`, builds that series, and copies the five modules to
-  `build/`, which `dkms.conf` names for all of them. A kernel of a series
-  the tree does not carry is skipped with status 0.
-- `dkms.conf`: `BUILD_EXCLUSIVE_KERNEL` is generated from the series list,
-  `^(6\.18|7\.2)\.`; other kernels keep their stock drivers.
-- The install scriptlet and `macbook91-wireless-verify` know a list of
-  series ("not one of Linux 6.18, 7.2"); the verifier compares the loaded
-  modules with the manifest of the running kernel's series.
-- PKGBUILD: `linux-cachyos-lts-headers` in `optdepends`.
-- Tests: the DKMS pattern against the series list, offline reassembly of
-  every series, `patches/<series>` for every lock tag, the skip of an
-  unshipped series, the LE fixup host test per series, and the pinned 7.2
-  source identity.
-- Build checks (VERIFIED 2026-10-20): all five modules build against
-  `7.2.11-1-cachyos` (clang) and `6.18.55-2-cachyos-lts` (gcc) with 0
-  warnings.
-- Install and runtime on 6.18 (VERIFIED 2026-10-20, run by the maintainer):
-  `pacman -U` exit 0, DKMS installed the package for
-  `6.18.55-2-cachyos-lts` and `7.2.11-1-cachyos`. After booting 6.18,
-  `macbook91-wireless-verify` reports 0 FAIL and 0 WARN: `brcmfmac`,
-  `brcmfmac-wcc` and `hci_uart` `20261020.02+2eed8ec6343efe4f` loaded, chip
-  reset across system sleep on, rebind recovery on, P2P off, WLAN BCM4350
-  up, no WLAN or Bluetooth errors in the journal.
-- NOT VERIFIED on 6.18: suspend/resume (no suspend happened in that boot),
-  Bluetooth function (`hci0` was present but blocked by rfkill, so
-  Bluetooth was not exercised), the rebind recovery in action.
-- NOT VERIFIED on 7.2: the runtime of 20261020.02 was not run; it is
-  carried over, since the module code is identical to 20261020.01 (the 7.2
-  modules built from both have the same disassembly and the same modinfo
-  apart from version and srcversion).
+- New patch series `patches/6.18/`: the twelve patches rebased with line
+  offsets only. The package carries one source tree per series.
+- On `6.18.55-2-cachyos-lts` the verifier reports 0 FAIL, 0 WARN with WLAN up.
+  Suspend/resume, Bluetooth function and the rebind recovery are not verified
+  on 6.18.
 
 ## 20261020.01 (2026-10-20)
 
-Twelve patches against kernel.org v7.2.9, unchanged since 20261015.01; the
-module code is the same, the two Kbuild files gain only license comments.
-
-- `macbook91-wireless-verify`: the P2P check reads the last
-  `feature_disable` value modprobe.d sets and tests its bit 0x10. It used to
-  report P2P off for any line with exactly `0x10`, even when a later file
-  overrode it, and on for values such as `0x30`.
-- modprobe.d: the comment names the reliable override, a file of the same
-  name in `/etc/modprobe.d/`.
-- License: this project's own files are GPL-3.0-or-later (they were
-  GPL-2.0-or-later) and name their license in an SPDX line. The files that
-  build the modules stay GPL-2.0-or-later, since GPLv2 requires them with a
-  built module: the module tree's `Makefile` and `dkms.conf` and
-  `packaging/overlay/brcm80211.Kbuild`; `packaging/overlay/bluetooth.Kbuild`
-  is GPL-2.0-only, as its object list is that of the kernel's Makefile.
-  Kernel files and the patches keep the kernel file's license; the LE fixup
-  host test stays GPL-2.0-or-later. `hci_ll.c`, `hci_qca.c` and `btqca.h`
-  are GPL-2.0-only, `hci_aml.c` GPL-2.0-only OR MIT. `LICENSES/` adds the
-  GPL-2.0 and MIT texts, the package installs the MIT text next to ISC, and
-  the PKGBUILD lists GPL-3.0-or-later, GPL-2.0-or-later, GPL-2.0-only, ISC
-  and MIT.
-- README: `clang lld llvm` are needed for clang-built kernels; the license
-  section maps each path to its license.
-- Tests: the e-mail check runs per file; one stream made `grep -I` stop at
-  the first release tarball. A new check compares the license texts, the
-  PKGBUILD's licenses and every own file's SPDX line with the license
-  mapping.
-- Documentation: project state of 2026-10-20, FINDINGS (sleep hooks, rtkit),
-  STRUCTURE lists `docs/NAMCAP.md`, the LUKS UUID in
-  `diag/2026-10-13/versions.txt` is redacted.
-- Language: what this project wrote in German is now English: the
-  findings, the project state, the first diagnosis (renamed to
-  `DIAGNOSIS.md`), the notes in `diag/`, and project-internal task notes,
-  plans and workflow messages (not part of this repository). Status markers read
-  VERIFIED, NOT VERIFIED, REFUTED, HYPOTHESIS and REPORTED. Recorded
-  command output stays as captured.
+- `macbook91-wireless-verify`: the P2P check reads the last `feature_disable`
+  value that modprobe.d sets and tests bit 0x10 (it misjudged `0x30` and later
+  overrides).
+- Own files are GPL-3.0-or-later and name their license in an SPDX line; the
+  files that build the modules stay GPL-2.0-or-later.
 
 ## 20261015.01 (2026-10-15)
 
-Twelve patches against kernel.org v7.2.9 (two revised):
-
-- hci_bcm: the LE advertising fixup takes its flag from `bcm_data`, copied
-  when the line discipline opens, instead of reading the device in the
-  receive path (0009).
-- hci_bcm: the speed change to the speed the controller already runs at is
-  left out on Macs only; other machines keep upstream behaviour (0010).
-  Both tested on the test machine: setup without warnings, LE scan without "unknown
-  advertising packet type" warnings.
-- `macbook91-wireless-verify` reads the journal from the time the modules
-  were loaded (it used the time sysfs first showed their directory) and,
-  without that time, the whole boot (it read nothing); `--help` shows the
-  whole usage.
-- Tests check `promote-release.sh` and `make-package.sh` as well.
-- Documentation: 20261014.01 verified on the test machine (no `unlocked secondary bus
-  reset` after two resumes), no Wake-on-WLAN with `pm_reset`, hibernation
-  not tested.
+- Bluetooth: the LE advertising fixup takes its flag from `bcm_data`; the
+  speed change to the current speed is left out on Macs only. Setup without
+  warnings, LE scan without "unknown advertising packet type".
+- `macbook91-wireless-verify` reads the journal from the time the modules were
+  loaded.
 
 ## 20261014.01 (2026-10-14)
 
-Twelve patches against kernel.org v7.2.9 (two new):
-
-- brcmfmac: the reset on resume (`pm_reset`) locks the parent bridge's
-  config space, as `pci_reset_function()` does; the PCI core no longer warns
-  `unlocked secondary bus reset` on the first resume of each boot (0011).
-- brcmfmac: no recovery is queued once module exit has begun (0012).
-- `macbook91-wireless-verify` checks `brcm/brcmfmac4350c2-pcie.bin`, the
-  file brcmfmac loads for revision 5 of the BCM4350.
-- Documentation: the regulatory domain as a user step, the Bluetooth
-  message `Failed to set mode` while Bluetooth is switched off, and other
-  messages that are not faults.
-- Repository: no Python bytecode tracked; `make test` writes none.
+- WLAN: the reset on resume locks the parent bridge's config space, so the PCI
+  core no longer warns `unlocked secondary bus reset`; no recovery is queued
+  once module exit has begun.
+- `macbook91-wireless-verify` checks `brcm/brcmfmac4350c2-pcie.bin`.
+- Documentation: regulatory domain step, harmless messages.
 
 ## 20261013.01 (2026-10-13)
 
-First release. Package `macbook91-wireless-dkms`, built by DKMS for Linux 7.2
-kernels from kernel.org v7.2.9 sources and ten patches:
+First release. Package `macbook91-wireless-dkms` for Linux 7.2 from kernel.org
+v7.2.9 sources and ten patches:
 
-- brcmfmac: reset the chip across system sleep (`pm_reset`), recover a hung
-  firmware by unbind, bus reset and probe (`reset_rebind`), treat repeated
-  command timeouts as a hang, remove before and probe after a PCI function
-  reset, no error flood during an intended teardown, normal conditions of this
-  firmware at debug level, informational messages at info level in debug
-  builds.
-- hci_bcm: set up the ROM firmware of Mac UART controllers without a patch
-  search and without refused speed changes; clear reserved bits of LE
-  advertising event types on Macs.
-- modprobe.d: Wi-Fi P2P off.
-- `macbook91-wireless-verify` checks build, loaded modules, parameters,
-  firmware, sleep hooks, devices and the journal; `--reload` loads the
-  installed modules without a reboot.
-
-Not part of this release's tests: the long mixed suspend series (postponed),
-Bluetooth audio and input devices across suspend (no paired device).
+- WLAN: reset across system sleep (`pm_reset`), recovery of a hung firmware by
+  unbind, bus reset and probe (`reset_rebind`), quiet teardown, normal
+  conditions of this firmware logged at debug level.
+- Bluetooth: ROM firmware set up without a patch search; reserved bits of LE
+  advertising event types cleared.
+- Wi-Fi P2P off through modprobe.d; `macbook91-wireless-verify` with `--reload`.
+- Not tested: the long mixed suspend series, Bluetooth audio and input devices
+  across suspend.
