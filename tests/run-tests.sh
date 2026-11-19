@@ -612,7 +612,7 @@ grep -qx "license=('GPL-3.0-or-later' 'GPL-2.0-or-later' 'GPL-2.0-only' 'ISC' 'M
 while IFS= read -r -d '' f; do
 	head -n 2 "$f" | grep -xE "(#|//) SPDX-License-Identifier: $(spdx_want "$f")" >/dev/null || lic+=" $f"
 done < <(tracked -- . ':!release' ':!diag' ':!patches' ':!LICENSE' ':!LICENSES' \
-	':!*.md' ':!*.json' ':!VERSION' ':!packaging/arch/.SRCINFO' ':![.]claude/*')
+	':!*.md' ':!*.json' ':!docs/entwicklung/ansichten' ':!VERSION' ':!packaging/arch/.SRCINFO' ':![.]claude/*')
 [ -z "$lic" ] && ok "license texts, PKGBUILD licenses and SPDX lines match the mapping" || bad "licenses:$lic"
 
 echo
