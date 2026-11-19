@@ -4,6 +4,29 @@ Versions have the form YYYYMMDD.NN (release date, NN counts releases that
 day); the tag is v<version>. Releases before 20261021.01 are not part of this
 repository. Test evidence per version is in [test-status.json](test-status.json).
 
+## 20261119.01 (2026-11-19)
+
+No driver change. The documentation is reorganised for four readers; the
+package ships the shorter README.
+
+- README: 99 lines, install and check near the top. Details moved to `docs/`:
+  `install.md`, `check.md`, `configuration.md`, `kernels.md`, `regdom.md`,
+  `remove.md`. The README in the package
+  (`/usr/share/doc/macbook91-wireless-dkms/`) links to `docs/` only on the
+  repository page.
+- For developers: `docs/entwicklung/bauen.md` (build from a checkout, the
+  fetcher) and `docs/entwicklung/lizenzen.md`.
+- `packaging/fetch-upstream.sh`: shorter `--help` text; options and behaviour
+  are unchanged.
+- `make test`: the license check skips the rendered view variants in
+  `docs/entwicklung/ansichten`. Result: 63 ok, 0 failed, 0 skipped.
+  `namcap`: no findings for the PKGBUILD, the package has the five known
+  warnings (`docs/NAMCAP.md`).
+- `diff -r` of the unpacked tarballs of 20261115.01 and 20261119.01 (356
+  files each) shows `README.md` and `VERSION` only; the module identities are
+  unchanged. The modules were not built for this version; not run on the
+  hardware.
+
 ## 20261115.01 (2026-11-15)
 
 No driver change. The build fetches the kernel files from the GitHub mirror
