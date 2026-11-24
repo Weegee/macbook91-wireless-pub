@@ -7,7 +7,7 @@
 
 pkgname=macbook91-wireless-dkms
 _pkgname="${pkgname%-dkms}"
-pkgver=20261115.01
+pkgver=20261124.01
 pkgrel=1
 pkgdesc="Patched brcmfmac and hci_uart for WLAN and Bluetooth of the Apple MacBook9,1 (DKMS)"
 arch=('x86_64')
@@ -49,7 +49,7 @@ makedepends=('make')
 # against packaging/upstream.lock before it enters the tarball; makepkg
 # downloads nothing, and DKMS rebuilds during kernel upgrades run offline.
 source=("$pkgname-$pkgver.tar")
-sha256sums=('9ce8037596dcf30611438bce82b2e2ba8f267519b57e84a435a0937c10b2443e')
+sha256sums=('0f10a2425e9c1bfd07c18f533d0c3df36693041dc78c3a42b79b0fa4c2740e29')
 
 package() {
     depends=('dkms' 'linux-firmware-broadcom' 'linux-cachyos-lts-headers')
