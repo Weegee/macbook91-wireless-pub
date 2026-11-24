@@ -7,14 +7,12 @@
 #
 # Prints no MAC or Bluetooth addresses, SSIDs or device names.
 #
-# Text interface (house HIG text part, Bash patterns): the report goes to stdout,
-# messages to stderr as "macbook91-wireless-verify: error: text". The report
-# has no colour, so there is nothing to switch off for NO_COLOR or a pipe.
-#
-# Abweichung von TXT-5: the verdict words PASS, WARN, FAIL and INFO and the
-# final "PASS: 0 FAIL, 0 WARN" line stay. They are quoted by docs/test-status.json,
-# the hardware gates in the diagnostics and the owner's gate steps, and scripts
-# read them (MAS-2); the word list of the HIG would rename all of them.
+# Text interface (house HIG, text part, Bash patterns): the report goes to
+# stdout, messages to stderr as "macbook91-wireless-verify: error: text". On a
+# terminal the report is coloured by role, with a symbol per row (NO_COLOR
+# switches it off); in a pipe it is plain text, one PASS, WARN, FAIL or INFO
+# row per check and a last line "PASS: 0 FAIL, 0 WARN", which docs/test-status.json,
+# the hardware gates in the diagnostics and the owner's gate steps quote.
 set -uo pipefail
 
 PROG=macbook91-wireless-verify
@@ -30,14 +28,41 @@ PCI=0000:02:00.0
 KERNEL_SERIES=/usr/lib/macbook91-wireless/kernel-series
 fails=0
 warns=0
-pass() { printf 'PASS  %s\n' "$*"; }
-warn() { printf 'WARN  %s\n' "$*"; warns=$((warns + 1)); }
-fail() { printf 'FAIL  %s\n' "$*"; fails=$((fails + 1)); }
-info() { printf 'INFO  %s\n' "$*"; }
+# Colour by role, only on a terminal (stdout a tty, NO_COLOR unset, TERM not
+# dumb); in a pipe or a file the report is the plain text below, so scripts
+# read the same PASS, WARN, FAIL and INFO words and totals line as ever.
+if [ -t 1 ] && [ -z "${NO_COLOR-}" ] && [ "${TERM:-dumb}" != dumb ]; then
+	C_PASS=$'\e[32m' C_WARN=$'\e[33m' C_FAIL=$'\e[31m' C_INFO=$'\e[36m' C_BOLD=$'\e[1m' C_DIM=$'\e[2m' C_OFF=$'\e[0m'
+	colour=1
+else
+	colour=0
+fi
+# row WORD SYMBOL COLOUR TEXT: plain "WORD  TEXT", or symbol, word, label in
+# bold and detail dimmed when the text reads "label: detail".
+row() {
+	local word=$1 sym=$2 col=$3 text=$4 label detail
+	if [ "$colour" = 0 ]; then printf '%s  %s\n' "$word" "$text"; return; fi
+	label=${text%%: *} detail=${text#*: }
+	# A label is a short name; a longer text before ": " is a sentence.
+	if [ "$label" = "$text" ] || [ "${#label}" -gt 14 ]; then label=$text detail=; fi
+	printf '  %s%s %s%s  %s%-14s%s %s%s%s\n' "$col" "$sym" "$word" "$C_OFF" "$C_BOLD" "$label" "$C_OFF" "$C_DIM" "$detail" "$C_OFF"
+}
+pass() { row PASS '✔' "${C_PASS-}" "$*"; }
+warn() { row WARN '▲' "${C_WARN-}" "$*"; warns=$((warns + 1)); }
+fail() { row FAIL '✖' "${C_FAIL-}" "$*"; fails=$((fails + 1)); }
+info() { row INFO '●' "${C_INFO-}" "$*"; }
 # The last line of the report: the verdict and the totals. Scripts and the
 # hardware gates read it (MAS-2), so every end of the report prints it, also
 # the early exit below.
-summary() { printf '%s: %d FAIL, %d WARN\n' "$([ $fails = 0 ] && echo PASS || echo FAIL)" "$fails" "$warns"; }
+summary() {
+	local v=PASS col=${C_PASS-}
+	[ "$fails" = 0 ] || { v=FAIL; col=${C_FAIL-}; }
+	if [ "$colour" = 1 ]; then
+		printf '%s%s▌ %s%s  %s%d FAIL, %d WARN%s\n' "$col" "$C_BOLD" "$v" "$C_OFF" "$C_BOLD" "$fails" "$warns" "$C_OFF"
+	else
+		printf '%s: %d FAIL, %d WARN\n' "$v" "$fails" "$warns"
+	fi
+}
 has_netdev() { [ -n "$(ls -A /sys/bus/pci/devices/$PCI/net 2>/dev/null)" ]; }
 
 # Messages on stderr (KAN-1, FEH-2): "prog: error: text", hints indented.

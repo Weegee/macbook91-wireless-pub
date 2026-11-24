@@ -4,6 +4,21 @@ Versions have the form YYYYMMDD.NN (release date, NN counts releases that
 day); the tag is v<version>. Releases before 20261021.01 are not part of this
 repository. Test evidence per version is in [test-status.json](test-status.json).
 
+## Unreleased
+
+No driver change. The report of `macbook91-wireless-verify` is coloured on a
+terminal.
+
+- `macbook91-wireless-verify`: on a terminal each row shows a symbol and the
+  verdict in colour by role (green PASS, yellow WARN, red FAIL, cyan INFO),
+  the check name in bold and the detail dimmed; the last line carries the
+  verdict and the totals. `NO_COLOR` switches the colour off. In a pipe or a
+  file the report is unchanged plain text, one `PASS`, `WARN`, `FAIL` or
+  `INFO` row per check and a last line `PASS: 0 FAIL, 0 WARN`, so scripts and
+  the hardware gates read it as before.
+- The source tarball changes (the tool is in it), so `sha256sums` in
+  `packaging/arch/PKGBUILD` is pinned again with the next release.
+
 ## 20261119.01 (2026-11-19)
 
 No driver change. The documentation is reorganised for four readers; the

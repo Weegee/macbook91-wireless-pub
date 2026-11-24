@@ -572,6 +572,20 @@ if [ "$rc" = 1 ] && [ "$(tail -n1 <<<"$o")" = "FAIL: 1 FAIL, 0 WARN" ] && [ "$(w
 else
 	bad "verify without the package: exit $rc, output: $(tr '\n' '|' <<<"$o")"
 fi
+# Colour by role only on a terminal: a pseudo terminal (script) gets escapes
+# and the totals line, NO_COLOR and a pipe get plain text.
+if command -v script >/dev/null 2>&1; then
+	tty=$(PATH="$TMP/nols:$PATH" TERM=xterm script -qec 'bash tools/macbook91-wireless-verify' /dev/null | tr -d '\r')
+	nocol=$(PATH="$TMP/nols:$PATH" TERM=xterm NO_COLOR=1 script -qec 'bash tools/macbook91-wireless-verify' /dev/null | tr -d '\r')
+	if grep -q $'\e\\[31m' <<<"$tty" && grep -q '1 FAIL, 0 WARN' <<<"$tty" && ! grep -q $'\e' <<<"$o" &&
+		[ "$nocol" = "$o" ]; then
+		ok "verify: colour on a terminal, plain text in a pipe and with NO_COLOR"
+	else
+		bad "verify colour: terminal output $(head -n1 <<<"$tty" | cat -v)"
+	fi
+else
+	skip "verify colour: script (util-linux) not found"
+fi
 # ERF-3: the hints of the verifier are commands that can be copied.
 if grep -qF 'missing; install it with: sudo pacman -S linux-firmware-broadcom' tools/macbook91-wireless-verify &&
 	grep -qF 'sudo dkms install macbook91-wireless/$pkgver -k $running' tools/macbook91-wireless-verify; then
