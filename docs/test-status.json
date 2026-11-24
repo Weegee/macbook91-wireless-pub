@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "updated": "2026-11-19",
+  "updated": "2026-11-24",
   "kernel": "7.3.0-4-cachyos",
-  "source_hash": "20261119.01",
+  "source_hash": "20261124.01",
   "legend": {
     "NOT_RUN": "never attempted",
     "PASS": "executed and passed",
@@ -66,6 +66,9 @@
     {"id": "hermetic.run_tests_20261119_01", "status": "PASS", "note": "tests/run-tests.sh, 2026-11-19 at 20261119.01: 63 ok, 0 failed, 0 skipped, in the working tree with the series fetched by make dist"},
     {"id": "build.package_20261119_01", "status": "PASS", "note": "2026-11-19, without hardware: make dist twice gives the same bytes, tarball sha256 eee2a183... (pinned in PKGBUILD); make arch-pkg built the package (local build, sha256 7368dc3d...); namcap: PKGBUILD clean, package the same five warnings as 20261115.01 (docs/NAMCAP.md). Payload against 20261115.01: diff -r of the unpacked tarballs (356 files each) shows README.md and VERSION only. The modules were NOT built for this version. Nothing installed or loaded"},
     {"id": "hw.runtime_modules_20261119_01_carried_over", "status": "SKIPPED", "note": "the module code (patches, series/, Kbuild, dkms.conf) of 20261119.01 is byte for byte that of 20261115.01 and 20261109.01 (diff -r of the tarballs, see build.package_20261119_01); the runtime result of the modules therefore equals that of 20261102.01 as recorded in hw.verify_readonly_20261109 and carried over in hw.runtime_modules_20261115_01_carried_over. To be verified after the next load of the new package"},
+    {"id": "hermetic.run_tests_20261124_01", "status": "PASS", "note": "tests/run-tests.sh, 2026-11-24 at 20261124.01: 64 ok, 0 failed, 0 skipped, in the working tree with the series fetched by make dist"},
+    {"id": "build.package_20261124_01", "status": "PASS", "note": "2026-11-24, without hardware: make dist twice gives the same bytes, tarball sha256 0f10a242... (pinned in PKGBUILD); make arch-pkg built the package (local build, sha256 a52e55e0...); namcap: PKGBUILD clean, package the same five warnings as 20261119.01 (docs/NAMCAP.md). Payload against 20261119.01: diff -r of the unpacked tarballs shows tools/macbook91-wireless-verify and VERSION only. The modules were NOT built for this version. Nothing installed or loaded"},
+    {"id": "hw.runtime_modules_20261124_01_carried_over", "status": "SKIPPED", "note": "the module code (patches, series/, Kbuild, dkms.conf) of 20261124.01 is byte for byte that of 20261119.01 (diff -r of the tarballs, see build.package_20261124_01); the runtime result of the modules therefore equals that of 20261102.01 as recorded in hw.verify_readonly_20261109 and carried over in hw.runtime_modules_20261119_01_carried_over. To be verified after the next load of the new package"},
     {"id": "hw.suspend_lts_6_18", "status": "NOT_RUN", "note": "no suspend happened in the 6.18 boot of 2026-10-20 (suspend_stats success=0 fail=0): suspend/resume of WLAN and Bluetooth with the 6.18 modules is not verified (accepted by the maintainer, not tested); all of 6.18 is new, nothing is carried over from 7.2", "accepted": "2026-10-20: accepted by the maintainer without a test run. The status stays NOT_RUN: this records the maintainer's decision to accept the open item, not a test result."},
     {"id": "hw.bt_lts_6_18", "status": "NOT_RUN", "note": "Bluetooth function on 6.18 not exercised: hci0 was present but blocked by rfkill (user setting) in the boot of 2026-10-20; a test would need the adapter unblocked; not tested, accepted by the maintainer", "accepted": "2026-10-20: accepted by the maintainer without a test run. The status stays NOT_RUN: this records the maintainer's decision to accept the open item, not a test result."},
     {"id": "hw.wlan_rebind_lts_6_18", "status": "NOT_RUN", "note": "the wireless hang recovery by rebind was configured on in the 6.18 boot of 2026-10-20 but has not been seen in action on 6.18 (accepted by the maintainer, not tested)", "accepted": "2026-10-20: accepted by the maintainer without a test run. The status stays NOT_RUN: this records the maintainer's decision to accept the open item, not a test result."},
